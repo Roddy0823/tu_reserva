@@ -124,6 +124,7 @@ export const useStaff = () => {
 
   return {
     staffMembers,
+    staff: staffMembers, // Agregar staff como alias para compatibilidad
     isLoading,
     error,
     createStaff: createStaffMutation.mutate,
