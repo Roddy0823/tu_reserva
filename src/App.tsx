@@ -39,7 +39,7 @@ function AppContent() {
     <Routes>
       <Route path="/" element={user ? <Navigate to="/dashboard" replace /> : <Index />} />
       <Route path="/auth" element={!user ? <Auth /> : <Navigate to="/dashboard" replace />} />
-      <Route path="/booking/:businessSlug" element={<BookingPublic />} />
+      <Route path="/reservas/:businessSlug" element={<BookingPublic />} />
       
       {/* Rutas protegidas con sidebar */}
       <Route path="/dashboard" element={

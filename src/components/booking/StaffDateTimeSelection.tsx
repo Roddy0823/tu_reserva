@@ -1,208 +1,155 @@
 
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
-import { format } from 'date-fns';
-import { es } from 'date-fns/locale';
-import { supabase } from '@/integrations/supabase/client';
-import { StaffMember } from '@/types/database';
+import { Service, StaffMember } from '@/types/database';
+import { ArrowLeft, Calendar as CalendarIcon, Clock } from 'lucide-react';
 import { useAvailableTimeSlots } from '@/hooks/useAvailableTimeSlots';
-import { useEffect } from 'react';
+import { format, isToday, isTomorrow, addDays, startOfDay } from 'date-fns';
+import { es } from 'date-fns/locale';
 
 interface StaffDateTimeSelectionProps {
-  business: any;
-  bookingData: any;
-  updateBookingData: (data: any) => void;
+  service: Service;
+  staffMember: StaffMember;
+  onDateTimeSelect: (date: Date, time: string) => void;
+  onBack: () => void;
 }
 
-const StaffDateTimeSelection = ({ business, bookingData, updateBookingData }: StaffDateTimeSelectionProps) => {
-  const [staff, setStaff] = useState<StaffMember[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [selectedDate, setSelectedDate] = useState<Date | undefined>(bookingData.date);
+const StaffDateTimeSelection = ({ service, staffMember, onDateTimeSelect, onBack }: StaffDateTimeSelectionProps) => {
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
+  const [selectedTime, setSelectedTime] = useState<string>('');
 
-  const { availableSlots, isLoading: slotsLoading } = useAvailableTimeSlots(
-    bookingData.staff?.id,
+  const { availableSlots, isLoading } = useAvailableTimeSlots(
+    staffMember.id,
     selectedDate,
-    bookingData.service?.duration_minutes
+    service.duration_minutes
   );
 
-  useEffect(() => {
-    const fetchStaffForService = async () => {
-      if (!bookingData.service) return;
-
-      try {
-        const { data, error } = await supabase
-          .from('staff_services')
-          .select(`
-            staff_members (
-              id,
-              full_name,
-              email,
-              is_active,
-              business_id,
-              created_at
-            )
-          `)
-          .eq('service_id', bookingData.service.id);
-
-        if (error) throw error;
-        
-        const staffMembers = data
-          ?.map(item => item.staff_members)
-          .filter(Boolean)
-          .filter(member => member.is_active) as StaffMember[];
-
-        setStaff(staffMembers || []);
-      } catch (error) {
-        console.error('Error fetching staff:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchStaffForService();
-  }, [bookingData.service]);
-
-  const handleStaffSelect = (staffMember: StaffMember) => {
-    updateBookingData({ 
-      staff: staffMember, 
-      date: undefined, 
-      time: undefined 
-    });
-    setSelectedDate(undefined);
-  };
-
   const handleDateSelect = (date: Date | undefined) => {
-    if (date) {
-      setSelectedDate(date);
-      updateBookingData({ date, time: undefined });
-    }
+    setSelectedDate(date);
+    setSelectedTime(''); // Reset time selection when date changes
   };
 
   const handleTimeSelect = (time: string) => {
-    updateBookingData({ time });
+    setSelectedTime(time);
   };
 
-  if (!bookingData.service) {
-    return <div className="text-center py-4">Primero selecciona un servicio.</div>;
-  }
+  const handleContinue = () => {
+    if (selectedDate && selectedTime) {
+      onDateTimeSelect(selectedDate, selectedTime);
+    }
+  };
 
-  if (loading) {
-    return <div className="text-center py-4">Cargando profesionales...</div>;
-  }
+  const formatDateHeader = (date: Date) => {
+    if (isToday(date)) {
+      return 'Hoy';
+    }
+    if (isTomorrow(date)) {
+      return 'Mañana';
+    }
+    return format(date, "EEEE, dd 'de' MMMM", { locale: es });
+  };
 
-  if (staff.length === 0) {
-    return (
-      <div className="text-center py-8">
-        <p className="text-gray-600">No hay profesionales disponibles para este servicio.</p>
-      </div>
-    );
-  }
-
-  const today = new Date();
-  const maxDate = new Date();
-  maxDate.setMonth(maxDate.getMonth() + 3);
+  // Disable past dates and dates too far in the future
+  const disabledDays = (date: Date) => {
+    const today = startOfDay(new Date());
+    const maxDate = addDays(today, 30); // Allow booking up to 30 days in advance
+    return date < today || date > maxDate;
+  };
 
   return (
-    <div className="space-y-6">
-      {/* Service Summary */}
-      <div className="bg-blue-50 p-4 rounded-lg">
-        <p className="text-sm font-medium text-blue-900 mb-1">Servicio seleccionado:</p>
-        <div className="flex items-center justify-between">
-          <span className="text-blue-800">{bookingData.service.name}</span>
-          <Badge variant="secondary">${bookingData.service.price}</Badge>
+    <Card>
+      <CardHeader>
+        <div className="flex items-center gap-2">
+          <Button variant="ghost" size="sm" onClick={onBack}>
+            <ArrowLeft className="h-4 w-4" />
+          </Button>
+          <div>
+            <CardTitle>Selecciona Fecha y Hora</CardTitle>
+            <p className="text-gray-600">
+              {service.name} con {staffMember.full_name}
+            </p>
+          </div>
         </div>
-      </div>
-
-      {/* Staff Selection */}
-      <div>
-        <h3 className="text-lg font-semibold mb-4">1. Selecciona el profesional</h3>
-        <div className="grid gap-3">
-          {staff.map((staffMember) => (
-            <Card
-              key={staffMember.id}
-              className={`cursor-pointer transition-all hover:shadow-md ${
-                bookingData.staff?.id === staffMember.id
-                  ? 'border-blue-500 bg-blue-50'
-                  : 'border-gray-200 hover:border-gray-300'
-              }`}
-              onClick={() => handleStaffSelect(staffMember)}
-            >
-              <CardHeader className="pb-2">
-                <CardTitle className="text-base">{staffMember.full_name}</CardTitle>
-              </CardHeader>
-            </Card>
-          ))}
-        </div>
-      </div>
-
-      {/* Date Selection */}
-      {bookingData.staff && (
+      </CardHeader>
+      <CardContent className="space-y-6">
+        {/* Date Selection */}
         <div>
-          <h3 className="text-lg font-semibold mb-4">2. Selecciona la fecha</h3>
+          <h3 className="font-semibold mb-3 flex items-center gap-2">
+            <CalendarIcon className="h-4 w-4" />
+            Selecciona una fecha
+          </h3>
           <div className="flex justify-center">
             <Calendar
               mode="single"
               selected={selectedDate}
               onSelect={handleDateSelect}
-              disabled={(date) => date < today || date > maxDate}
-              initialFocus
-              locale={es}
+              disabled={disabledDays}
               className="rounded-md border"
+              locale={es}
             />
           </div>
-          {selectedDate && (
-            <div className="text-center mt-4">
-              <Badge variant="outline">
-                {format(selectedDate, 'EEEE, d MMMM yyyy', { locale: es })}
-              </Badge>
-            </div>
-          )}
         </div>
-      )}
 
-      {/* Time Selection */}
-      {selectedDate && bookingData.staff && (
-        <div>
-          <h3 className="text-lg font-semibold mb-4">3. Selecciona la hora</h3>
-          {slotsLoading ? (
-            <div className="text-center py-4">Cargando horarios disponibles...</div>
-          ) : availableSlots.length === 0 ? (
-            <div className="text-center py-8 bg-gray-50 rounded-lg">
-              <p className="text-gray-600">No hay horarios disponibles para esta fecha.</p>
-              <p className="text-sm text-gray-500 mt-2">Por favor, selecciona otra fecha.</p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-3 gap-3">
-              {availableSlots.map((slot) => (
-                <Button
-                  key={slot}
-                  variant={bookingData.time === slot ? "default" : "outline"}
-                  onClick={() => handleTimeSelect(slot)}
-                  className="h-12"
-                >
-                  {slot}
-                </Button>
-              ))}
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* Selection Summary */}
-      {bookingData.staff && selectedDate && bookingData.time && (
-        <div className="bg-green-50 p-4 rounded-lg">
-          <h4 className="font-medium text-green-900 mb-2">Tu selección:</h4>
-          <div className="space-y-1 text-sm text-green-800">
-            <p><strong>Profesional:</strong> {bookingData.staff.full_name}</p>
-            <p><strong>Fecha:</strong> {format(selectedDate, 'EEEE, d MMMM yyyy', { locale: es })}</p>
-            <p><strong>Hora:</strong> {bookingData.time}</p>
+        {/* Time Selection */}
+        {selectedDate && (
+          <div>
+            <h3 className="font-semibold mb-3 flex items-center gap-2">
+              <Clock className="h-4 w-4" />
+              Horarios disponibles para {formatDateHeader(selectedDate)}
+            </h3>
+            
+            {isLoading ? (
+              <div className="flex items-center justify-center py-8">
+                <div className="w-6 h-6 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+              </div>
+            ) : availableSlots.length === 0 ? (
+              <div className="text-center py-8">
+                <p className="text-gray-600">No hay horarios disponibles para esta fecha.</p>
+                <p className="text-sm text-gray-500 mt-1">
+                  Selecciona otra fecha o intenta más tarde.
+                </p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
+                {availableSlots.map((time) => (
+                  <Button
+                    key={time}
+                    variant={selectedTime === time ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => handleTimeSelect(time)}
+                    className="text-sm"
+                  >
+                    {time}
+                  </Button>
+                ))}
+              </div>
+            )}
           </div>
-        </div>
-      )}
-    </div>
+        )}
+
+        {/* Summary and Continue */}
+        {selectedDate && selectedTime && (
+          <div className="pt-4 border-t">
+            <div className="bg-blue-50 rounded-lg p-4 mb-4">
+              <h4 className="font-semibold text-blue-900 mb-2">Resumen:</h4>
+              <div className="space-y-1 text-sm text-blue-800">
+                <p><strong>Servicio:</strong> {service.name}</p>
+                <p><strong>Personal:</strong> {staffMember.full_name}</p>
+                <p><strong>Fecha:</strong> {format(selectedDate, "EEEE, dd 'de' MMMM 'de' yyyy", { locale: es })}</p>
+                <p><strong>Hora:</strong> {selectedTime}</p>
+                <p><strong>Duración:</strong> {service.duration_minutes} minutos</p>
+              </div>
+            </div>
+            
+            <Button onClick={handleContinue} className="w-full">
+              Continuar
+            </Button>
+          </div>
+        )}
+      </CardContent>
+    </Card>
   );
 };
 

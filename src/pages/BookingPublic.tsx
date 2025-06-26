@@ -1,9 +1,5 @@
 
 import { useParams } from 'react-router-dom';
-import { useState } from 'react';
-import { useBusiness } from '@/hooks/useBusiness';
-import { useServices } from '@/hooks/useServices';
-import { useStaff } from '@/hooks/useStaff';
 import BookingFlow from '@/components/BookingFlow';
 
 const BookingPublic = () => {
@@ -20,13 +16,7 @@ const BookingPublic = () => {
     );
   }
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-      <div className="container mx-auto px-4 py-8">
-        <BookingFlow businessSlug={businessSlug} />
-      </div>
-    </div>
-  );
+  return <BookingFlow businessSlug={businessSlug} />;
 };
 
 export default BookingPublic;

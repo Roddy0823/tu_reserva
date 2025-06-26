@@ -1,91 +1,81 @@
 
-import { useEffect, useState } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { supabase } from '@/integrations/supabase/client';
-import { Service, Business } from '@/types/database';
+import { Service } from '@/types/database';
+import { Clock, DollarSign } from 'lucide-react';
 
 interface ServiceSelectionProps {
-  business: Business;
-  bookingData: any;
-  updateBookingData: (data: any) => void;
+  services: Service[];
+  isLoading: boolean;
+  onServiceSelect: (service: Service) => void;
 }
 
-const ServiceSelection = ({ business, bookingData, updateBookingData }: ServiceSelectionProps) => {
-  const [services, setServices] = useState<Service[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchServices = async () => {
-      try {
-        const { data, error } = await supabase
-          .from('services')
-          .select('*')
-          .eq('business_id', business.id)
-          .order('name');
-
-        if (error) throw error;
-        setServices(data || []);
-      } catch (error) {
-        console.error('Error fetching services:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchServices();
-  }, [business.id]);
-
-  const handleServiceSelect = (service: Service) => {
-    updateBookingData({ service, staff: undefined, date: undefined, time: undefined });
-  };
-
-  if (loading) {
-    return <div className="text-center py-4">Cargando servicios...</div>;
+const ServiceSelection = ({ services, isLoading, onServiceSelect }: ServiceSelectionProps) => {
+  if (isLoading) {
+    return (
+      <Card>
+        <CardContent className="flex items-center justify-center py-12">
+          <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+        </CardContent>
+      </Card>
+    );
   }
 
   if (services.length === 0) {
     return (
-      <div className="text-center py-8">
-        <p className="text-gray-600">No hay servicios disponibles en este momento.</p>
-      </div>
+      <Card>
+        <CardContent className="text-center py-12">
+          <h3 className="text-lg font-semibold text-gray-900 mb-2">No hay servicios disponibles</h3>
+          <p className="text-gray-600">Este negocio no tiene servicios configurados actualmente.</p>
+        </CardContent>
+      </Card>
     );
   }
 
   return (
-    <div className="space-y-4">
-      <p className="text-gray-600 mb-4">Selecciona el servicio que deseas reservar:</p>
-      
-      <div className="grid gap-4">
-        {services.map((service) => (
-          <Card
-            key={service.id}
-            className={`cursor-pointer transition-all hover:shadow-md ${
-              bookingData.service?.id === service.id
-                ? 'border-blue-500 bg-blue-50'
-                : 'border-gray-200'
-            }`}
-            onClick={() => handleServiceSelect(service)}
-          >
-            <CardHeader className="pb-2">
-              <div className="flex justify-between items-start">
-                <CardTitle className="text-lg">{service.name}</CardTitle>
-                <Badge variant="secondary">${service.price}</Badge>
+    <Card>
+      <CardHeader>
+        <CardTitle>Selecciona un Servicio</CardTitle>
+        <p className="text-gray-600">Elige el servicio que deseas reservar</p>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-4">
+          {services.map((service) => (
+            <div
+              key={service.id}
+              className="border rounded-lg p-4 hover:border-blue-300 hover:bg-blue-50 transition-colors cursor-pointer"
+              onClick={() => onServiceSelect(service)}
+            >
+              <div className="flex justify-between items-start mb-2">
+                <h3 className="font-semibold text-gray-900">{service.name}</h3>
+                <span className="text-2xl font-bold text-blue-600">
+                  ${service.price?.toLocaleString()} COP
+                </span>
               </div>
-            </CardHeader>
-            <CardContent>
+              
               {service.description && (
-                <CardDescription className="mb-2">{service.description}</CardDescription>
+                <p className="text-gray-600 mb-3">{service.description}</p>
               )}
-              <div className="flex items-center text-sm text-gray-600">
-                <span>Duración: {service.duration_minutes} minutos</span>
+              
+              <div className="flex items-center gap-4 text-sm text-gray-500">
+                <div className="flex items-center gap-1">
+                  <Clock className="h-4 w-4" />
+                  <span>{service.duration_minutes} minutos</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <DollarSign className="h-4 w-4" />
+                  <span>${service.price?.toLocaleString()} COP</span>
+                </div>
               </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-    </div>
+              
+              <Button className="w-full mt-3" onClick={() => onServiceSelect(service)}>
+                Seleccionar Servicio
+              </Button>
+            </div>
+          ))}
+        </div>
+      </CardContent>
+    </Card>
   );
 };
 
