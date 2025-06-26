@@ -1,10 +1,10 @@
-
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { CalendarDays, Package, TrendingUp, Users } from "lucide-react";
 import { useBusiness } from "@/hooks/useBusiness";
 import { useDashboardStats } from "@/hooks/useDashboardStats";
 import { Link } from "react-router-dom";
 import RecentActivity from "./RecentActivity";
+import PendingPaymentsList from "./PendingPaymentsList";
 
 const Dashboard = () => {
   const { business } = useBusiness();
@@ -102,6 +102,7 @@ const Dashboard = () => {
         </Card>
       </div>
       <div className="grid gap-6 mt-8">
+        <PendingPaymentsList />
         <Card>
           <CardHeader>
             <CardTitle>Actividad Reciente</CardTitle>

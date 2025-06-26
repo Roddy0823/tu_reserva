@@ -1,168 +1,198 @@
-
-import { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { useState } from 'react';
+import { useBusinessBySlug } from '@/hooks/useBusinessBySlug';
+import { useServices } from '@/hooks/useServices';
+import { useStaff } from '@/hooks/useStaff';
+import { useCreateAppointment } from '@/hooks/useCreateAppointment';
 import ServiceSelection from './booking/ServiceSelection';
 import StaffSelection from './booking/StaffSelection';
 import DateSelection from './booking/DateSelection';
 import TimeSelection from './booking/TimeSelection';
 import ClientDetails from './booking/ClientDetails';
 import BookingSummary from './booking/BookingSummary';
-import { useBusinessBySlug } from '@/hooks/useBusinessBySlug';
-import { Service, StaffMember } from '@/types/database';
+import PaymentStep from './booking/PaymentStep';
+import { Button } from '@/components/ui/button';
+import { ArrowLeft, ArrowRight } from 'lucide-react';
+import { addMinutes, format } from 'date-fns';
 
-interface BookingData {
-  service?: Service;
-  staff?: StaffMember;
-  date?: Date;
-  time?: string;
-  clientName?: string;
-  clientEmail?: string;
-  clientPhone?: string;
-}
+const BookingFlow = ({ businessSlug }: { businessSlug: string }) => {
+  const [step, setStep] = useState(1);
+  const [selectedService, setSelectedService] = useState<any>(null);
+  const [selectedStaff, setSelectedStaff] = useState<any>(null);
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [selectedTime, setSelectedTime] = useState<string>('');
+  const [clientData, setClientData] = useState<any>(null);
+  const [newAppointment, setNewAppointment] = useState<any>(null);
 
-interface BookingFlowProps {
-  businessSlug: string;
-}
+  const { business, isLoading: isBusinessLoading, error: businessError } = useBusinessBySlug(businessSlug);
+  const { services, isLoading: isServicesLoading, error: servicesError } = useServices(business?.id);
+  const { staff, isLoading: isStaffLoading, error: staffError } = useStaff(business?.id);
+  const { createAppointment, isCreating } = useCreateAppointment();
 
-const BookingFlow = ({ businessSlug }: BookingFlowProps) => {
-  const [currentStep, setCurrentStep] = useState(1);
-  const [bookingData, setBookingData] = useState<BookingData>({});
-  const { business, isLoading } = useBusinessBySlug(businessSlug);
+  if (isBusinessLoading) {
+    return <div>Cargando negocio...</div>;
+  }
 
-  const steps = [
-    { id: 1, title: 'Seleccionar Servicio', component: ServiceSelection },
-    { id: 2, title: 'Seleccionar Profesional', component: StaffSelection },
-    { id: 3, title: 'Seleccionar Fecha', component: DateSelection },
-    { id: 4, title: 'Seleccionar Horario', component: TimeSelection },
-    { id: 5, title: 'Datos del Cliente', component: ClientDetails },
-    { id: 6, title: 'Confirmar Reserva', component: BookingSummary },
-  ];
-
-  const canGoNext = () => {
-    switch (currentStep) {
-      case 1: return !!bookingData.service;
-      case 2: return !!bookingData.staff;
-      case 3: return !!bookingData.date;
-      case 4: return !!bookingData.time;
-      case 5: return !!(bookingData.clientName && bookingData.clientEmail);
-      default: return false;
-    }
-  };
-
-  const handleNext = () => {
-    if (canGoNext() && currentStep < steps.length) {
-      setCurrentStep(currentStep + 1);
-    }
-  };
-
-  const handlePrevious = () => {
-    if (currentStep > 1) {
-      setCurrentStep(currentStep - 1);
-    }
-  };
-
-  const updateBookingData = (data: Partial<BookingData>) => {
-    setBookingData(prev => ({ ...prev, ...data }));
-  };
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p>Cargando...</p>
-        </div>
-      </div>
-    );
+  if (businessError) {
+    return <div>Error al cargar el negocio.</div>;
   }
 
   if (!business) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">Negocio no encontrado</h1>
-          <p className="text-gray-600">El negocio que buscas no existe o no está disponible.</p>
-        </div>
-      </div>
-    );
+    return <div>Negocio no encontrado.</div>;
   }
 
-  const CurrentStepComponent = steps[currentStep - 1].component;
+  const handleNext = () => {
+    setStep(step + 1);
+  };
+
+  const handleBack = () => {
+    setStep(step - 1);
+  };
+
+  const handleConfirmBooking = () => {
+    if (!selectedService || !selectedStaff || !selectedDate || !selectedTime || !clientData || !business) return;
+
+    const startTime = new Date(selectedDate);
+    const [hours, minutes] = selectedTime.split(':').map(Number);
+    startTime.setHours(hours, minutes, 0, 0);
+    
+    const endTime = addMinutes(startTime, selectedService.duration_minutes);
+
+    const appointmentData = {
+      business_id: business.id,
+      service_id: selectedService.id,
+      staff_id: selectedStaff.id,
+      start_time: startTime.toISOString(),
+      end_time: endTime.toISOString(),
+      client_name: clientData.name,
+      client_email: clientData.email,
+      client_phone: clientData.phone || null,
+    };
+
+    createAppointment(appointmentData, {
+      onSuccess: (data) => {
+        setNewAppointment(data);
+        setStep(7); // Move to payment step
+      }
+    });
+  };
 
   return (
-    <div className="max-w-2xl mx-auto">
-      <div className="mb-8 text-center">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">{business.name}</h1>
-        <p className="text-gray-600">Reserva tu cita en línea</p>
-      </div>
+    <div className="max-w-2xl mx-auto p-4">
+      <h1 className="text-3xl font-bold text-center mb-8">{business.name}</h1>
 
-      {/* Progress indicator */}
-      <div className="mb-8">
-        <div className="flex items-center justify-between mb-2">
-          {steps.map((step, index) => (
-            <div
-              key={step.id}
-              className={`flex items-center ${index < steps.length - 1 ? 'flex-1' : ''}`}
-            >
-              <div
-                className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
-                  step.id <= currentStep
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-gray-200 text-gray-600'
-                }`}
-              >
-                {step.id}
-              </div>
-              {index < steps.length - 1 && (
-                <div
-                  className={`flex-1 h-1 mx-2 ${
-                    step.id < currentStep ? 'bg-blue-600' : 'bg-gray-200'
-                  }`}
-                />
-              )}
-            </div>
-          ))}
-        </div>
-        <p className="text-sm text-gray-600 text-center">
-          Paso {currentStep} de {steps.length}: {steps[currentStep - 1].title}
-        </p>
-      </div>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>{steps[currentStep - 1].title}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <CurrentStepComponent
-            business={business}
-            bookingData={bookingData}
-            updateBookingData={updateBookingData}
-          />
-        </CardContent>
-      </Card>
-
-      <div className="flex justify-between mt-6">
-        <Button
-          variant="outline"
-          onClick={handlePrevious}
-          disabled={currentStep === 1}
-        >
-          <ChevronLeft className="h-4 w-4 mr-2" />
-          Anterior
-        </Button>
-        
-        {currentStep < steps.length ? (
-          <Button
-            onClick={handleNext}
-            disabled={!canGoNext()}
-          >
-            Siguiente
-            <ChevronRight className="h-4 w-4 ml-2" />
+      <div className="mb-4">
+        <h2 className="text-xl font-semibold mb-2">Paso {step}</h2>
+        {step > 1 && (
+          <Button variant="outline" size="sm" onClick={handleBack}>
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Anterior
           </Button>
-        ) : null}
+        )}
       </div>
+
+      {step === 1 && (
+        <div>
+          <h2 className="text-2xl font-bold mb-6">Selecciona un Servicio</h2>
+          <ServiceSelection
+            services={services}
+            onServiceSelect={(service) => {
+              setSelectedService(service);
+              handleNext();
+            }}
+            isLoading={isServicesLoading}
+          />
+        </div>
+      )}
+
+      {step === 2 && selectedService && (
+        <div>
+          <h2 className="text-2xl font-bold mb-6">Selecciona un Profesional</h2>
+          <StaffSelection
+            staff={staff}
+            serviceId={selectedService.id}
+            onStaffSelect={(staff) => {
+              setSelectedStaff(staff);
+              handleNext();
+            }}
+            isLoading={isStaffLoading}
+          />
+        </div>
+      )}
+
+      {step === 3 && selectedService && selectedStaff && (
+        <div>
+          <h2 className="text-2xl font-bold mb-6">Selecciona una Fecha</h2>
+          <DateSelection
+            onDateSelect={(date) => {
+              setSelectedDate(date);
+              handleNext();
+            }}
+          />
+        </div>
+      )}
+
+      {step === 4 && selectedService && selectedStaff && selectedDate && (
+        <div>
+          <h2 className="text-2xl font-bold mb-6">Selecciona una Hora</h2>
+          <TimeSelection
+            staffId={selectedStaff.id}
+            date={selectedDate}
+            serviceDuration={selectedService.duration_minutes}
+            onTimeSelect={(time) => {
+              setSelectedTime(time);
+              handleNext();
+            }}
+          />
+        </div>
+      )}
+
+      {step === 5 && selectedService && selectedStaff && selectedDate && selectedTime && (
+        <div>
+          <h2 className="text-2xl font-bold mb-6">Tus Datos</h2>
+          <ClientDetails
+            onClientDetailsSubmit={(data) => {
+              setClientData(data);
+              handleNext();
+            }}
+          />
+        </div>
+      )}
+
+        {step === 6 && selectedService && selectedStaff && selectedDate && selectedTime && clientData && (
+          <div>
+            <h2 className="text-2xl font-bold mb-6">Resumen de tu Reserva</h2>
+            <BookingSummary
+              service={selectedService}
+              staff={selectedStaff}
+              date={selectedDate}
+              time={selectedTime}
+              clientData={clientData}
+              onConfirm={handleConfirmBooking}
+              isLoading={isCreating}
+            />
+          </div>
+        )}
+
+        {step === 7 && newAppointment && (
+          <div>
+            <h2 className="text-2xl font-bold mb-6">¡Reserva Completada!</h2>
+            <PaymentStep
+              appointment={newAppointment}
+              businessBankDetails={business?.bank_account_details}
+              onComplete={() => {
+                // Could redirect to a success page or show final message
+                console.log('Payment process completed');
+              }}
+            />
+          </div>
+        )}
+
+      {step < 6 && step !== 1 && (
+        <Button onClick={handleNext} className="mt-4">
+          Siguiente
+          <ArrowRight className="h-4 w-4 ml-2" />
+        </Button>
+      )}
     </div>
   );
 };
