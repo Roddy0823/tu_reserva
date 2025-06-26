@@ -1,17 +1,16 @@
 
-import { useState } from 'react';
 import { useBusiness } from '@/hooks/useBusiness';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Settings, Bell, CreditCard, Building } from 'lucide-react';
+import { ArrowLeft, Settings as SettingsIcon, Bell, CreditCard, Building } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import BusinessInfoSettings from '@/components/settings/BusinessInfoSettings';
 import BookingRulesSettings from '@/components/settings/BookingRulesSettings';
 import NotificationSettings from '@/components/settings/NotificationSettings';
 import BillingSettings from '@/components/settings/BillingSettings';
 
-const Settings = () => {
+const SettingsPage = () => {
   const { business, isLoading } = useBusiness();
 
   if (isLoading) {
@@ -60,7 +59,7 @@ const Settings = () => {
             Información
           </TabsTrigger>
           <TabsTrigger value="booking-rules" className="flex items-center gap-2">
-            <Settings className="h-4 w-4" />
+            <SettingsIcon className="h-4 w-4" />
             Reglas de Reserva
           </TabsTrigger>
           <TabsTrigger value="notifications" className="flex items-center gap-2">
@@ -93,4 +92,4 @@ const Settings = () => {
   );
 };
 
-export default Settings;
+export default SettingsPage;
