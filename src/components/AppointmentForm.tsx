@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -49,10 +48,12 @@ const AppointmentForm = ({ editingAppointment, onClose, defaultDate }: Appointme
   const [selectedServiceId, setSelectedServiceId] = useState<string>('');
   const [selectedStaffId, setSelectedStaffId] = useState<string>('');
 
+  const selectedService = services.find(s => s.id === selectedServiceId);
+
   const { availableSlots } = useAvailableTimeSlots(
-    format(selectedDate, 'yyyy-MM-dd'),
-    selectedServiceId,
-    selectedStaffId
+    selectedStaffId,
+    selectedDate,
+    selectedService?.duration_minutes
   );
 
   const {
@@ -90,8 +91,6 @@ const AppointmentForm = ({ editingAppointment, onClose, defaultDate }: Appointme
       setSelectedStaffId(editingAppointment.staff_id);
     }
   }, [editingAppointment, reset]);
-
-  const selectedService = services.find(s => s.id === selectedServiceId);
 
   const onSubmit = async (data: AppointmentFormData) => {
     if (!selectedService) {
