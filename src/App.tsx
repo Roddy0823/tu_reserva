@@ -8,6 +8,7 @@ import { useAuth } from "@/hooks/useAuth";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Dashboard from "./components/Dashboard";
+import Services from "./pages/Services";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -44,6 +45,11 @@ const AppContent = () => {
       <Route path="/dashboard" element={
         <ProtectedRoute>
           <Dashboard />
+        </ProtectedRoute>
+      } />
+      <Route path="/services" element={
+        <ProtectedRoute>
+          <Services />
         </ProtectedRoute>
       } />
       <Route path="*" element={<NotFound />} />

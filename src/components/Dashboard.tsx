@@ -4,7 +4,8 @@ import { useBusiness } from '@/hooks/useBusiness';
 import { useDashboardStats } from '@/hooks/useDashboardStats';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { CalendarDays, Users, Building2, Settings, FileText, Clock, LogOut, AlertCircle, CreditCard, CheckCircle } from 'lucide-react';
+import { CalendarDays, Users, Building2, Settings, FileText, Clock, LogOut, AlertCircle, CreditCard } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import BusinessSetup from './BusinessSetup';
 import RecentActivity from './RecentActivity';
 
@@ -116,22 +117,24 @@ const Dashboard = () => {
                 </CardContent>
               </Card>
 
-              <Card className="hover:shadow-lg transition-shadow cursor-pointer">
-                <CardHeader>
-                  <div className="flex items-center space-x-2">
-                    <FileText className="h-8 w-8 text-green-600" />
-                    <CardTitle>Servicios</CardTitle>
-                  </div>
-                  <CardDescription>
-                    Crea y gestiona los servicios que ofreces
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <Button variant="outline" className="w-full">
-                    Gestionar Servicios
-                  </Button>
-                </CardContent>
-              </Card>
+              <Link to="/services">
+                <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+                  <CardHeader>
+                    <div className="flex items-center space-x-2">
+                      <FileText className="h-8 w-8 text-green-600" />
+                      <CardTitle>Servicios</CardTitle>
+                    </div>
+                    <CardDescription>
+                      Crea y gestiona los servicios que ofreces
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <Button variant="outline" className="w-full">
+                      Gestionar Servicios
+                    </Button>
+                  </CardContent>
+                </Card>
+              </Link>
 
               <Card className="hover:shadow-lg transition-shadow cursor-pointer">
                 <CardHeader>
