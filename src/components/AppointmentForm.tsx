@@ -42,7 +42,7 @@ interface AppointmentFormProps {
 const AppointmentForm = ({ editingAppointment, onClose, defaultDate }: AppointmentFormProps) => {
   const { toast } = useToast();
   const { services } = useServices();
-  const { staff } = useStaff();
+  const { staffMembers } = useStaff();
   const { createAppointment, isCreating } = useCreateAppointment();
   
   const [selectedDate, setSelectedDate] = useState<Date>(defaultDate || new Date());
@@ -239,7 +239,7 @@ const AppointmentForm = ({ editingAppointment, onClose, defaultDate }: Appointme
                   <SelectValue placeholder="Selecciona un miembro del personal" />
                 </SelectTrigger>
                 <SelectContent>
-                  {staff.map((member) => (
+                  {staffMembers.map((member) => (
                     <SelectItem key={member.id} value={member.id}>
                       {member.full_name}
                     </SelectItem>

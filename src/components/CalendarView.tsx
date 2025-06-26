@@ -7,8 +7,6 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ChevronLeft, ChevronRight, Plus, Calendar as CalendarIcon } from 'lucide-react';
 import { TimeBlock, Appointment, StaffMember, Service } from '@/types/database';
-import AppointmentForm from './AppointmentForm';
-import { useCreateAppointment } from '@/hooks/useCreateAppointment';
 
 interface CalendarEvent {
   id: string;
@@ -43,12 +41,7 @@ const CalendarView = ({
   onEditAppointment 
 }: CalendarViewProps) => {
   const [currentDate, setCurrentDate] = useState(new Date());
-  const [showAppointmentForm, setShowAppointmentForm] = useState(false);
-  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
-  const [selectedTime, setSelectedTime] = useState<string>('');
   const [viewMode, setViewMode] = useState<'month' | 'week'>('month');
-
-  const { createAppointment, isCreating } = useCreateAppointment();
 
   const calendarEvents: CalendarEvent[] = useMemo(() => {
     const events: CalendarEvent[] = [];
@@ -122,43 +115,6 @@ const CalendarView = ({
     }
   };
 
-  const handleDayClick = (day: Date) => {
-    if (day >= new Date()) {
-      setSelectedDate(day);
-      setSelectedTime('09:00');
-      setShowAppointmentForm(true);
-    }
-  };
-
-  const handleCreateAppointment = (appointmentData: any) => {
-    createAppointment(appointmentData, {
-      onSuccess: () => {
-        setShowAppointmentForm(false);
-        setSelectedDate(null);
-        setSelectedTime('');
-      }
-    });
-  };
-
-  const getEventsByTimeSlot = (day: Date) => {
-    const dayEvents = getEventsForDay(day);
-    const timeSlots = [];
-    
-    for (let hour = 8; hour < 20; hour++) {
-      const timeSlot = `${hour.toString().padStart(2, '0')}:00`;
-      const slotEvents = dayEvents.filter(event => {
-        const eventHour = event.startDate.getHours();
-        return eventHour === hour;
-      });
-      
-      if (slotEvents.length > 0) {
-        timeSlots.push({ time: timeSlot, events: slotEvents });
-      }
-    }
-    
-    return timeSlots;
-  };
-
   return (
     <div className="space-y-6">
       {/* Header del calendario */}
@@ -180,10 +136,6 @@ const CalendarView = ({
           </div>
         </div>
         <div className="flex items-center space-x-2">
-          <Button variant="outline" onClick={() => setShowAppointmentForm(true)} className="gap-2">
-            <Plus className="h-4 w-4" />
-            Nueva Cita
-          </Button>
           <Button variant="outline" onClick={onCreateTimeBlock} className="gap-2">
             <CalendarIcon className="h-4 w-4" />
             Bloquear Horario
@@ -215,7 +167,6 @@ const CalendarView = ({
               return (
                 <div
                   key={day.toISOString()}
-                  onClick={() => handleDayClick(day)}
                   className={`min-h-[120px] p-2 border-r border-b last:border-r-0 cursor-pointer transition-colors hover:bg-gray-50 ${
                     !isCurrentMonth ? 'bg-gray-50 text-gray-400' : ''
                   } ${isDayToday ? 'bg-blue-50 border-blue-200' : ''} ${
@@ -266,7 +217,7 @@ const CalendarView = ({
                     )}
                     {dayEvents.length === 0 && isCurrentMonth && !isPastDay && (
                       <div className="text-xs text-gray-400 p-1 text-center opacity-0 hover:opacity-100 transition-opacity">
-                        Clic para agendar
+                        Disponible
                       </div>
                     )}
                   </div>
@@ -337,23 +288,6 @@ const CalendarView = ({
           </div>
         </CardContent>
       </Card>
-
-      {/* Formulario de nueva cita */}
-      {showAppointmentForm && (
-        <AppointmentForm
-          selectedDate={selectedDate || undefined}
-          selectedTime={selectedTime}
-          staffMembers={staffMembers}
-          services={services}
-          onSubmit={handleCreateAppointment}
-          onCancel={() => {
-            setShowAppointmentForm(false);
-            setSelectedDate(null);
-            setSelectedTime('');
-          }}
-          isLoading={isCreating}
-        />
-      )}
     </div>
   );
 };
