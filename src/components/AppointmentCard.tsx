@@ -2,7 +2,7 @@
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Appointment } from '@/types/database';
+import { Appointment, AppointmentStatus } from '@/types/database';
 import { Clock, User, Phone, Mail, DollarSign, Edit, CheckCircle, XCircle } from 'lucide-react';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
@@ -25,7 +25,7 @@ const AppointmentCard = ({ appointment, onEdit }: AppointmentCardProps) => {
   const [isUpdating, setIsUpdating] = useState(false);
 
   const updateStatusMutation = useMutation({
-    mutationFn: async (newStatus: string) => {
+    mutationFn: async (newStatus: AppointmentStatus) => {
       const { error } = await supabase
         .from('appointments')
         .update({ status: newStatus })
@@ -69,7 +69,7 @@ const AppointmentCard = ({ appointment, onEdit }: AppointmentCardProps) => {
     }
   };
 
-  const handleStatusUpdate = async (newStatus: string) => {
+  const handleStatusUpdate = async (newStatus: AppointmentStatus) => {
     setIsUpdating(true);
     try {
       await updateStatusMutation.mutateAsync(newStatus);

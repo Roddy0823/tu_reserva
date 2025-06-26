@@ -54,7 +54,7 @@ const TodayAppointments = () => {
     return (
       <div className="container py-6">
         <AppointmentForm
-          appointment={editingAppointment}
+          editingAppointment={editingAppointment}
           onClose={handleCloseForm}
           defaultDate={new Date()}
         />

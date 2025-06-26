@@ -485,7 +485,11 @@ export type Database = {
       }
     }
     Enums: {
-      appointment_status: "pendiente" | "confirmado" | "cancelado"
+      appointment_status:
+        | "pendiente"
+        | "confirmado"
+        | "cancelado"
+        | "completado"
       payment_validation_status: "pendiente" | "aprobado" | "rechazado"
     }
     CompositeTypes: {
@@ -602,7 +606,12 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      appointment_status: ["pendiente", "confirmado", "cancelado"],
+      appointment_status: [
+        "pendiente",
+        "confirmado",
+        "cancelado",
+        "completado",
+      ],
       payment_validation_status: ["pendiente", "aprobado", "rechazado"],
     },
   },
