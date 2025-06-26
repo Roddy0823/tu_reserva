@@ -168,6 +168,57 @@ export type Database = {
           },
         ]
       }
+      business_subscriptions: {
+        Row: {
+          business_id: string
+          created_at: string
+          current_period_end: string
+          current_period_start: string
+          id: string
+          plan_id: string
+          status: string
+          stripe_subscription_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          business_id: string
+          created_at?: string
+          current_period_end?: string
+          current_period_start?: string
+          id?: string
+          plan_id: string
+          status?: string
+          stripe_subscription_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          business_id?: string
+          created_at?: string
+          current_period_end?: string
+          current_period_start?: string
+          id?: string
+          plan_id?: string
+          status?: string
+          stripe_subscription_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "business_subscriptions_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: true
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "business_subscriptions_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "subscription_plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       businesses: {
         Row: {
           bank_account_details: string | null
@@ -194,6 +245,44 @@ export type Database = {
           owner_user_id?: string
         }
         Relationships: []
+      }
+      monthly_usage: {
+        Row: {
+          business_id: string
+          completed_bookings: number
+          created_at: string
+          id: string
+          month: number
+          updated_at: string
+          year: number
+        }
+        Insert: {
+          business_id: string
+          completed_bookings?: number
+          created_at?: string
+          id?: string
+          month: number
+          updated_at?: string
+          year: number
+        }
+        Update: {
+          business_id?: string
+          completed_bookings?: number
+          created_at?: string
+          id?: string
+          month?: number
+          updated_at?: string
+          year?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "monthly_usage_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       services: {
         Row: {
@@ -298,6 +387,36 @@ export type Database = {
           },
         ]
       }
+      subscription_plans: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          is_active: boolean
+          max_bookings_per_month: number | null
+          name: string
+          price_cop: number
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          max_bookings_per_month?: number | null
+          name: string
+          price_cop?: number
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          max_bookings_per_month?: number | null
+          name?: string
+          price_cop?: number
+        }
+        Relationships: []
+      }
       time_blocks: {
         Row: {
           created_at: string
@@ -338,6 +457,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      can_accept_booking: {
+        Args: { business_uuid: string }
+        Returns: boolean
+      }
       get_my_business_id: {
         Args: Record<PropertyKey, never>
         Returns: string

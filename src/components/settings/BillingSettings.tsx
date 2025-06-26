@@ -2,18 +2,74 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { CreditCard, Download, Eye, Calendar } from 'lucide-react';
+import { Progress } from '@/components/ui/progress';
+import { CreditCard, Download, Eye, Calendar, Crown, BarChart } from 'lucide-react';
+import { useSubscription } from '@/hooks/useSubscription';
+import SubscriptionCard from '../SubscriptionCard';
 
 interface BillingSettingsProps {
   business: any;
 }
 
 const BillingSettings = ({ business }: BillingSettingsProps) => {
+  const { 
+    subscription, 
+    plans, 
+    currentUsage, 
+    isFreePlan, 
+    currentBookings, 
+    maxBookings,
+    openCustomerPortal,
+    isOpeningPortal,
+    isLoading 
+  } = useSubscription();
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center p-8">
+        <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    );
+  }
+
+  const formatPrice = (price: number) => {
+    return new Intl.NumberFormat('es-CO', {
+      style: 'currency',
+      currency: 'COP',
+      minimumFractionDigits: 0,
+    }).format(price);
+  };
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('es-CO', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  };
+
+  const usagePercentage = isFreePlan && maxBookings > 0 
+    ? Math.min((currentBookings / maxBookings) * 100, 100) 
+    : 0;
+
   return (
     <div className="space-y-6">
+      {/* Current Plan Status */}
       <Card>
         <CardHeader>
-          <CardTitle>Plan Actual</CardTitle>
+          <CardTitle className="flex items-center gap-2">
+            {isFreePlan ? (
+              <>
+                <BarChart className="h-5 w-5" />
+                Plan Actual
+              </>
+            ) : (
+              <>
+                <Crown className="h-5 w-5 text-purple-600" />
+                Plan Pro Activo
+              </>
+            )}
+          </CardTitle>
           <CardDescription>
             Información sobre tu membresía y facturación
           </CardDescription>
@@ -21,101 +77,103 @@ const BillingSettings = ({ business }: BillingSettingsProps) => {
         <CardContent className="space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="font-medium">Plan Básico</h3>
+              <h3 className="font-medium">{subscription?.subscription_plans?.name}</h3>
               <p className="text-sm text-gray-500">
-                Ideal para negocios pequeños
+                {subscription?.subscription_plans?.description}
               </p>
             </div>
-            <Badge variant="secondary">Activo</Badge>
+            <Badge variant={subscription?.status === 'active' ? 'default' : 'secondary'}>
+              {subscription?.status === 'active' ? 'Activo' : 'Inactivo'}
+            </Badge>
           </div>
           
           <div className="grid grid-cols-2 gap-4 text-sm">
             <div>
               <p className="text-gray-500">Precio</p>
-              <p className="font-medium">$29/mes</p>
+              <p className="font-medium">
+                {subscription?.subscription_plans?.price_cop === 0 
+                  ? 'Gratis' 
+                  : `${formatPrice(subscription?.subscription_plans?.price_cop || 0)}/mes`
+                }
+              </p>
             </div>
-            <div>
-              <p className="text-gray-500">Próxima facturación</p>
-              <p className="font-medium">15 de Enero, 2024</p>
-            </div>
-          </div>
-
-          <div className="pt-4 border-t">
-            <h4 className="font-medium mb-2">Características incluidas:</h4>
-            <ul className="text-sm text-gray-600 space-y-1">
-              <li>• Hasta 100 citas por mes</li>
-              <li>• 3 miembros del equipo</li>
-              <li>• Notificaciones por email</li>
-              <li>• Soporte por chat</li>
-            </ul>
-          </div>
-
-          <Button variant="outline" className="w-full">
-            Actualizar Plan
-          </Button>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Métodos de Pago</CardTitle>
-          <CardDescription>
-            Gestiona tus métodos de pago para la facturación
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex items-center justify-between p-4 border rounded-lg">
-            <div className="flex items-center space-x-3">
-              <CreditCard className="h-8 w-8 text-gray-400" />
+            {!isFreePlan && (
               <div>
-                <p className="font-medium">Visa terminada en 4242</p>
-                <p className="text-sm text-gray-500">Expira 12/25</p>
+                <p className="text-gray-500">Próxima facturación</p>
+                <p className="font-medium">
+                  {subscription?.current_period_end 
+                    ? formatDate(subscription.current_period_end)
+                    : 'N/A'
+                  }
+                </p>
               </div>
-            </div>
-            <Badge variant="outline">Principal</Badge>
+            )}
           </div>
 
-          <Button variant="outline" className="w-full">
-            Añadir Método de Pago
-          </Button>
+          {/* Usage for free plan */}
+          {isFreePlan && (
+            <div className="space-y-2">
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-500">Reservas este mes</span>
+                <span className="font-medium">{currentBookings} / {maxBookings}</span>
+              </div>
+              <Progress value={usagePercentage} className="h-2" />
+              {usagePercentage >= 100 && (
+                <p className="text-sm text-red-600 font-medium">
+                  ⚠️ Has alcanzado el límite de reservas para este mes
+                </p>
+              )}
+            </div>
+          )}
+
+          {!isFreePlan && subscription?.stripe_subscription_id && (
+            <Button 
+              variant="outline" 
+              className="w-full"
+              onClick={() => openCustomerPortal()}
+              disabled={isOpeningPortal}
+            >
+              <CreditCard className="h-4 w-4 mr-2" />
+              Gestionar Suscripción
+            </Button>
+          )}
         </CardContent>
       </Card>
 
+      {/* Available Plans */}
+      <div>
+        <h3 className="text-lg font-semibold mb-4">Planes Disponibles</h3>
+        <div className="grid md:grid-cols-2 gap-6">
+          {plans.map((plan) => (
+            <SubscriptionCard
+              key={plan.id}
+              plan={plan}
+              isCurrentPlan={subscription?.plan_id === plan.id}
+            />
+          ))}
+        </div>
+      </div>
+
+      {/* Usage Statistics */}
       <Card>
         <CardHeader>
-          <CardTitle>Historial de Facturación</CardTitle>
+          <CardTitle>Estadísticas de Uso</CardTitle>
           <CardDescription>
-            Descarga tus facturas anteriores
+            Resumen de tu actividad este mes
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="space-y-3">
-            {[
-              { date: '1 Dic 2023', amount: '$29.00', status: 'Pagada' },
-              { date: '1 Nov 2023', amount: '$29.00', status: 'Pagada' },
-              { date: '1 Oct 2023', amount: '$29.00', status: 'Pagada' },
-            ].map((invoice, index) => (
-              <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
-                <div className="flex items-center space-x-3">
-                  <Calendar className="h-4 w-4 text-gray-400" />
-                  <div>
-                    <p className="font-medium">{invoice.date}</p>
-                    <p className="text-sm text-gray-500">{invoice.amount}</p>
-                  </div>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Badge variant="outline" className="text-green-600">
-                    {invoice.status}
-                  </Badge>
-                  <Button variant="ghost" size="sm">
-                    <Download className="h-4 w-4" />
-                  </Button>
-                  <Button variant="ghost" size="sm">
-                    <Eye className="h-4 w-4" />
-                  </Button>
-                </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="text-center p-4 bg-blue-50 rounded-lg">
+              <div className="text-2xl font-bold text-blue-600">{currentBookings}</div>
+              <div className="text-sm text-gray-600">Reservas Completadas</div>
+            </div>
+            <div className="text-center p-4 bg-green-50 rounded-lg">
+              <div className="text-2xl font-bold text-green-600">
+                {isFreePlan ? `${maxBookings - currentBookings}` : '∞'}
               </div>
-            ))}
+              <div className="text-sm text-gray-600">Reservas Restantes</div>
+            </div>
           </div>
         </CardContent>
       </Card>

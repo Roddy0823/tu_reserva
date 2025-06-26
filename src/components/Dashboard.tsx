@@ -6,6 +6,7 @@ import { useDashboardStats } from "@/hooks/useDashboardStats";
 import { Link } from "react-router-dom";
 import RecentActivity from "./RecentActivity";
 import PendingPaymentsList from "./PendingPaymentsList";
+import SubscriptionLimitBanner from "./SubscriptionLimitBanner";
 
 const Dashboard = () => {
   const { business } = useBusiness();
@@ -37,6 +38,10 @@ const Dashboard = () => {
           </Button>
         </Link>
       </div>
+
+      {/* Subscription Limit Banner */}
+      <SubscriptionLimitBanner />
+
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         <Link to="/services">
           <Card className="cursor-pointer hover:shadow-lg transition-shadow">
