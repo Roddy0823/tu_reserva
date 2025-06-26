@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { format, addMinutes, startOfDay, endOfDay, isAfter, isBefore } from "date-fns";
 
 export const useAvailableTimeSlots = (staffId?: string, date?: Date, serviceDuration?: number) => {
-  return useQuery({
+  const query = useQuery({
     queryKey: ['available-time-slots', staffId, date, serviceDuration],
     queryFn: async () => {
       if (!staffId || !date || !serviceDuration) return [];
@@ -81,4 +81,10 @@ export const useAvailableTimeSlots = (staffId?: string, date?: Date, serviceDura
     },
     enabled: !!(staffId && date && serviceDuration),
   });
+
+  return {
+    availableSlots: query.data || [],
+    isLoading: query.isLoading,
+    error: query.error,
+  };
 };

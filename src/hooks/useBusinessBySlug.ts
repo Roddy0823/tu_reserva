@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Business } from "@/types/database";
 
 export const useBusinessBySlug = (slug: string) => {
-  return useQuery({
+  const query = useQuery({
     queryKey: ['business-by-slug', slug],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -23,4 +23,10 @@ export const useBusinessBySlug = (slug: string) => {
     },
     enabled: !!slug,
   });
+
+  return {
+    business: query.data,
+    isLoading: query.isLoading,
+    error: query.error,
+  };
 };
