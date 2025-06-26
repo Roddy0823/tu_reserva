@@ -1,9 +1,6 @@
 
 import { useAuth } from '@/hooks/useAuth';
 import { useBusiness } from '@/hooks/useBusiness';
-import { Button } from '@/components/ui/button';
-import { ArrowLeft } from 'lucide-react';
-import { Link } from 'react-router-dom';
 import AvailabilityManagement from '@/components/AvailabilityManagement';
 import BusinessSetup from '@/components/BusinessSetup';
 
@@ -28,18 +25,8 @@ const Availability = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-      <div className="container mx-auto px-4 py-4">
-        <div className="mb-4">
-          <Link to="/dashboard">
-            <Button variant="outline" size="sm">
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Volver al Dashboard
-            </Button>
-          </Link>
-        </div>
-        <AvailabilityManagement />
-      </div>
+    <div className="container mx-auto px-4 py-4">
+      <AvailabilityManagement />
     </div>
   );
 };

@@ -1,10 +1,7 @@
 
 import { useBusiness } from '@/hooks/useBusiness';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Button } from '@/components/ui/button';
-import { ArrowLeft, Settings as SettingsIcon, Bell, CreditCard, Building } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Settings as SettingsIcon, Bell, CreditCard, Building } from 'lucide-react';
 import BusinessInfoSettings from '@/components/settings/BusinessInfoSettings';
 import BookingRulesSettings from '@/components/settings/BookingRulesSettings';
 import NotificationSettings from '@/components/settings/NotificationSettings';
@@ -26,12 +23,6 @@ const SettingsPage = () => {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <p className="text-gray-600">No se encontró información del negocio</p>
-          <Link to="/dashboard">
-            <Button variant="outline" className="mt-4">
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Volver al Dashboard
-            </Button>
-          </Link>
         </div>
       </div>
     );
@@ -40,12 +31,6 @@ const SettingsPage = () => {
   return (
     <div className="container py-8">
       <div className="mb-6">
-        <Link to="/dashboard">
-          <Button variant="outline" size="sm" className="mb-4">
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Volver al Dashboard
-          </Button>
-        </Link>
         <h1 className="text-3xl font-bold">Configuración del Negocio</h1>
         <p className="text-gray-600 mt-2">
           Gestiona la configuración y ajustes de tu negocio

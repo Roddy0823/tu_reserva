@@ -14,22 +14,12 @@ import SettingsPage from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 import Availability from "@/pages/Availability";
 import BookingPublic from "@/pages/BookingPublic";
+import TodayAppointments from "@/pages/TodayAppointments";
+import Transfers from "@/pages/Transfers";
+import Subscription from "@/pages/Subscription";
+import AdminLayout from "@/components/AdminLayout";
 
 const queryClient = new QueryClient();
-
-const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  const { user, loading } = useAuth();
-  
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-      </div>
-    );
-  }
-  
-  return user ? <>{children}</> : <Navigate to="/auth" replace />;
-};
 
 function AppContent() {
   const { user, loading } = useAuth();
@@ -49,12 +39,66 @@ function AppContent() {
     <Routes>
       <Route path="/" element={user ? <Navigate to="/dashboard" replace /> : <Index />} />
       <Route path="/auth" element={!user ? <Auth /> : <Navigate to="/dashboard" replace />} />
-      <Route path="/dashboard" element={user ? <Dashboard /> : <Navigate to="/auth" replace />} />
-      <Route path="/services" element={user ? <Services /> : <Navigate to="/auth" replace />} />
-      <Route path="/staff" element={user ? <Staff /> : <Navigate to="/auth" replace />} />
-      <Route path="/availability" element={user ? <Availability /> : <Navigate to="/auth" replace />} />
-      <Route path="/settings" element={user ? <SettingsPage /> : <Navigate to="/auth" replace />} />
       <Route path="/booking/:businessSlug" element={<BookingPublic />} />
+      
+      {/* Rutas protegidas con sidebar */}
+      <Route path="/dashboard" element={
+        user ? (
+          <AdminLayout>
+            <Dashboard />
+          </AdminLayout>
+        ) : <Navigate to="/auth" replace />
+      } />
+      <Route path="/services" element={
+        user ? (
+          <AdminLayout>
+            <Services />
+          </AdminLayout>
+        ) : <Navigate to="/auth" replace />
+      } />
+      <Route path="/staff" element={
+        user ? (
+          <AdminLayout>
+            <Staff />
+          </AdminLayout>
+        ) : <Navigate to="/auth" replace />
+      } />
+      <Route path="/availability" element={
+        user ? (
+          <AdminLayout>
+            <Availability />
+          </AdminLayout>
+        ) : <Navigate to="/auth" replace />
+      } />
+      <Route path="/appointments/today" element={
+        user ? (
+          <AdminLayout>
+            <TodayAppointments />
+          </AdminLayout>
+        ) : <Navigate to="/auth" replace />
+      } />
+      <Route path="/transfers" element={
+        user ? (
+          <AdminLayout>
+            <Transfers />
+          </AdminLayout>
+        ) : <Navigate to="/auth" replace />
+      } />
+      <Route path="/subscription" element={
+        user ? (
+          <AdminLayout>
+            <Subscription />
+          </AdminLayout>
+        ) : <Navigate to="/auth" replace />
+      } />
+      <Route path="/settings" element={
+        user ? (
+          <AdminLayout>
+            <SettingsPage />
+          </AdminLayout>
+        ) : <Navigate to="/auth" replace />
+      } />
+      
       <Route path="*" element={<NotFound />} />
     </Routes>
   );
