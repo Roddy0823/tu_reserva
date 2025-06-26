@@ -61,6 +61,21 @@ const Dashboard = () => {
           </Card>
         </Link>
 
+        <Link to="/availability">
+          <Card className="cursor-pointer hover:shadow-lg transition-shadow">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Gestión de Disponibilidad</CardTitle>
+              <CalendarDays className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">Horarios</div>
+              <p className="text-xs text-muted-foreground">
+                bloquear disponibilidad
+              </p>
+            </CardContent>
+          </Card>
+        </Link>
+
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Citas de Hoy</CardTitle>

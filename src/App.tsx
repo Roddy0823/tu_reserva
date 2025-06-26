@@ -10,6 +10,7 @@ import Dashboard from "./components/Dashboard";
 import Services from "./pages/Services";
 import Staff from "./pages/Staff";
 import NotFound from "./pages/NotFound";
+import Availability from "@/pages/Availability";
 
 const queryClient = new QueryClient();
 
@@ -27,40 +28,32 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   return user ? <>{children}</> : <Navigate to="/auth" replace />;
 };
 
-const AppContent = () => {
-  const { user, loading } = useAuth();
+function AppContent() {
+  const { user, isLoading } = useAuth();
 
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+        <div className="text-center">
+          <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p>Cargando...</p>
+        </div>
       </div>
     );
   }
 
   return (
     <Routes>
-      <Route path="/auth" element={<Auth />} />
-      <Route path="/" element={user ? <Dashboard /> : <Index />} />
-      <Route path="/dashboard" element={
-        <ProtectedRoute>
-          <Dashboard />
-        </ProtectedRoute>
-      } />
-      <Route path="/services" element={
-        <ProtectedRoute>
-          <Services />
-        </ProtectedRoute>
-      } />
-      <Route path="/staff" element={
-        <ProtectedRoute>
-          <Staff />
-        </ProtectedRoute>
-      } />
+      <Route path="/" element={user ? <Navigate to="/dashboard" replace /> : <Index />} />
+      <Route path="/auth" element={!user ? <Auth /> : <Navigate to="/dashboard" replace />} />
+      <Route path="/dashboard" element={user ? <Dashboard /> : <Navigate to="/auth" replace />} />
+      <Route path="/services" element={user ? <Services /> : <Navigate to="/auth" replace />} />
+      <Route path="/staff" element={user ? <Staff /> : <Navigate to="/auth" replace />} />
+      <Route path="/availability" element={user ? <Availability /> : <Navigate to="/auth" replace />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   );
-};
+}
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
