@@ -1,22 +1,27 @@
 
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useTimeBlocks } from '@/hooks/useTimeBlocks';
 import { useStaff } from '@/hooks/useStaff';
+import { useAppointments } from '@/hooks/useAppointments';
 import TimeBlockForm from './TimeBlockForm';
-import { TimeBlock } from '@/types/database';
-import { Plus, Edit, Trash2, Calendar, Clock, User } from 'lucide-react';
+import CalendarView from './CalendarView';
+import { TimeBlock, Appointment } from '@/types/database';
+import { Plus, Edit, Trash2, Calendar, Clock, User, List } from 'lucide-react';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 
 const AvailabilityManagement = () => {
   const [showForm, setShowForm] = useState(false);
   const [editingTimeBlock, setEditingTimeBlock] = useState<(TimeBlock & { staff_members: { full_name: string } }) | null>(null);
+  const [currentView, setCurrentView] = useState<'calendar' | 'list'>('calendar');
   
   const { getAllTimeBlocks, createTimeBlock, updateTimeBlock, deleteTimeBlock, isCreating, isUpdating, isDeleting } = useTimeBlocks();
   const { staffMembers } = useStaff();
+  const { appointments } = useAppointments();
   const { data: timeBlocks = [], isLoading } = getAllTimeBlocks();
 
   const handleCreateTimeBlock = (data: any) => {
@@ -41,9 +46,14 @@ const AvailabilityManagement = () => {
     }
   };
 
-  const handleEdit = (timeBlock: TimeBlock & { staff_members: { full_name: string } }) => {
+  const handleEditTimeBlock = (timeBlock: TimeBlock & { staff_members: { full_name: string } }) => {
     setEditingTimeBlock(timeBlock);
     setShowForm(true);
+  };
+
+  const handleEditAppointment = (appointment: Appointment & { staff_members: { full_name: string }, services: { name: string } }) => {
+    // TODO: Implementar edición de citas
+    console.log('Editar cita:', appointment);
   };
 
   const handleDelete = (timeBlockId: string) => {
@@ -82,41 +92,69 @@ const AvailabilityManagement = () => {
       <div className="flex justify-between items-center">
         <div>
           <h2 className="text-3xl font-bold text-gray-900">Gestión de Disponibilidad</h2>
-          <p className="text-gray-600 mt-2">Administra los horarios bloqueados de tu personal</p>
+          <p className="text-gray-600 mt-2">Administra los horarios bloqueados y visualiza las citas programadas</p>
         </div>
-        <Button onClick={() => setShowForm(true)} className="gap-2">
-          <Plus className="h-4 w-4" />
-          Bloquear Horario
-        </Button>
+        <div className="flex items-center space-x-4">
+          <Tabs value={currentView} onValueChange={(value) => setCurrentView(value as 'calendar' | 'list')}>
+            <TabsList>
+              <TabsTrigger value="calendar" className="gap-2">
+                <Calendar className="h-4 w-4" />
+                Calendario
+              </TabsTrigger>
+              <TabsTrigger value="list" className="gap-2">
+                <List className="h-4 w-4" />
+                Lista
+              </TabsTrigger>
+            </TabsList>
+          </Tabs>
+          <Button onClick={() => setShowForm(true)} className="gap-2">
+            <Plus className="h-4 w-4" />
+            Bloquear Horario
+          </Button>
+        </div>
       </div>
 
-      {timeBlocks.length === 0 ? (
-        <Card>
-          <CardContent className="flex flex-col items-center justify-center py-12">
-            <Calendar className="h-12 w-12 text-gray-400 mb-4" />
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">No hay horarios bloqueados</h3>
-            <p className="text-gray-600 text-center mb-4">
-              Comienza bloqueando horarios para gestionar la disponibilidad de tu personal
-            </p>
-            <Button onClick={() => setShowForm(true)} className="gap-2">
-              <Plus className="h-4 w-4" />
-              Crear Primer Bloqueo
-            </Button>
-          </CardContent>
-        </Card>
-      ) : (
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {timeBlocks.map((timeBlock) => (
-            <TimeBlockCard
-              key={timeBlock.id}
-              timeBlock={timeBlock}
-              onEdit={handleEdit}
-              onDelete={handleDelete}
-              isDeleting={isDeleting}
-            />
-          ))}
-        </div>
-      )}
+      <Tabs value={currentView} onValueChange={(value) => setCurrentView(value as 'calendar' | 'list')}>
+        <TabsContent value="calendar">
+          <CalendarView
+            timeBlocks={timeBlocks}
+            appointments={appointments}
+            onCreateTimeBlock={() => setShowForm(true)}
+            onEditTimeBlock={handleEditTimeBlock}
+            onEditAppointment={handleEditAppointment}
+          />
+        </TabsContent>
+        
+        <TabsContent value="list">
+          {timeBlocks.length === 0 ? (
+            <Card>
+              <CardContent className="flex flex-col items-center justify-center py-12">
+                <Calendar className="h-12 w-12 text-gray-400 mb-4" />
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">No hay horarios bloqueados</h3>
+                <p className="text-gray-600 text-center mb-4">
+                  Comienza bloqueando horarios para gestionar la disponibilidad de tu personal
+                </p>
+                <Button onClick={() => setShowForm(true)} className="gap-2">
+                  <Plus className="h-4 w-4" />
+                  Crear Primer Bloqueo
+                </Button>
+              </CardContent>
+            </Card>
+          ) : (
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+              {timeBlocks.map((timeBlock) => (
+                <TimeBlockCard
+                  key={timeBlock.id}
+                  timeBlock={timeBlock}
+                  onEdit={handleEditTimeBlock}
+                  onDelete={handleDelete}
+                  isDeleting={isDeleting}
+                />
+              ))}
+            </div>
+          )}
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };
