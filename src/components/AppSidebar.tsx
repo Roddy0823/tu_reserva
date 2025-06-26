@@ -1,4 +1,3 @@
-
 import { 
   Home, 
   Package, 
@@ -7,7 +6,8 @@ import {
   CheckCircle,
   CreditCard, 
   Crown, 
-  Settings 
+  Settings,
+  LogOut
 } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import {
@@ -22,7 +22,10 @@ import {
   SidebarHeader,
   SidebarFooter,
 } from "@/components/ui/sidebar";
+import { Button } from "@/components/ui/button";
 import { useBusiness } from "@/hooks/useBusiness";
+import { useAuth } from "@/hooks/useAuth";
+import { useToast } from "@/hooks/use-toast";
 
 const menuItems = [
   {
@@ -70,6 +73,18 @@ const menuItems = [
 export function AppSidebar() {
   const location = useLocation();
   const { business } = useBusiness();
+  const { signOut } = useAuth();
+  const { toast } = useToast();
+
+  const handleSignOut = async () => {
+    const { error } = await signOut();
+    if (!error) {
+      toast({
+        title: "Sesión cerrada",
+        description: "Has cerrado sesión exitosamente",
+      });
+    }
+  };
 
   return (
     <Sidebar>
@@ -110,7 +125,15 @@ export function AppSidebar() {
         </SidebarGroup>
       </SidebarContent>
       
-      <SidebarFooter className="p-4">
+      <SidebarFooter className="p-4 space-y-4">
+        <Button 
+          variant="outline" 
+          onClick={handleSignOut}
+          className="w-full justify-start"
+        >
+          <LogOut className="h-4 w-4 mr-2" />
+          Cerrar Sesión
+        </Button>
         <div className="text-xs text-muted-foreground">
           © 2024 ReservaFácil
         </div>
