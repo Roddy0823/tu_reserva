@@ -1,7 +1,7 @@
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Appointment, AppointmentInsert } from "@/types/database";
+import { Appointment, AppointmentInsert, AppointmentStatus } from "@/types/database";
 import { useToast } from "@/hooks/use-toast";
 import { useBusiness } from "./useBusiness";
 
@@ -86,7 +86,7 @@ export const useAppointments = () => {
 
   // Actualizar estado de cita
   const updateAppointmentStatusMutation = useMutation({
-    mutationFn: async ({ id, status }: { id: string; status: string }) => {
+    mutationFn: async ({ id, status }: { id: string; status: AppointmentStatus }) => {
       const { data, error } = await supabase
         .from('appointments')
         .update({ status })
