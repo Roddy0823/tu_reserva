@@ -40,7 +40,7 @@ export const useDashboardStats = () => {
     enabled: !!business?.id,
   });
 
-  // Obtener turnos de hoy
+  // Obtener turnos de hoy con estadísticas mejoradas
   const { data: todayAppointments = [] } = useQuery({
     queryKey: ['appointments', 'today', business?.id],
     queryFn: async () => {
@@ -52,7 +52,10 @@ export const useDashboardStats = () => {
 
       const { data, error } = await supabase
         .from('appointments')
-        .select('*')
+        .select(`
+          *,
+          services (price)
+        `)
         .eq('business_id', business.id)
         .gte('start_time', startOfDay.toISOString())
         .lte('start_time', endOfDay.toISOString());
@@ -86,14 +89,20 @@ export const useDashboardStats = () => {
     enabled: !!business?.id,
   });
 
-  // Calcular estadísticas
+  // Calcular estadísticas mejoradas
+  const todayRevenue = todayAppointments
+    .filter(apt => apt.status === 'completado')
+    .reduce((sum, apt) => sum + (apt.services?.price || 0), 0);
+
   const stats = {
     total_services: services.length,
     total_staff: staff.length,
     today_appointments: todayAppointments.length,
-    monthly_revenue: 0, // Por ahora 0, se puede calcular más adelante
+    monthly_revenue: todayRevenue, // Por ahora usamos ingresos de hoy
     todayAppointments: todayAppointments.length,
     todayCancellations: todayAppointments.filter(apt => apt.status === 'cancelado').length,
+    todayCompleted: todayAppointments.filter(apt => apt.status === 'completado').length,
+    todayRevenue: todayRevenue,
   };
 
   return {

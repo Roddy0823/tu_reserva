@@ -1,6 +1,7 @@
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { CalendarDays, Package, TrendingUp, Users, Settings } from "lucide-react";
+import { CalendarDays, Package, TrendingUp, Users, Settings, Clock, CheckCircle } from "lucide-react";
 import { useBusiness } from "@/hooks/useBusiness";
 import { useDashboardStats } from "@/hooks/useDashboardStats";
 import { Link } from "react-router-dom";
@@ -96,31 +97,48 @@ const Dashboard = () => {
           </Card>
         </Link>
         
+        <Link to="/appointments/today">
+          <Card className="cursor-pointer hover:shadow-lg transition-shadow">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Citas de Hoy</CardTitle>
+              <CalendarDays className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{stats?.today_appointments || 0}</div>
+              <p className="text-xs text-muted-foreground">
+                citas agendadas para hoy
+              </p>
+            </CardContent>
+          </Card>
+        </Link>
+
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Citas de Hoy</CardTitle>
-            <CalendarDays className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium">Citas Completadas Hoy</CardTitle>
+            <CheckCircle className="h-4 w-4 text-green-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats?.today_appointments || 0}</div>
+            <div className="text-2xl font-bold text-green-600">{stats?.todayCompleted || 0}</div>
             <p className="text-xs text-muted-foreground">
-              citas agendadas para hoy
+              servicios realizados
             </p>
           </CardContent>
         </Card>
+        
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Ingresos del Mes</CardTitle>
+            <CardTitle className="text-sm font-medium">Ingresos de Hoy</CardTitle>
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">${stats?.monthly_revenue || 0}</div>
+            <div className="text-2xl font-bold">${stats?.todayRevenue || 0}</div>
             <p className="text-xs text-muted-foreground">
-              ingresos generados este mes
+              ingresos generados hoy
             </p>
           </CardContent>
         </Card>
       </div>
+      
       <div className="grid gap-6 mt-8">
         <PendingPaymentsList />
         <Card>
