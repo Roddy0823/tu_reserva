@@ -1,3 +1,4 @@
+
 import { 
   Home, 
   Package, 
@@ -72,7 +73,7 @@ const menuItems = [
 
 export function AppSidebar() {
   const location = useLocation();
-  const { business } = useBusiness();
+  const { business, isLoading } = useBusiness();
   const { signOut } = useAuth();
   const { toast } = useToast();
 
@@ -85,6 +86,9 @@ export function AppSidebar() {
       });
     }
   };
+
+  // Determinar si la navegación debe estar deshabilitada
+  const isNavigationDisabled = !business && !isLoading;
 
   return (
     <Sidebar>
@@ -104,23 +108,33 @@ export function AppSidebar() {
       
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Navegación Principal</SidebarGroupLabel>
+          <SidebarGroupLabel>
+            {isNavigationDisabled ? "Configuración Requerida" : "Navegación Principal"}
+          </SidebarGroupLabel>
           <SidebarGroupContent>
-            <SidebarMenu>
-              {menuItems.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton 
-                    asChild 
-                    isActive={location.pathname === item.url}
-                  >
-                    <Link to={item.url}>
-                      <item.icon className="h-4 w-4" />
-                      <span>{item.title}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
+            {isNavigationDisabled ? (
+              <div className="p-4 text-sm text-muted-foreground text-center">
+                <p className="mb-2">Configura tu negocio para acceder a todas las funciones</p>
+                <div className="w-6 h-6 border-2 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto"></div>
+              </div>
+            ) : (
+              <SidebarMenu>
+                {menuItems.map((item) => (
+                  <SidebarMenuItem key={item.title}>
+                    <SidebarMenuButton 
+                      asChild 
+                      isActive={location.pathname === item.url}
+                      disabled={isLoading}
+                    >
+                      <Link to={item.url}>
+                        <item.icon className="h-4 w-4" />
+                        <span>{item.title}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+              </SidebarMenu>
+            )}
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>

@@ -9,12 +9,31 @@ import RecentActivity from "./RecentActivity";
 import PendingPaymentsList from "./PendingPaymentsList";
 import SubscriptionLimitBanner from "./SubscriptionLimitBanner";
 import BookingUrlCard from "./BookingUrlCard";
+import BusinessSetup from "./BusinessSetup";
 
 const Dashboard = () => {
-  const { business } = useBusiness();
-  const { stats, recentActivity, isLoading } = useDashboardStats();
+  const { business, isLoading: businessLoading } = useBusiness();
+  const { stats, recentActivity, isLoading: statsLoading } = useDashboardStats();
 
-  if (isLoading) {
+  // Si está cargando la información del negocio, mostrar spinner
+  if (businessLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p>Cargando información del negocio...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Si no hay negocio, mostrar el formulario de configuración
+  if (!business) {
+    return <BusinessSetup />;
+  }
+
+  // Si hay negocio pero las estadísticas están cargando
+  if (statsLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
