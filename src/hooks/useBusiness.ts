@@ -33,6 +33,13 @@ export const useBusiness = () => {
     },
   });
 
+  // Función para generar sugerencias de URL alternativas
+  const generateAlternativeSlug = (baseSlug: string) => {
+    const timestamp = Date.now().toString().slice(-4);
+    const randomSuffix = Math.floor(Math.random() * 99) + 1;
+    return `${baseSlug}-${randomSuffix}`;
+  };
+
   // Crear un nuevo negocio
   const createBusinessMutation = useMutation({
     mutationFn: async (businessData: Omit<BusinessInsert, 'owner_user_id'>) => {
@@ -57,16 +64,32 @@ export const useBusiness = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['business'] });
       toast({
-        title: "Negocio creado",
-        description: "Tu negocio se ha registrado correctamente",
+        title: "¡Negocio creado exitosamente!",
+        description: "Tu negocio se ha registrado correctamente y ya puedes comenzar a configurar tus servicios.",
       });
     },
-    onError: (error) => {
-      toast({
-        title: "Error al crear negocio",
-        description: error.message,
-        variant: "destructive",
-      });
+    onError: (error: any) => {
+      console.error('Error creating business:', error);
+      
+      if (error.code === '23505' && error.message.includes('businesses_booking_url_slug_key')) {
+        toast({
+          title: "URL de reservas ya existe",
+          description: "Esta URL ya está en uso. Por favor, elige una URL diferente para tu negocio.",
+          variant: "destructive",
+        });
+      } else if (error.message.includes('duplicate key')) {
+        toast({
+          title: "Información duplicada",
+          description: "Ya existe un negocio con estos datos. Verifica la información e intenta nuevamente.",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Error al crear negocio",
+          description: error.message || "Ocurrió un error inesperado. Intenta nuevamente.",
+          variant: "destructive",
+        });
+      }
     },
   });
 
@@ -94,12 +117,22 @@ export const useBusiness = () => {
         description: "Los cambios se han guardado correctamente",
       });
     },
-    onError: (error) => {
-      toast({
-        title: "Error al actualizar negocio",
-        description: error.message,
-        variant: "destructive",
-      });
+    onError: (error: any) => {
+      console.error('Error updating business:', error);
+
+      if (error.code === '23505' && error.message.includes('businesses_booking_url_slug_key')) {
+        toast({
+          title: "URL de reservas ya existe",
+          description: "Esta URL ya está en uso por otro negocio. Por favor, elige una URL diferente.",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Error al actualizar negocio",
+          description: error.message || "Ocurrió un error inesperado. Intenta nuevamente.",
+          variant: "destructive",
+        });
+      }
     },
   });
 
@@ -111,5 +144,6 @@ export const useBusiness = () => {
     updateBusiness: updateBusinessMutation.mutate,
     isCreating: createBusinessMutation.isPending,
     isUpdating: updateBusinessMutation.isPending,
+    generateAlternativeSlug,
   };
 };
