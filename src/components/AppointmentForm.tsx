@@ -50,7 +50,7 @@ const AppointmentForm = ({ editingAppointment, onClose, defaultDate }: Appointme
   const [selectedStaffId, setSelectedStaffId] = useState<string>('');
 
   const { availableSlots } = useAvailableTimeSlots(
-    selectedDate,
+    format(selectedDate, 'yyyy-MM-dd'),
     selectedServiceId,
     selectedStaffId
   );
