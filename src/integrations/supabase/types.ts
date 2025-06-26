@@ -305,30 +305,105 @@ export type Database = {
       services: {
         Row: {
           business_id: string
+          confirmation_message: string | null
           created_at: string
           description: string | null
           duration_minutes: number
+          friday_end: string | null
+          friday_start: string | null
           id: string
+          image_url: string | null
+          is_friday_active: boolean | null
+          is_monday_active: boolean | null
+          is_saturday_active: boolean | null
+          is_sunday_active: boolean | null
+          is_thursday_active: boolean | null
+          is_tuesday_active: boolean | null
+          is_wednesday_active: boolean | null
+          min_advance_days: number | null
+          monday_end: string | null
+          monday_start: string | null
           name: string
+          payment_method: string | null
           price: number
+          saturday_end: string | null
+          saturday_start: string | null
+          sunday_end: string | null
+          sunday_start: string | null
+          thursday_end: string | null
+          thursday_start: string | null
+          tuesday_end: string | null
+          tuesday_start: string | null
+          wednesday_end: string | null
+          wednesday_start: string | null
         }
         Insert: {
           business_id: string
+          confirmation_message?: string | null
           created_at?: string
           description?: string | null
           duration_minutes: number
+          friday_end?: string | null
+          friday_start?: string | null
           id?: string
+          image_url?: string | null
+          is_friday_active?: boolean | null
+          is_monday_active?: boolean | null
+          is_saturday_active?: boolean | null
+          is_sunday_active?: boolean | null
+          is_thursday_active?: boolean | null
+          is_tuesday_active?: boolean | null
+          is_wednesday_active?: boolean | null
+          min_advance_days?: number | null
+          monday_end?: string | null
+          monday_start?: string | null
           name: string
+          payment_method?: string | null
           price: number
+          saturday_end?: string | null
+          saturday_start?: string | null
+          sunday_end?: string | null
+          sunday_start?: string | null
+          thursday_end?: string | null
+          thursday_start?: string | null
+          tuesday_end?: string | null
+          tuesday_start?: string | null
+          wednesday_end?: string | null
+          wednesday_start?: string | null
         }
         Update: {
           business_id?: string
+          confirmation_message?: string | null
           created_at?: string
           description?: string | null
           duration_minutes?: number
+          friday_end?: string | null
+          friday_start?: string | null
           id?: string
+          image_url?: string | null
+          is_friday_active?: boolean | null
+          is_monday_active?: boolean | null
+          is_saturday_active?: boolean | null
+          is_sunday_active?: boolean | null
+          is_thursday_active?: boolean | null
+          is_tuesday_active?: boolean | null
+          is_wednesday_active?: boolean | null
+          min_advance_days?: number | null
+          monday_end?: string | null
+          monday_start?: string | null
           name?: string
+          payment_method?: string | null
           price?: number
+          saturday_end?: string | null
+          saturday_start?: string | null
+          sunday_end?: string | null
+          sunday_start?: string | null
+          thursday_end?: string | null
+          thursday_start?: string | null
+          tuesday_end?: string | null
+          tuesday_start?: string | null
+          wednesday_end?: string | null
+          wednesday_start?: string | null
         }
         Relationships: [
           {
