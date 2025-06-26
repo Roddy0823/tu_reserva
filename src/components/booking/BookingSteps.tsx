@@ -8,41 +8,46 @@ interface BookingStepsProps {
 
 const BookingSteps = ({ currentStep, steps }: BookingStepsProps) => {
   return (
-    <div className="mb-8">
-      <div className="flex items-center justify-between max-w-2xl mx-auto">
+    <div className="mb-12">
+      <div className="flex items-center justify-between max-w-4xl mx-auto px-4">
         {steps.map((step, index) => {
           const stepNumber = index + 1;
           const isActive = stepNumber === currentStep;
           const isCompleted = stepNumber < currentStep;
           
           return (
-            <div key={step} className="flex items-center">
-              <div className="flex flex-col items-center">
+            <div key={step} className="flex items-center flex-1">
+              <div className="flex flex-col items-center flex-1">
                 <div className={`
-                  w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium
+                  w-12 h-12 rounded-full flex items-center justify-center text-sm font-bold border-2 transition-all
                   ${isCompleted 
-                    ? 'bg-green-500 text-white' 
+                    ? 'bg-green-500 text-white border-green-500 shadow-lg' 
                     : isActive 
-                      ? 'bg-blue-500 text-white' 
-                      : 'bg-gray-200 text-gray-600'
+                      ? 'bg-blue-500 text-white border-blue-500 shadow-lg scale-110' 
+                      : 'bg-white text-gray-400 border-gray-300'
                   }
                 `}>
                   {isCompleted ? (
-                    <Check className="h-5 w-5" />
+                    <Check className="h-6 w-6" />
                   ) : (
                     stepNumber
                   )}
                 </div>
                 <span className={`
-                  mt-2 text-xs font-medium text-center max-w-16
-                  ${isActive ? 'text-blue-600' : isCompleted ? 'text-green-600' : 'text-gray-500'}
+                  mt-3 text-sm font-medium text-center px-2 transition-all
+                  ${isActive 
+                    ? 'text-blue-600 font-semibold' 
+                    : isCompleted 
+                      ? 'text-green-600 font-medium' 
+                      : 'text-gray-500'
+                  }
                 `}>
                   {step}
                 </span>
               </div>
               {index < steps.length - 1 && (
                 <div className={`
-                  flex-1 h-px mx-4 mt-5
+                  flex-1 h-1 mx-4 mt-[-20px] rounded-full transition-all
                   ${isCompleted ? 'bg-green-500' : 'bg-gray-200'}
                 `} />
               )}
