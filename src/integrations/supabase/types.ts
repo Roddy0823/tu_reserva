@@ -221,28 +221,46 @@ export type Database = {
       }
       businesses: {
         Row: {
+          address: string | null
           bank_account_details: string | null
           booking_url_slug: string
+          contact_email: string | null
+          contact_phone: string | null
           created_at: string
+          description: string | null
           id: string
+          logo_url: string | null
           name: string
           owner_user_id: string
+          updated_at: string | null
         }
         Insert: {
+          address?: string | null
           bank_account_details?: string | null
           booking_url_slug: string
+          contact_email?: string | null
+          contact_phone?: string | null
           created_at?: string
+          description?: string | null
           id?: string
+          logo_url?: string | null
           name: string
           owner_user_id: string
+          updated_at?: string | null
         }
         Update: {
+          address?: string | null
           bank_account_details?: string | null
           booking_url_slug?: string
+          contact_email?: string | null
+          contact_phone?: string | null
           created_at?: string
+          description?: string | null
           id?: string
+          logo_url?: string | null
           name?: string
           owner_user_id?: string
+          updated_at?: string | null
         }
         Relationships: []
       }
