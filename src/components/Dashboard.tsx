@@ -1,5 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { CalendarDays, Package, TrendingUp, Users } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { CalendarDays, Package, TrendingUp, Users, Settings } from "lucide-react";
 import { useBusiness } from "@/hooks/useBusiness";
 import { useDashboardStats } from "@/hooks/useDashboardStats";
 import { Link } from "react-router-dom";
@@ -29,6 +30,12 @@ const Dashboard = () => {
             Este es un resumen general de tu negocio.
           </p>
         </div>
+        <Link to="/settings">
+          <Button variant="outline" size="sm">
+            <Settings className="h-4 w-4 mr-2" />
+            Configuración
+          </Button>
+        </Link>
       </div>
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         <Link to="/services">
@@ -75,7 +82,7 @@ const Dashboard = () => {
             </CardContent>
           </Card>
         </Link>
-
+        
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Citas de Hoy</CardTitle>

@@ -9,6 +9,7 @@ import Auth from "./pages/Auth";
 import Dashboard from "./components/Dashboard";
 import Services from "./pages/Services";
 import Staff from "./pages/Staff";
+import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 import Availability from "@/pages/Availability";
 import BookingPublic from "@/pages/BookingPublic";
@@ -51,6 +52,7 @@ function AppContent() {
       <Route path="/services" element={user ? <Services /> : <Navigate to="/auth" replace />} />
       <Route path="/staff" element={user ? <Staff /> : <Navigate to="/auth" replace />} />
       <Route path="/availability" element={user ? <Availability /> : <Navigate to="/auth" replace />} />
+      <Route path="/settings" element={user ? <Settings /> : <Navigate to="/auth" replace />} />
       <Route path="/booking/:businessSlug" element={<BookingPublic />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
