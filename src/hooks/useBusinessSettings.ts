@@ -41,7 +41,7 @@ export const useBusinessSettings = (businessId: string) => {
     queryKey: ['business-settings', businessId],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from('business_settings')
+        .from('business_settings' as any)
         .select('*')
         .eq('business_id', businessId)
         .single();
@@ -63,7 +63,7 @@ export const useBusinessSettings = (businessId: string) => {
     mutationFn: async (settingsData: Partial<BusinessSettings>) => {
       // Check if settings exist
       const { data: existingSettings } = await supabase
-        .from('business_settings')
+        .from('business_settings' as any)
         .select('id')
         .eq('business_id', businessId)
         .single();
@@ -71,7 +71,7 @@ export const useBusinessSettings = (businessId: string) => {
       if (existingSettings) {
         // Update existing settings
         const { data, error } = await supabase
-          .from('business_settings')
+          .from('business_settings' as any)
           .update({
             ...settingsData,
             updated_at: new Date().toISOString()
@@ -85,7 +85,7 @@ export const useBusinessSettings = (businessId: string) => {
       } else {
         // Create new settings
         const { data, error } = await supabase
-          .from('business_settings')
+          .from('business_settings' as any)
           .insert({
             business_id: businessId,
             ...settingsData,

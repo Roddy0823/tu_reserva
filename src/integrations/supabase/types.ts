@@ -85,6 +85,89 @@ export type Database = {
           },
         ]
       }
+      business_settings: {
+        Row: {
+          allow_same_day_booking: boolean
+          auto_confirm_bookings: boolean
+          browser_notifications: boolean
+          business_id: string
+          cancellation_hours: number
+          cancellation_policy: string
+          cancellation_policy_text: string | null
+          created_at: string
+          email_booking_cancelled: boolean
+          email_booking_confirmed: boolean
+          email_daily_summary: boolean
+          email_new_booking: boolean
+          email_payment_received: boolean
+          email_weekly_report: boolean
+          id: string
+          max_advance_days: number
+          min_advance_hours: number
+          require_confirmation: boolean
+          sms_booking_reminder: boolean
+          sms_new_booking: boolean
+          sound_notifications: boolean
+          updated_at: string
+        }
+        Insert: {
+          allow_same_day_booking?: boolean
+          auto_confirm_bookings?: boolean
+          browser_notifications?: boolean
+          business_id: string
+          cancellation_hours?: number
+          cancellation_policy?: string
+          cancellation_policy_text?: string | null
+          created_at?: string
+          email_booking_cancelled?: boolean
+          email_booking_confirmed?: boolean
+          email_daily_summary?: boolean
+          email_new_booking?: boolean
+          email_payment_received?: boolean
+          email_weekly_report?: boolean
+          id?: string
+          max_advance_days?: number
+          min_advance_hours?: number
+          require_confirmation?: boolean
+          sms_booking_reminder?: boolean
+          sms_new_booking?: boolean
+          sound_notifications?: boolean
+          updated_at?: string
+        }
+        Update: {
+          allow_same_day_booking?: boolean
+          auto_confirm_bookings?: boolean
+          browser_notifications?: boolean
+          business_id?: string
+          cancellation_hours?: number
+          cancellation_policy?: string
+          cancellation_policy_text?: string | null
+          created_at?: string
+          email_booking_cancelled?: boolean
+          email_booking_confirmed?: boolean
+          email_daily_summary?: boolean
+          email_new_booking?: boolean
+          email_payment_received?: boolean
+          email_weekly_report?: boolean
+          id?: string
+          max_advance_days?: number
+          min_advance_hours?: number
+          require_confirmation?: boolean
+          sms_booking_reminder?: boolean
+          sms_new_booking?: boolean
+          sound_notifications?: boolean
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "business_settings_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: true
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       businesses: {
         Row: {
           bank_account_details: string | null
