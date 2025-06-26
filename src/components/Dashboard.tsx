@@ -1,3 +1,4 @@
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { CalendarDays, Package, TrendingUp, Users } from "lucide-react";
 import { useBusiness } from "@/hooks/useBusiness";
@@ -7,7 +8,7 @@ import RecentActivity from "./RecentActivity";
 
 const Dashboard = () => {
   const { business } = useBusiness();
-  const { stats, isLoading } = useDashboardStats();
+  const { stats, recentActivity, isLoading } = useDashboardStats();
 
   if (isLoading) {
     return (
@@ -28,7 +29,6 @@ const Dashboard = () => {
             Este es un resumen general de tu negocio.
           </p>
         </div>
-        {/* <Button>Download</Button> */}
       </div>
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         <Link to="/services">
@@ -95,7 +95,7 @@ const Dashboard = () => {
             </CardDescription>
           </CardHeader>
           <CardContent className="pl-2">
-            <RecentActivity />
+            <RecentActivity activities={recentActivity} />
           </CardContent>
         </Card>
       </div>

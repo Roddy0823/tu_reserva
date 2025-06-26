@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -46,7 +46,7 @@ const StaffForm = ({ staffMember, services, onSubmit, onCancel, isLoading }: Sta
   });
 
   // Establecer servicios seleccionados cuando se cargan
-  useState(() => {
+  useEffect(() => {
     if (staffServices && staffServices.length > 0) {
       setSelectedServices(staffServices.map((service: any) => service.id));
     }

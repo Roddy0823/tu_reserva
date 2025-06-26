@@ -6,6 +6,40 @@ import { useBusiness } from "./useBusiness";
 export const useDashboardStats = () => {
   const { business } = useBusiness();
 
+  // Obtener servicios del negocio
+  const { data: services = [] } = useQuery({
+    queryKey: ['services', business?.id],
+    queryFn: async () => {
+      if (!business?.id) return [];
+      
+      const { data, error } = await supabase
+        .from('services')
+        .select('*')
+        .eq('business_id', business.id);
+
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: !!business?.id,
+  });
+
+  // Obtener personal del negocio
+  const { data: staff = [] } = useQuery({
+    queryKey: ['staff', business?.id],
+    queryFn: async () => {
+      if (!business?.id) return [];
+      
+      const { data, error } = await supabase
+        .from('staff_members')
+        .select('*')
+        .eq('business_id', business.id);
+
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: !!business?.id,
+  });
+
   // Obtener turnos de hoy
   const { data: todayAppointments = [] } = useQuery({
     queryKey: ['appointments', 'today', business?.id],
@@ -22,43 +56,6 @@ export const useDashboardStats = () => {
         .eq('business_id', business.id)
         .gte('start_time', startOfDay.toISOString())
         .lte('start_time', endOfDay.toISOString());
-
-      if (error) throw error;
-      return data || [];
-    },
-    enabled: !!business?.id,
-  });
-
-  // Obtener turnos pendientes
-  const { data: pendingAppointments = [] } = useQuery({
-    queryKey: ['appointments', 'pending', business?.id],
-    queryFn: async () => {
-      if (!business?.id) return [];
-
-      const { data, error } = await supabase
-        .from('appointments')
-        .select('*')
-        .eq('business_id', business.id)
-        .eq('status', 'pendiente');
-
-      if (error) throw error;
-      return data || [];
-    },
-    enabled: !!business?.id,
-  });
-
-  // Obtener comprobantes pendientes de validación
-  const { data: pendingPayments = [] } = useQuery({
-    queryKey: ['appointments', 'pending-payments', business?.id],
-    queryFn: async () => {
-      if (!business?.id) return [];
-
-      const { data, error } = await supabase
-        .from('appointments')
-        .select('*')
-        .eq('business_id', business.id)
-        .eq('payment_status', 'pendiente')
-        .not('payment_proof_url', 'is', null);
 
       if (error) throw error;
       return data || [];
@@ -91,10 +88,12 @@ export const useDashboardStats = () => {
 
   // Calcular estadísticas
   const stats = {
+    total_services: services.length,
+    total_staff: staff.length,
+    today_appointments: todayAppointments.length,
+    monthly_revenue: 0, // Por ahora 0, se puede calcular más adelante
     todayAppointments: todayAppointments.length,
     todayCancellations: todayAppointments.filter(apt => apt.status === 'cancelado').length,
-    pendingAppointments: pendingAppointments.length,
-    pendingPayments: pendingPayments.length,
   };
 
   return {
