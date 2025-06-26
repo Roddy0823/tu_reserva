@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useTimeBlocks } from '@/hooks/useTimeBlocks';
 import { useStaff } from '@/hooks/useStaff';
+import { useServices } from '@/hooks/useServices';
 import { useAppointments } from '@/hooks/useAppointments';
 import TimeBlockForm from './TimeBlockForm';
 import CalendarView from './CalendarView';
@@ -19,6 +20,7 @@ const AvailabilityManagement = () => {
   
   const { getAllTimeBlocks, createTimeBlock, updateTimeBlock, deleteTimeBlock, isCreating, isUpdating, isDeleting } = useTimeBlocks();
   const { staffMembers } = useStaff();
+  const { services } = useServices();
   const { appointments } = useAppointments();
   const { data: timeBlocks = [], isLoading } = getAllTimeBlocks();
 
@@ -117,6 +119,8 @@ const AvailabilityManagement = () => {
           <CalendarView
             timeBlocks={timeBlocks}
             appointments={appointments}
+            staffMembers={staffMembers}
+            services={services}
             onCreateTimeBlock={() => setShowForm(true)}
             onEditTimeBlock={handleEditTimeBlock}
             onEditAppointment={handleEditAppointment}
