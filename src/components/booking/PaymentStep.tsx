@@ -27,7 +27,7 @@ const PaymentStep = ({ appointment, businessBankDetails, onComplete }: PaymentSt
           </div>
           
           <div className="p-4 bg-yellow-50 rounded-lg">
-            <h4 className="font-medium text-yellow-800 mb-2">¡Tu reserva está casi lista!</</h4>
+            <h4 className="font-medium text-yellow-800 mb-2">¡Tu reserva está casi lista!</h4>
             <p className="text-sm text-yellow-700">
               Para confirmar tu cita, necesitas realizar el pago y subir el comprobante.
               Una vez que el administrador apruebe tu pago, tu cita será confirmada automáticamente.
