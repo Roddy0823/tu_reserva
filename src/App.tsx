@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -12,6 +11,7 @@ import Services from "./pages/Services";
 import Staff from "./pages/Staff";
 import NotFound from "./pages/NotFound";
 import Availability from "@/pages/Availability";
+import BookingPublic from "@/pages/BookingPublic";
 
 const queryClient = new QueryClient();
 
@@ -51,6 +51,7 @@ function AppContent() {
       <Route path="/services" element={user ? <Services /> : <Navigate to="/auth" replace />} />
       <Route path="/staff" element={user ? <Staff /> : <Navigate to="/auth" replace />} />
       <Route path="/availability" element={user ? <Availability /> : <Navigate to="/auth" replace />} />
+      <Route path="/booking/:businessSlug" element={<BookingPublic />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   );
