@@ -4,6 +4,7 @@ import {
   Package, 
   CalendarDays, 
   Calendar, 
+  CheckCircle,
   CreditCard, 
   Crown, 
   Settings 
@@ -43,6 +44,11 @@ const menuItems = [
     title: "Citas de Hoy",
     url: "/appointments/today",
     icon: Calendar,
+  },
+  {
+    title: "Citas Completadas",
+    url: "/appointments/completed",
+    icon: CheckCircle,
   },
   {
     title: "Transferencias",

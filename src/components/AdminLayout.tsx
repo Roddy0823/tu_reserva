@@ -19,6 +19,7 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
       '/staff': 'Gestión de Personal',
       '/availability': 'Gestión de Disponibilidad',
       '/appointments/today': 'Citas de Hoy',
+      '/appointments/completed': 'Citas Completadas',
       '/transfers': 'Transferencias',
       '/subscription': 'Mi Suscripción',
       '/settings': 'Ajustes',
