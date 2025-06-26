@@ -10,7 +10,7 @@ import { useSubscription } from '@/hooks/useSubscription';
 const Subscription = () => {
   const { user } = useAuth();
   const { business, isLoading } = useBusiness();
-  const { subscription, usage, isLoading: subscriptionLoading } = useSubscription();
+  const { subscription, currentUsage, isLoading: subscriptionLoading, plans } = useSubscription();
 
   if (isLoading || subscriptionLoading) {
     return (
@@ -26,6 +26,9 @@ const Subscription = () => {
   if (!business) {
     return <BusinessSetup />;
   }
+
+  const currentPlan = subscription?.subscription_plans;
+  const isFreePlan = currentPlan?.name === 'Gratuito';
 
   return (
     <div className="container py-6">
@@ -55,10 +58,10 @@ const Subscription = () => {
               <div className="flex items-center justify-between p-4 bg-blue-50 rounded-lg">
                 <div>
                   <h3 className="font-semibold text-blue-900">
-                    Plan {subscription?.plan_type === 'free' ? 'Gratuito' : 'Pro'}
+                    Plan {currentPlan?.name || 'Gratuito'}
                   </h3>
                   <p className="text-sm text-blue-700">
-                    {subscription?.plan_type === 'free' 
+                    {isFreePlan
                       ? 'Funcionalidades básicas incluidas'
                       : 'Acceso completo a todas las funcionalidades'
                     }
@@ -66,27 +69,19 @@ const Subscription = () => {
                 </div>
                 <div className="text-right">
                   <div className="text-2xl font-bold text-blue-900">
-                    ${subscription?.plan_type === 'free' ? '0' : '29'}
+                    ${isFreePlan ? '0' : (currentPlan?.price_cop ? (currentPlan.price_cop / 1000).toFixed(0) : '29')}
                   </div>
                   <div className="text-sm text-blue-700">por mes</div>
                 </div>
               </div>
 
-              {usage && (
+              {currentUsage && (
                 <div className="p-4 border rounded-lg">
                   <h4 className="font-medium mb-2">Uso del Mes Actual</h4>
                   <div className="space-y-2">
                     <div className="flex justify-between text-sm">
-                      <span>Citas creadas:</span>
-                      <span>{usage.appointments_this_month} / {subscription?.plan_type === 'free' ? '10' : '∞'}</span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span>Servicios activos:</span>
-                      <span>{usage.active_services} / {subscription?.plan_type === 'free' ? '3' : '∞'}</span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span>Personal activo:</span>
-                      <span>{usage.active_staff} / {subscription?.plan_type === 'free' ? '2' : '∞'}</span>
+                      <span>Citas completadas:</span>
+                      <span>{currentUsage.completed_bookings} / {currentPlan?.max_bookings_per_month || '∞'}</span>
                     </div>
                   </div>
                 </div>
@@ -95,7 +90,15 @@ const Subscription = () => {
           </CardContent>
         </Card>
 
-        <SubscriptionCard />
+        <div className="grid md:grid-cols-2 gap-6">
+          {plans.map((plan) => (
+            <SubscriptionCard 
+              key={plan.id} 
+              plan={plan} 
+              isCurrentPlan={currentPlan?.id === plan.id}
+            />
+          ))}
+        </div>
       </div>
     </div>
   );

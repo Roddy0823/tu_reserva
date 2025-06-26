@@ -9,7 +9,7 @@ interface SubscriptionCardProps {
   plan: {
     id: string;
     name: string;
-    description: string;
+    description: string | null;
     price_cop: number;
     max_bookings_per_month: number | null;
   };
@@ -34,7 +34,7 @@ const SubscriptionCard = ({ plan, isCurrentPlan }: SubscriptionCardProps) => {
     'Soporte prioritario',
     'Reportes detallados'
   ] : [
-    'Hasta 10 reservas por mes',
+    `Hasta ${plan.max_bookings_per_month || 10} reservas por mes`,
     'Gestión básica de servicios',
     'Notificaciones por email',
     'Soporte estándar'
@@ -79,8 +79,8 @@ const SubscriptionCard = ({ plan, isCurrentPlan }: SubscriptionCardProps) => {
       <CardContent className="space-y-4">
         <ul className="space-y-2">
           {features.map((feature, index) => (
-            <li key={index} className="flex items-center gap-2 text-sm">
-              <Check className="h-4 w-4 text-green-500 flex-shrink-0" />
+            <li key={index} className="flex items-start gap-2 text-sm">
+              <Check className="h-4 w-4 text-green-500 flex-shrink-0 mt-0.5" />
               {feature}
             </li>
           ))}
@@ -97,7 +97,7 @@ const SubscriptionCard = ({ plan, isCurrentPlan }: SubscriptionCardProps) => {
           </Button>
         )}
         
-        {isCurrentPlan && plan.name === 'Pro' && (
+        {isCurrentPlan && (
           <Button variant="outline" className="w-full" disabled>
             Plan Activo
           </Button>
