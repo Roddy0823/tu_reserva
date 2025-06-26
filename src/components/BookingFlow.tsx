@@ -1,7 +1,6 @@
+
 import { useState } from 'react';
 import { useBusinessBySlug } from '@/hooks/useBusinessBySlug';
-import { useServices } from '@/hooks/useServices';
-import { useStaff } from '@/hooks/useStaff';
 import { useCreateAppointment } from '@/hooks/useCreateAppointment';
 import ServiceSelection from './booking/ServiceSelection';
 import StaffSelection from './booking/StaffSelection';
@@ -11,21 +10,23 @@ import ClientDetails from './booking/ClientDetails';
 import BookingSummary from './booking/BookingSummary';
 import PaymentStep from './booking/PaymentStep';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, ArrowRight } from 'lucide-react';
-import { addMinutes, format } from 'date-fns';
+import { ArrowLeft } from 'lucide-react';
+import { addMinutes } from 'date-fns';
 
 const BookingFlow = ({ businessSlug }: { businessSlug: string }) => {
   const [step, setStep] = useState(1);
-  const [selectedService, setSelectedService] = useState<any>(null);
-  const [selectedStaff, setSelectedStaff] = useState<any>(null);
-  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
-  const [selectedTime, setSelectedTime] = useState<string>('');
-  const [clientData, setClientData] = useState<any>(null);
-  const [newAppointment, setNewAppointment] = useState<any>(null);
+  const [bookingData, setBookingData] = useState<any>({
+    service: null,
+    staff: null,
+    date: null,
+    time: null,
+    clientName: '',
+    clientEmail: '',
+    clientPhone: '',
+  });
+  const [appointment, setAppointment] = useState<any>(null);
 
   const { business, isLoading: isBusinessLoading, error: businessError } = useBusinessBySlug(businessSlug);
-  const { services, isLoading: isServicesLoading, error: servicesError } = useServices(business?.id);
-  const { staff, isLoading: isStaffLoading, error: staffError } = useStaff(business?.id);
   const { createAppointment, isCreating } = useCreateAppointment();
 
   if (isBusinessLoading) {
@@ -40,6 +41,10 @@ const BookingFlow = ({ businessSlug }: { businessSlug: string }) => {
     return <div>Negocio no encontrado.</div>;
   }
 
+  const updateBookingData = (data: any) => {
+    setBookingData(prev => ({ ...prev, ...data }));
+  };
+
   const handleNext = () => {
     setStep(step + 1);
   };
@@ -48,32 +53,15 @@ const BookingFlow = ({ businessSlug }: { businessSlug: string }) => {
     setStep(step - 1);
   };
 
-  const handleConfirmBooking = () => {
-    if (!selectedService || !selectedStaff || !selectedDate || !selectedTime || !clientData || !business) return;
-
-    const startTime = new Date(selectedDate);
-    const [hours, minutes] = selectedTime.split(':').map(Number);
-    startTime.setHours(hours, minutes, 0, 0);
-    
-    const endTime = addMinutes(startTime, selectedService.duration_minutes);
-
-    const appointmentData = {
-      business_id: business.id,
-      service_id: selectedService.id,
-      staff_id: selectedStaff.id,
-      start_time: startTime.toISOString(),
-      end_time: endTime.toISOString(),
-      client_name: clientData.name,
-      client_email: clientData.email,
-      client_phone: clientData.phone || null,
-    };
-
-    createAppointment(appointmentData, {
-      onSuccess: (data) => {
-        setNewAppointment(data);
-        setStep(7); // Move to payment step
-      }
-    });
+  const canProceedToNext = () => {
+    switch (step) {
+      case 1: return bookingData.service;
+      case 2: return bookingData.staff;
+      case 3: return bookingData.date;
+      case 4: return bookingData.time;
+      case 5: return bookingData.clientName && bookingData.clientEmail;
+      default: return false;
+    }
   };
 
   return (
@@ -82,7 +70,7 @@ const BookingFlow = ({ businessSlug }: { businessSlug: string }) => {
 
       <div className="mb-4">
         <h2 className="text-xl font-semibold mb-2">Paso {step}</h2>
-        {step > 1 && (
+        {step > 1 && step < 7 && (
           <Button variant="outline" size="sm" onClick={handleBack}>
             <ArrowLeft className="h-4 w-4 mr-2" />
             Anterior
@@ -94,103 +82,91 @@ const BookingFlow = ({ businessSlug }: { businessSlug: string }) => {
         <div>
           <h2 className="text-2xl font-bold mb-6">Selecciona un Servicio</h2>
           <ServiceSelection
-            services={services}
-            onServiceSelect={(service) => {
-              setSelectedService(service);
-              handleNext();
-            }}
-            isLoading={isServicesLoading}
+            business={business}
+            bookingData={bookingData}
+            updateBookingData={updateBookingData}
           />
         </div>
       )}
 
-      {step === 2 && selectedService && (
+      {step === 2 && (
         <div>
           <h2 className="text-2xl font-bold mb-6">Selecciona un Profesional</h2>
           <StaffSelection
-            staff={staff}
-            serviceId={selectedService.id}
-            onStaffSelect={(staff) => {
-              setSelectedStaff(staff);
-              handleNext();
-            }}
-            isLoading={isStaffLoading}
+            business={business}
+            bookingData={bookingData}
+            updateBookingData={updateBookingData}
           />
         </div>
       )}
 
-      {step === 3 && selectedService && selectedStaff && (
+      {step === 3 && (
         <div>
           <h2 className="text-2xl font-bold mb-6">Selecciona una Fecha</h2>
           <DateSelection
-            onDateSelect={(date) => {
-              setSelectedDate(date);
-              handleNext();
-            }}
+            business={business}
+            bookingData={bookingData}
+            updateBookingData={updateBookingData}
           />
         </div>
       )}
 
-      {step === 4 && selectedService && selectedStaff && selectedDate && (
+      {step === 4 && (
         <div>
           <h2 className="text-2xl font-bold mb-6">Selecciona una Hora</h2>
           <TimeSelection
-            staffId={selectedStaff.id}
-            date={selectedDate}
-            serviceDuration={selectedService.duration_minutes}
-            onTimeSelect={(time) => {
-              setSelectedTime(time);
-              handleNext();
-            }}
+            business={business}
+            bookingData={bookingData}
+            updateBookingData={updateBookingData}
           />
         </div>
       )}
 
-      {step === 5 && selectedService && selectedStaff && selectedDate && selectedTime && (
+      {step === 5 && (
         <div>
           <h2 className="text-2xl font-bold mb-6">Tus Datos</h2>
           <ClientDetails
-            onClientDetailsSubmit={(data) => {
-              setClientData(data);
-              handleNext();
+            business={business}
+            bookingData={bookingData}
+            updateBookingData={updateBookingData}
+          />
+        </div>
+      )}
+
+      {step === 6 && (
+        <div>
+          <h2 className="text-2xl font-bold mb-6">Resumen de tu Reserva</h2>
+          <BookingSummary
+            business={business}
+            bookingData={bookingData}
+            updateBookingData={(data) => {
+              if (data.appointment) {
+                setAppointment(data.appointment);
+                setStep(7);
+              } else {
+                updateBookingData(data);
+              }
             }}
           />
         </div>
       )}
 
-        {step === 6 && selectedService && selectedStaff && selectedDate && selectedTime && clientData && (
-          <div>
-            <h2 className="text-2xl font-bold mb-6">Resumen de tu Reserva</h2>
-            <BookingSummary
-              service={selectedService}
-              staff={selectedStaff}
-              date={selectedDate}
-              time={selectedTime}
-              clientData={clientData}
-              onConfirm={handleConfirmBooking}
-              isLoading={isCreating}
-            />
-          </div>
-        )}
+      {step === 7 && appointment && (
+        <div>
+          <h2 className="text-2xl font-bold mb-6">¡Reserva Completada!</h2>
+          <PaymentStep
+            appointment={appointment}
+            businessBankDetails={business?.bank_account_details}
+            onComplete={() => {
+              console.log('Payment process completed');
+            }}
+          />
+        </div>
+      )}
 
-        {step === 7 && newAppointment && (
-          <div>
-            <h2 className="text-2xl font-bold mb-6">¡Reserva Completada!</h2>
-            <PaymentStep
-              appointment={newAppointment}
-              businessBankDetails={business?.bank_account_details}
-              onComplete={() => {
-                // Could redirect to a success page or show final message
-                console.log('Payment process completed');
-              }}
-            />
-          </div>
-        )}
-
-      {step < 6 && step !== 1 && (
-        <Button onClick={handleNext} className="mt-4">
+      {step >= 1 && step <= 5 && canProceedToNext() && (
+        <Button onClick={handleNext} className="mt-4 w-full">
           Siguiente
-          <ArrowRight className="h-4 w-4 ml-2" />
         </Button>
       )}
     </div>

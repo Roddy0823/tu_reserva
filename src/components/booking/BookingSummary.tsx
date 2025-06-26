@@ -16,7 +16,6 @@ interface BookingSummaryProps {
 }
 
 const BookingSummary = ({ business, bookingData, updateBookingData }: BookingSummaryProps) => {
-  const [isConfirmed, setIsConfirmed] = useState(false);
   const { createAppointment, isCreating } = useCreateAppointment();
 
   const handleConfirmBooking = async () => {
@@ -43,33 +42,12 @@ const BookingSummary = ({ business, bookingData, updateBookingData }: BookingSum
       status: 'pendiente' as const,
     };
 
-    try {
-      await createAppointment(appointmentData);
-      setIsConfirmed(true);
-    } catch (error) {
-      console.error('Error creating appointment:', error);
-    }
+    createAppointment(appointmentData, {
+      onSuccess: (appointment) => {
+        updateBookingData({ appointment });
+      }
+    });
   };
-
-  if (isConfirmed) {
-    return (
-      <div className="text-center space-y-4">
-        <div className="flex justify-center">
-          <CheckCircle className="h-16 w-16 text-green-500" />
-        </div>
-        <h2 className="text-2xl font-bold text-green-600">¡Reserva Confirmada!</h2>
-        <p className="text-gray-600">
-          Tu cita ha sido registrada exitosamente. Recibirás un email de confirmación en breve.
-        </p>
-        <Alert>
-          <Clock className="h-4 w-4" />
-          <AlertDescription>
-            Tu cita está en estado <strong>pendiente</strong> hasta que el negocio confirme tu reserva.
-          </AlertDescription>
-        </Alert>
-      </div>
-    );
-  }
 
   return (
     <div className="space-y-6">
