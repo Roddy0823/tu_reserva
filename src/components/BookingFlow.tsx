@@ -3,15 +3,13 @@ import { useState } from 'react';
 import { useBusinessBySlug } from '@/hooks/useBusinessBySlug';
 import { useCreateAppointment } from '@/hooks/useCreateAppointment';
 import ServiceSelection from './booking/ServiceSelection';
-import StaffSelection from './booking/StaffSelection';
-import DateSelection from './booking/DateSelection';
-import TimeSelection from './booking/TimeSelection';
+import StaffDateTimeSelection from './booking/StaffDateTimeSelection';
 import ClientDetails from './booking/ClientDetails';
 import BookingSummary from './booking/BookingSummary';
 import PaymentStep from './booking/PaymentStep';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft } from 'lucide-react';
-import { addMinutes } from 'date-fns';
+import { ArrowLeft, Check } from 'lucide-react';
+import { Progress } from '@/components/ui/progress';
 
 const BookingFlow = ({ businessSlug }: { businessSlug: string }) => {
   const [step, setStep] = useState(1);
@@ -27,18 +25,38 @@ const BookingFlow = ({ businessSlug }: { businessSlug: string }) => {
   const [appointment, setAppointment] = useState<any>(null);
 
   const { business, isLoading: isBusinessLoading, error: businessError } = useBusinessBySlug(businessSlug);
-  const { createAppointment, isCreating } = useCreateAppointment();
 
   if (isBusinessLoading) {
-    return <div>Cargando negocio...</div>;
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p>Cargando...</p>
+        </div>
+      </div>
+    );
   }
 
   if (businessError) {
-    return <div>Error al cargar el negocio.</div>;
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">Error</h1>
+          <p className="text-gray-600">Error al cargar el negocio.</p>
+        </div>
+      </div>
+    );
   }
 
   if (!business) {
-    return <div>Negocio no encontrado.</div>;
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">No encontrado</h1>
+          <p className="text-gray-600">Negocio no encontrado.</p>
+        </div>
+      </div>
+    );
   }
 
   const updateBookingData = (data: any) => {
@@ -56,21 +74,47 @@ const BookingFlow = ({ businessSlug }: { businessSlug: string }) => {
   const canProceedToNext = () => {
     switch (step) {
       case 1: return bookingData.service;
-      case 2: return bookingData.staff;
-      case 3: return bookingData.date;
-      case 4: return bookingData.time;
-      case 5: return bookingData.clientName && bookingData.clientEmail;
+      case 2: return bookingData.staff && bookingData.date && bookingData.time;
+      case 3: return bookingData.clientName && bookingData.clientEmail;
       default: return false;
     }
   };
 
-  return (
-    <div className="max-w-2xl mx-auto p-4">
-      <h1 className="text-3xl font-bold text-center mb-8">{business.name}</h1>
+  const stepTitles = [
+    'Selecciona un Servicio',
+    'Profesional, Fecha y Hora',
+    'Tus Datos',
+    'Confirmar Reserva',
+    'Completado'
+  ];
 
-      <div className="mb-4">
-        <h2 className="text-xl font-semibold mb-2">Paso {step}</h2>
-        {step > 1 && step < 7 && (
+  const currentProgress = (step / 5) * 100;
+
+  return (
+    <div className="max-w-3xl mx-auto p-4">
+      {/* Business Header */}
+      <div className="text-center mb-8">
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">{business.name}</h1>
+        <p className="text-gray-600">Reserva tu cita en {stepTitles.length} pasos simples</p>
+      </div>
+
+      {/* Progress Bar */}
+      <div className="mb-8">
+        <div className="flex justify-between items-center mb-2">
+          <span className="text-sm font-medium text-gray-700">
+            Paso {step} de {stepTitles.length}
+          </span>
+          <span className="text-sm text-gray-500">
+            {Math.round(currentProgress)}% completado
+          </span>
+        </div>
+        <Progress value={currentProgress} className="h-2" />
+      </div>
+
+      {/* Step Title and Back Button */}
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-2xl font-bold text-gray-900">{stepTitles[step - 1]}</h2>
+        {step > 1 && step < 5 && (
           <Button variant="outline" size="sm" onClick={handleBack}>
             <ArrowLeft className="h-4 w-4 mr-2" />
             Anterior
@@ -78,82 +122,48 @@ const BookingFlow = ({ businessSlug }: { businessSlug: string }) => {
         )}
       </div>
 
-      {step === 1 && (
-        <div>
-          <h2 className="text-2xl font-bold mb-6">Selecciona un Servicio</h2>
+      {/* Step Content */}
+      <div className="bg-white rounded-lg shadow-sm border p-6 mb-6">
+        {step === 1 && (
           <ServiceSelection
             business={business}
             bookingData={bookingData}
             updateBookingData={updateBookingData}
           />
-        </div>
-      )}
+        )}
 
-      {step === 2 && (
-        <div>
-          <h2 className="text-2xl font-bold mb-6">Selecciona un Profesional</h2>
-          <StaffSelection
+        {step === 2 && (
+          <StaffDateTimeSelection
             business={business}
             bookingData={bookingData}
             updateBookingData={updateBookingData}
           />
-        </div>
-      )}
+        )}
 
-      {step === 3 && (
-        <div>
-          <h2 className="text-2xl font-bold mb-6">Selecciona una Fecha</h2>
-          <DateSelection
-            business={business}
-            bookingData={bookingData}
-            updateBookingData={updateBookingData}
-          />
-        </div>
-      )}
-
-      {step === 4 && (
-        <div>
-          <h2 className="text-2xl font-bold mb-6">Selecciona una Hora</h2>
-          <TimeSelection
-            business={business}
-            bookingData={bookingData}
-            updateBookingData={updateBookingData}
-          />
-        </div>
-      )}
-
-      {step === 5 && (
-        <div>
-          <h2 className="text-2xl font-bold mb-6">Tus Datos</h2>
+        {step === 3 && (
           <ClientDetails
             business={business}
             bookingData={bookingData}
             updateBookingData={updateBookingData}
           />
-        </div>
-      )}
+        )}
 
-      {step === 6 && (
-        <div>
-          <h2 className="text-2xl font-bold mb-6">Resumen de tu Reserva</h2>
+        {step === 4 && (
           <BookingSummary
             business={business}
             bookingData={bookingData}
             updateBookingData={(data) => {
               if (data.appointment) {
                 setAppointment(data.appointment);
-                setStep(7);
+                setStep(5);
               } else {
                 updateBookingData(data);
               }
             }}
           />
-        </div>
-      )}
+        )}
 
-      {step === 7 && appointment && (
-        <div>
-          <h2 className="text-2xl font-bold mb-6">¡Reserva Completada!</h2>
+        {step === 5 && appointment && (
           <PaymentStep
             appointment={appointment}
             businessBankDetails={business?.bank_account_details}
@@ -161,12 +171,24 @@ const BookingFlow = ({ businessSlug }: { businessSlug: string }) => {
               console.log('Payment process completed');
             }}
           />
-        </div>
-      )}
+        )}
+      </div>
 
-      {step >= 1 && step <= 5 && canProceedToNext() && (
-        <Button onClick={handleNext} className="mt-4 w-full">
-          Siguiente
+      {/* Next Button */}
+      {step >= 1 && step <= 3 && (
+        <Button 
+          onClick={handleNext} 
+          className="w-full h-12 text-lg font-medium"
+          disabled={!canProceedToNext()}
+        >
+          {step === 3 ? (
+            <>
+              <Check className="h-5 w-5 mr-2" />
+              Revisar y Confirmar
+            </>
+          ) : (
+            'Siguiente'
+          )}
         </Button>
       )}
     </div>
