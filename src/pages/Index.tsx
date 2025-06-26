@@ -30,11 +30,6 @@ const Index = () => {
                 Configura tu negocio, datos bancarios y URL personalizada
               </CardDescription>
             </CardHeader>
-            <CardContent>
-              <Button variant="outline" className="w-full">
-                Configurar Negocio
-              </Button>
-            </CardContent>
           </Card>
 
           <Card className="hover:shadow-lg transition-shadow">
@@ -47,11 +42,6 @@ const Index = () => {
                 Crea y gestiona los servicios que ofreces
               </CardDescription>
             </CardHeader>
-            <CardContent>
-              <Button variant="outline" className="w-full">
-                Gestionar Servicios
-              </Button>
-            </CardContent>
           </Card>
 
           <Card className="hover:shadow-lg transition-shadow">
@@ -64,11 +54,6 @@ const Index = () => {
                 Administra tu equipo y sus especialidades
               </CardDescription>
             </CardHeader>
-            <CardContent>
-              <Button variant="outline" className="w-full">
-                Gestionar Personal
-              </Button>
-            </CardContent>
           </Card>
 
           <Card className="hover:shadow-lg transition-shadow">
@@ -81,11 +66,6 @@ const Index = () => {
                 Visualiza y gestiona todas las citas
               </CardDescription>
             </CardHeader>
-            <CardContent>
-              <Button variant="outline" className="w-full">
-                Ver Reservas
-              </Button>
-            </CardContent>
           </Card>
 
           <Card className="hover:shadow-lg transition-shadow">
@@ -98,11 +78,6 @@ const Index = () => {
                 Configura disponibilidad y bloqueos
               </CardDescription>
             </CardHeader>
-            <CardContent>
-              <Button variant="outline" className="w-full">
-                Gestionar Horarios
-              </Button>
-            </CardContent>
           </Card>
 
           <Card className="hover:shadow-lg transition-shadow">
@@ -115,29 +90,25 @@ const Index = () => {
                 Ajustes generales del sistema
               </CardDescription>
             </CardHeader>
-            <CardContent>
-              <Button variant="outline" className="w-full">
-                Configurar
-              </Button>
-            </CardContent>
           </Card>
         </div>
 
         {/* Quick Actions */}
         <div className="bg-white rounded-lg shadow-md p-6">
           <h2 className="text-2xl font-semibold text-gray-900 mb-4">
-            Acciones Rápidas
+            Comenzar Ahora
           </h2>
           <div className="flex flex-wrap gap-4">
-            <Button className="bg-blue-600 hover:bg-blue-700">
-              Iniciar Sesión
-            </Button>
-            <Button variant="outline">
-              Registrar Negocio
-            </Button>
-            <Button variant="outline">
-              Ver Demo
-            </Button>
+            <Link to="/auth">
+              <Button className="bg-blue-600 hover:bg-blue-700">
+                Iniciar Sesión
+              </Button>
+            </Link>
+            <Link to="/auth">
+              <Button variant="outline">
+                Registrar Negocio
+              </Button>
+            </Link>
           </div>
         </div>
 
@@ -146,7 +117,7 @@ const Index = () => {
           <div className="inline-flex items-center space-x-2 bg-green-100 text-green-800 px-4 py-2 rounded-full">
             <div className="w-2 h-2 bg-green-600 rounded-full"></div>
             <span className="text-sm font-medium">
-              Base de datos configurada correctamente
+              Sistema listo para usar
             </span>
           </div>
         </div>
