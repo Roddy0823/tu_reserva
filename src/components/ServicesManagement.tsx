@@ -48,18 +48,36 @@ const ServicesManagement = () => {
     setEditingService(null);
   };
 
-  const getPaymentMethodBadge = (method: string) => {
-    return method === 'transferencia' ? (
-      <Badge variant="outline" className="flex items-center space-x-1 bg-blue-50 text-blue-700 border-blue-200">
-        <CreditCard className="h-3 w-3" />
-        <span>Transferencia</span>
-      </Badge>
-    ) : (
-      <Badge variant="outline" className="flex items-center space-x-1 bg-green-50 text-green-700 border-green-200">
-        <DollarSign className="h-3 w-3" />
-        <span>Presencial</span>
-      </Badge>
-    );
+  const getPaymentMethodBadges = (service: Service) => {
+    const badges = [];
+    
+    if (service.accepts_cash) {
+      badges.push(
+        <Badge key="cash" variant="outline" className="flex items-center space-x-1 bg-green-50 text-green-700 border-green-200">
+          <DollarSign className="h-3 w-3" />
+          <span>Efectivo</span>
+        </Badge>
+      );
+    }
+    
+    if (service.accepts_transfer) {
+      badges.push(
+        <Badge key="transfer" variant="outline" className="flex items-center space-x-1 bg-blue-50 text-blue-700 border-blue-200">
+          <CreditCard className="h-3 w-3" />
+          <span>Transferencia</span>
+        </Badge>
+      );
+    }
+    
+    if (badges.length === 0) {
+      badges.push(
+        <Badge key="none" variant="outline" className="text-gray-500">
+          No configurado
+        </Badge>
+      );
+    }
+    
+    return badges;
   };
 
   const getActiveDays = (service: Service) => {
@@ -154,9 +172,11 @@ const ServicesManagement = () => {
                             <Camera className="h-6 w-6 text-blue-600" />
                           </div>
                         )}
-                        <div>
-                          <CardTitle className="text-xl font-bold text-gray-900">{service.name}</CardTitle>
-                          {getPaymentMethodBadge(service.payment_method || 'presencial')}
+                        <div className="flex-1">
+                          <CardTitle className="text-xl font-bold text-gray-900 mb-2">{service.name}</CardTitle>
+                          <div className="flex flex-wrap gap-1">
+                            {getPaymentMethodBadges(service)}
+                          </div>
                         </div>
                       </div>
                       

@@ -8,14 +8,13 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
 import { Service } from '@/types/database';
-import { X, Clock, DollarSign, Calendar, Users, Camera, MessageSquare } from 'lucide-react';
+import { X, Clock, DollarSign, Calendar, Users, Camera, MessageSquare, CreditCard } from 'lucide-react';
 import FileUpload from '@/components/ui/file-upload';
 import { useImageUpload } from '@/hooks/useImageUpload';
-import { useStaff } from '@/hooks/useStaff';
+import { useStaffServices } from '@/hooks/useStaffServices';
 
 const serviceSchema = z.object({
   name: z.string().min(1, 'El nombre es requerido'),
@@ -23,7 +22,8 @@ const serviceSchema = z.object({
   confirmation_message: z.string().optional(),
   duration_minutes: z.number().min(1, 'La duración debe ser mayor a 0'),
   price: z.number().min(0, 'El precio debe ser mayor o igual a 0'),
-  payment_method: z.enum(['presencial', 'transferencia']),
+  accepts_cash: z.boolean(),
+  accepts_transfer: z.boolean(),
   min_advance_days: z.number().min(0, 'Los días de anticipación deben ser 0 o más'),
   is_monday_active: z.boolean(),
   is_tuesday_active: z.boolean(),
@@ -60,7 +60,11 @@ interface ServiceFormProps {
 const ServiceForm = ({ service, onSubmit, onCancel, isLoading }: ServiceFormProps) => {
   const [imageUrl, setImageUrl] = useState<string | undefined>(service?.image_url || undefined);
   const { uploadImage, deleteImage, isUploading } = useImageUpload();
-  const { staff } = useStaff();
+  
+  // Obtener personal asignado a este servicio específico
+  const { getStaffServices } = useStaffServices();
+  const staffServicesQuery = service ? getStaffServices(service.id) : null;
+  const assignedStaff = staffServicesQuery?.data || [];
 
   const days = [
     { key: 'monday', label: 'Lunes', active: 'is_monday_active', start: 'monday_start', end: 'monday_end' },
@@ -80,7 +84,8 @@ const ServiceForm = ({ service, onSubmit, onCancel, isLoading }: ServiceFormProp
       confirmation_message: service?.confirmation_message || '',
       duration_minutes: service?.duration_minutes || 60,
       price: service?.price || 0,
-      payment_method: (service?.payment_method as 'presencial' | 'transferencia') || 'presencial',
+      accepts_cash: service?.accepts_cash ?? true,
+      accepts_transfer: service?.accepts_transfer ?? false,
       min_advance_days: service?.min_advance_days || 1,
       is_monday_active: service?.is_monday_active || false,
       is_tuesday_active: service?.is_tuesday_active || false,
@@ -236,7 +241,7 @@ const ServiceForm = ({ service, onSubmit, onCancel, isLoading }: ServiceFormProp
                   Precio y Duración
                 </h3>
                 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <FormField
                     control={form.control}
                     name="price"
@@ -277,25 +282,59 @@ const ServiceForm = ({ service, onSubmit, onCancel, isLoading }: ServiceFormProp
                       </FormItem>
                     )}
                   />
+                </div>
+              </div>
+
+              {/* Métodos de Pago Aceptados */}
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                  <CreditCard className="h-5 w-5 mr-2 text-purple-600" />
+                  Métodos de Pago Aceptados
+                </h3>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="accepts_cash"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-row items-center space-x-3 space-y-0 border border-gray-200 rounded-lg p-4">
+                        <FormControl>
+                          <Checkbox
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
+                        </FormControl>
+                        <div className="space-y-1 leading-none">
+                          <FormLabel className="text-base font-medium">
+                            Efectivo/Presencial
+                          </FormLabel>
+                          <p className="text-sm text-muted-foreground">
+                            El cliente paga en efectivo al momento del servicio
+                          </p>
+                        </div>
+                      </FormItem>
+                    )}
+                  />
 
                   <FormField
                     control={form.control}
-                    name="payment_method"
+                    name="accepts_transfer"
                     render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="text-sm font-medium">Método de Pago</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
-                          <FormControl>
-                            <SelectTrigger className="h-11">
-                              <SelectValue placeholder="Seleccionar método" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value="presencial">Presencial/Efectivo</SelectItem>
-                            <SelectItem value="transferencia">Transferencia Bancaria</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
+                      <FormItem className="flex flex-row items-center space-x-3 space-y-0 border border-gray-200 rounded-lg p-4">
+                        <FormControl>
+                          <Checkbox
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
+                        </FormControl>
+                        <div className="space-y-1 leading-none">
+                          <FormLabel className="text-base font-medium">
+                            Transferencia Bancaria
+                          </FormLabel>
+                          <p className="text-sm text-muted-foreground">
+                            El cliente debe transferir antes del servicio
+                          </p>
+                        </div>
                       </FormItem>
                     )}
                   />
@@ -414,24 +453,24 @@ const ServiceForm = ({ service, onSubmit, onCancel, isLoading }: ServiceFormProp
                 </div>
               </div>
 
-              {/* Personal Asignado */}
-              {staff.length > 0 && (
+              {/* Personal Asignado - Solo mostrar si hay personal asignado */}
+              {service && assignedStaff.length > 0 && (
                 <div>
                   <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
                     <Users className="h-5 w-5 mr-2 text-indigo-600" />
-                    Personal Disponible
+                    Personal Asignado a este Servicio
                   </h3>
                   <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                    <p className="text-sm text-blue-800 mb-2">Personal registrado en tu negocio:</p>
+                    <p className="text-sm text-blue-800 mb-2">Personal que puede realizar este servicio:</p>
                     <div className="flex flex-wrap gap-2">
-                      {staff.map((member) => (
-                        <Badge key={member.id} variant="secondary" className="bg-blue-100 text-blue-800">
-                          {member.full_name}
+                      {assignedStaff.map((serviceStaff) => (
+                        <Badge key={serviceStaff.id} variant="secondary" className="bg-blue-100 text-blue-800">
+                          {serviceStaff.name}
                         </Badge>
                       ))}
                     </div>
                     <p className="text-xs text-blue-600 mt-2">
-                      El personal podrá ser asignado a este servicio desde la gestión de personal
+                      Para cambiar el personal asignado, ve a la gestión de personal
                     </p>
                   </div>
                 </div>

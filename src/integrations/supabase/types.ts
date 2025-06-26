@@ -304,6 +304,8 @@ export type Database = {
       }
       services: {
         Row: {
+          accepts_cash: boolean | null
+          accepts_transfer: boolean | null
           business_id: string
           confirmation_message: string | null
           created_at: string
@@ -324,7 +326,6 @@ export type Database = {
           monday_end: string | null
           monday_start: string | null
           name: string
-          payment_method: string | null
           price: number
           saturday_end: string | null
           saturday_start: string | null
@@ -338,6 +339,8 @@ export type Database = {
           wednesday_start: string | null
         }
         Insert: {
+          accepts_cash?: boolean | null
+          accepts_transfer?: boolean | null
           business_id: string
           confirmation_message?: string | null
           created_at?: string
@@ -358,7 +361,6 @@ export type Database = {
           monday_end?: string | null
           monday_start?: string | null
           name: string
-          payment_method?: string | null
           price: number
           saturday_end?: string | null
           saturday_start?: string | null
@@ -372,6 +374,8 @@ export type Database = {
           wednesday_start?: string | null
         }
         Update: {
+          accepts_cash?: boolean | null
+          accepts_transfer?: boolean | null
           business_id?: string
           confirmation_message?: string | null
           created_at?: string
@@ -392,7 +396,6 @@ export type Database = {
           monday_end?: string | null
           monday_start?: string | null
           name?: string
-          payment_method?: string | null
           price?: number
           saturday_end?: string | null
           saturday_start?: string | null
