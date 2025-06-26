@@ -7,6 +7,7 @@ import { Link } from "react-router-dom";
 import RecentActivity from "./RecentActivity";
 import PendingPaymentsList from "./PendingPaymentsList";
 import SubscriptionLimitBanner from "./SubscriptionLimitBanner";
+import BookingUrlCard from "./BookingUrlCard";
 
 const Dashboard = () => {
   const { business } = useBusiness();
@@ -38,6 +39,13 @@ const Dashboard = () => {
           </Button>
         </Link>
       </div>
+
+      {/* Booking URL Card - Quick Access */}
+      {business?.booking_url_slug && (
+        <div className="mb-6">
+          <BookingUrlCard businessSlug={business.booking_url_slug} />
+        </div>
+      )}
 
       {/* Subscription Limit Banner */}
       <SubscriptionLimitBanner />
