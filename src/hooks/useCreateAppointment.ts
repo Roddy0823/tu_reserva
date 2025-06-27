@@ -19,12 +19,12 @@ export const useCreateAppointment = () => {
       const startTime = parseISO(appointmentData.start_time);
       const endTime = parseISO(appointmentData.end_time);
 
-      // 1. Verificar que no hay conflictos con otras citas
+      // 1. Verificar que no hay conflictos con otras citas ACTIVAS (no canceladas)
       const { data: conflictingAppointments, error: conflictError } = await supabase
         .from('appointments')
-        .select('id, start_time, end_time')
+        .select('id, start_time, end_time, status')
         .eq('staff_id', appointmentData.staff_id)
-        .in('status', ['pendiente', 'confirmado'])
+        .in('status', ['pendiente', 'confirmado']) // Solo citas activas
         .or(`and(start_time.lte.${appointmentData.start_time},end_time.gt.${appointmentData.start_time}),and(start_time.lt.${appointmentData.end_time},end_time.gte.${appointmentData.end_time}),and(start_time.gte.${appointmentData.start_time},end_time.lte.${appointmentData.end_time})`);
 
       if (conflictError) {
@@ -37,7 +37,7 @@ export const useCreateAppointment = () => {
         throw new Error('Este horario ya está ocupado. Por favor selecciona otro horario.');
       }
 
-      // 2. Verificar que no hay bloqueos de tiempo
+      // 2. Verificar que no hay bloqueos de tiempo que se superpongan
       const { data: timeBlocks, error: blockError } = await supabase
         .from('time_blocks')
         .select('id, start_time, end_time, reason')
@@ -50,7 +50,7 @@ export const useCreateAppointment = () => {
       }
 
       if (timeBlocks && timeBlocks.length > 0) {
-        console.log('Time blocks found:', timeBlocks);
+        console.log('Time blocks found that conflict:', timeBlocks);
         throw new Error('Este horario no está disponible debido a un bloqueo programado.');
       }
 

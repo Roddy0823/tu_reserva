@@ -44,18 +44,18 @@ export const useAvailableTimeSlots = (staffId?: string, date?: Date, serviceDura
         return [];
       }
 
-      // Obtener citas existentes para el día
+      // Obtener citas existentes ACTIVAS para el día (excluir canceladas)
       const { data: appointments, error: appointmentsError } = await supabase
         .from('appointments')
         .select('start_time, end_time, status')
         .eq('staff_id', staffId)
         .gte('start_time', dayStart.toISOString())
         .lte('start_time', dayEnd.toISOString())
-        .in('status', ['pendiente', 'confirmado']);
+        .in('status', ['pendiente', 'confirmado']); // Solo citas activas
 
       if (appointmentsError) throw appointmentsError;
 
-      console.log('Existing appointments:', appointments);
+      console.log('Existing active appointments:', appointments);
 
       // Obtener bloqueos de tiempo para el día
       const { data: timeBlocks, error: timeBlocksError } = await supabase
@@ -100,7 +100,7 @@ export const useAvailableTimeSlots = (staffId?: string, date?: Date, serviceDura
           break;
         }
 
-        // Verificar si el slot no se superpone con citas existentes
+        // Verificar si el slot no se superpone con citas existentes ACTIVAS
         const hasAppointmentConflict = appointments?.some(appointment => {
           const appointmentStart = parseISO(appointment.start_time);
           const appointmentEnd = parseISO(appointment.end_time);
