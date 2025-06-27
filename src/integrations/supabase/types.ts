@@ -629,6 +629,19 @@ export type Database = {
         Args: { business_uuid: string }
         Returns: boolean
       }
+      create_appointment_safely: {
+        Args: {
+          p_client_name: string
+          p_client_email: string
+          p_client_phone: string
+          p_service_id: string
+          p_staff_id: string
+          p_start_time: string
+          p_end_time: string
+          p_business_id: string
+        }
+        Returns: Json
+      }
       get_my_business_id: {
         Args: Record<PropertyKey, never>
         Returns: string
