@@ -94,20 +94,20 @@ const ServiceForm = ({ service, onSubmit, onCancel, isLoading }: ServiceFormProp
       is_friday_active: service?.is_friday_active || false,
       is_saturday_active: service?.is_saturday_active || false,
       is_sunday_active: service?.is_sunday_active || false,
-      monday_start: service?.monday_start || '',
-      monday_end: service?.monday_end || '',
-      tuesday_start: service?.tuesday_start || '',
-      tuesday_end: service?.tuesday_end || '',
-      wednesday_start: service?.wednesday_start || '',
-      wednesday_end: service?.wednesday_end || '',
-      thursday_start: service?.thursday_start || '',
-      thursday_end: service?.thursday_end || '',
-      friday_start: service?.friday_start || '',
-      friday_end: service?.friday_end || '',
-      saturday_start: service?.saturday_start || '',
-      saturday_end: service?.saturday_end || '',
-      sunday_start: service?.sunday_start || '',
-      sunday_end: service?.sunday_end || '',
+      monday_start: service?.monday_start || '08:00',
+      monday_end: service?.monday_end || '20:00',
+      tuesday_start: service?.tuesday_start || '08:00',
+      tuesday_end: service?.tuesday_end || '20:00',
+      wednesday_start: service?.wednesday_start || '08:00',
+      wednesday_end: service?.wednesday_end || '20:00',
+      thursday_start: service?.thursday_start || '08:00',
+      thursday_end: service?.thursday_end || '20:00',
+      friday_start: service?.friday_start || '08:00',
+      friday_end: service?.friday_end || '20:00',
+      saturday_start: service?.saturday_start || '08:00',
+      saturday_end: service?.saturday_end || '20:00',
+      sunday_start: service?.sunday_start || '08:00',
+      sunday_end: service?.sunday_end || '20:00',
     },
   });
 
@@ -128,7 +128,30 @@ const ServiceForm = ({ service, onSubmit, onCancel, isLoading }: ServiceFormProp
   };
 
   const handleSubmit = (data: ServiceFormData) => {
-    onSubmit({ ...data, image_url: imageUrl });
+    // Filtrar campos de tiempo vacíos para evitar errores de base de datos
+    const cleanedData = { ...data };
+    
+    // Para cada día, si no está activo, limpiar los campos de tiempo
+    days.forEach(day => {
+      const isActiveKey = day.active as keyof ServiceFormData;
+      const startKey = day.start as keyof ServiceFormData;
+      const endKey = day.end as keyof ServiceFormData;
+      
+      if (!cleanedData[isActiveKey]) {
+        cleanedData[startKey] = null as any;
+        cleanedData[endKey] = null as any;
+      } else {
+        // Si está activo pero los campos están vacíos, usar valores por defecto
+        if (!cleanedData[startKey]) {
+          cleanedData[startKey] = '08:00' as any;
+        }
+        if (!cleanedData[endKey]) {
+          cleanedData[endKey] = '20:00' as any;
+        }
+      }
+    });
+    
+    onSubmit({ ...cleanedData, image_url: imageUrl });
   };
 
   return (
@@ -419,7 +442,7 @@ const ServiceForm = ({ service, onSubmit, onCancel, isLoading }: ServiceFormProp
                                   <Input 
                                     type="time" 
                                     {...field}
-                                    value={field.value as string}
+                                    value={field.value as string || '08:00'}
                                     className="h-10"
                                   />
                                 </FormControl>
@@ -438,7 +461,7 @@ const ServiceForm = ({ service, onSubmit, onCancel, isLoading }: ServiceFormProp
                                   <Input 
                                     type="time" 
                                     {...field}
-                                    value={field.value as string}
+                                    value={field.value as string || '20:00'}
                                     className="h-10"
                                   />
                                 </FormControl>

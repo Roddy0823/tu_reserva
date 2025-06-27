@@ -1,15 +1,12 @@
 
-import { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { CheckCircle, Upload, CreditCard, Calendar, Clock, User, MapPin } from 'lucide-react';
-import { Business, Service, StaffMember, Appointment } from '@/types/database';
+import { Badge } from '@/components/ui/badge';
+import { Separator } from '@/components/ui/separator';
+import { Business, Appointment, Service, StaffMember } from '@/types/database';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { usePaymentProofUpload } from '@/hooks/usePaymentProofUpload';
-import { useToast } from '@/hooks/use-toast';
+import { CheckCircle, CalendarDays, Clock, User, DollarSign, MapPin, Phone, Mail, CreditCard, Banknote } from 'lucide-react';
 
 interface BookingSuccessProps {
   business: Business;
@@ -19,198 +16,206 @@ interface BookingSuccessProps {
 }
 
 const BookingSuccess = ({ business, appointment, service, staffMember }: BookingSuccessProps) => {
-  const [paymentProof, setPaymentProof] = useState<File | null>(null);
-  const { uploadPaymentProof, isUploading } = usePaymentProofUpload();
-  const { toast } = useToast();
-
-  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      setPaymentProof(file);
-    }
-  };
-
-  const handleUploadProof = async () => {
-    if (!paymentProof) return;
-
-    uploadPaymentProof(
-      { appointmentId: appointment.id, file: paymentProof },
-      {
-        onSuccess: () => {
-          toast({
-            title: "Comprobante subido",
-            description: "Tu comprobante de pago ha sido enviado correctamente. Te confirmaremos tu cita pronto.",
-          });
-          setPaymentProof(null);
-        }
-      }
-    );
-  };
-
   const appointmentDate = new Date(appointment.start_time);
+  const appointmentTime = format(appointmentDate, 'HH:mm');
+
+  // Determinar métodos de pago aceptados
+  const paymentMethods = [];
+  if (service.accepts_cash) {
+    paymentMethods.push({ type: 'cash', label: 'Efectivo/Presencial', icon: Banknote });
+  }
+  if (service.accepts_transfer) {
+    paymentMethods.push({ type: 'transfer', label: 'Transferencia Bancaria', icon: CreditCard });
+  }
+
+  const showBankInfo = service.accepts_transfer && business.bank_account_details;
 
   return (
-    <div className="max-w-2xl mx-auto space-y-6">
-      {/* Success Header */}
-      <Card className="text-center border-green-200 bg-green-50">
-        <CardContent className="pt-6">
-          <CheckCircle className="h-16 w-16 text-green-500 mx-auto mb-4" />
-          <h2 className="text-2xl font-bold text-green-800 mb-2">
-            ¡Reserva Exitosa!
-          </h2>
-          <p className="text-green-700">
-            Tu cita ha sido agendada con estado <strong>pendiente</strong>
-          </p>
-        </CardContent>
-      </Card>
-
-      {/* Booking Summary */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Calendar className="h-5 w-5" />
-            Resumen de tu Cita
+    <div className="max-w-2xl mx-auto">
+      <Card className="shadow-xl border-0 bg-gradient-to-br from-white to-gray-50">
+        <CardHeader className="bg-gradient-to-r from-green-600 to-green-700 text-white rounded-t-lg text-center">
+          <div className="flex justify-center mb-4">
+            <CheckCircle className="h-16 w-16 text-green-200" />
+          </div>
+          <CardTitle className="text-3xl font-bold">
+            ¡Reserva Confirmada!
           </CardTitle>
+          <CardDescription className="text-green-100 text-lg">
+            Tu cita ha sido registrada exitosamente
+          </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="flex items-center gap-3">
-              <MapPin className="h-5 w-5 text-gray-500" />
-              <div>
-                <p className="font-medium">Servicio</p>
-                <p className="text-gray-600">{service.name}</p>
-                <p className="text-sm text-gray-500">{service.duration_minutes} min</p>
+        
+        <CardContent className="p-8">
+          <div className="space-y-6">
+            {/* Información del Negocio */}
+            <div className="text-center bg-blue-50 border border-blue-200 rounded-lg p-6">
+              <h3 className="text-xl font-bold text-blue-900 mb-2">{business.name}</h3>
+              {business.description && (
+                <p className="text-blue-700 mb-4">{business.description}</p>
+              )}
+              <div className="flex justify-center space-x-6 text-sm text-blue-600">
+                {business.contact_phone && (
+                  <div className="flex items-center">
+                    <Phone className="h-4 w-4 mr-1" />
+                    {business.contact_phone}
+                  </div>
+                )}
+                {business.contact_email && (
+                  <div className="flex items-center">
+                    <Mail className="h-4 w-4 mr-1" />
+                    {business.contact_email}
+                  </div>
+                )}
               </div>
             </div>
-            
-            <div className="flex items-center gap-3">
-              <User className="h-5 w-5 text-gray-500" />
-              <div>
-                <p className="font-medium">Personal</p>
-                <p className="text-gray-600">{staffMember.full_name}</p>
+
+            {/* Detalles de la Cita */}
+            <div className="bg-gray-50 border border-gray-200 rounded-lg p-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                <CalendarDays className="h-5 w-5 mr-2" />
+                Detalles de tu Cita
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-3">
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Servicio:</span>
+                    <span className="font-medium text-gray-900">{service.name}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Profesional:</span>
+                    <span className="font-medium text-gray-900">{staffMember.full_name}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Fecha:</span>
+                    <span className="font-medium text-gray-900">
+                      {format(appointmentDate, 'EEEE, d MMMM yyyy', { locale: es })}
+                    </span>
+                  </div>
+                </div>
+                <div className="space-y-3">
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Hora:</span>
+                    <Badge variant="secondary" className="bg-blue-100 text-blue-800">
+                      <Clock className="h-3 w-3 mr-1" />
+                      {appointmentTime}
+                    </Badge>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Duración:</span>
+                    <span className="font-medium text-gray-900">{service.duration_minutes} min</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Precio:</span>
+                    <Badge variant="secondary" className="bg-green-100 text-green-800">
+                      <DollarSign className="h-3 w-3 mr-1" />
+                      ${service.price?.toLocaleString()} COP
+                    </Badge>
+                  </div>
+                </div>
               </div>
             </div>
-            
-            <div className="flex items-center gap-3">
-              <Calendar className="h-5 w-5 text-gray-500" />
-              <div>
-                <p className="font-medium">Fecha</p>
-                <p className="text-gray-600">
-                  {format(appointmentDate, "EEEE, dd 'de' MMMM 'de' yyyy", { locale: es })}
+
+            {/* Métodos de Pago Aceptados */}
+            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6">
+              <h3 className="text-lg font-semibold text-yellow-900 mb-4 flex items-center">
+                <CreditCard className="h-5 w-5 mr-2" />
+                Métodos de Pago Aceptados
+              </h3>
+              <div className="space-y-3">
+                {paymentMethods.map((method, index) => {
+                  const IconComponent = method.icon;
+                  return (
+                    <div key={index} className="flex items-center space-x-3">
+                      <IconComponent className="h-4 w-4 text-yellow-700" />
+                      <span className="text-yellow-800 font-medium">{method.label}</span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Información Bancaria - Solo si acepta transferencias */}
+            {showBankInfo && (
+              <div className="bg-red-50 border border-red-200 rounded-lg p-6">
+                <h3 className="text-lg font-semibold text-red-900 mb-4 flex items-center">
+                  <CreditCard className="h-5 w-5 mr-2" />
+                  Información para Transferencia Bancaria
+                </h3>
+                <div className="bg-white rounded-lg p-4 border border-red-200">
+                  <p className="text-sm text-red-800 mb-2 font-medium">
+                    Realiza tu pago a la siguiente cuenta:
+                  </p>
+                  <div className="text-sm text-red-900 whitespace-pre-line font-mono">
+                    {business.bank_account_details}
+                  </div>
+                </div>
+                <p className="text-xs text-red-700 mt-3">
+                  * Por favor, conserva tu comprobante de pago para presentarlo al momento de tu cita.
                 </p>
-              </div>
-            </div>
-            
-            <div className="flex items-center gap-3">
-              <Clock className="h-5 w-5 text-gray-500" />
-              <div>
-                <p className="font-medium">Hora</p>
-                <p className="text-gray-600">
-                  {format(appointmentDate, "HH:mm")}
-                </p>
-              </div>
-            </div>
-          </div>
-          
-          <div className="pt-4 border-t">
-            <div className="flex justify-between items-center">
-              <span className="font-medium">Total a pagar:</span>
-              <span className="text-2xl font-bold text-blue-600">
-                ${service.price?.toLocaleString()} COP
-              </span>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Payment Instructions */}
-      <Card className="border-blue-200 bg-blue-50">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-blue-800">
-            <CreditCard className="h-5 w-5" />
-            Instrucciones de Pago
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <p className="text-blue-700">
-            Para confirmar tu cita, por favor realiza el pago por adelantado a la siguiente cuenta:
-          </p>
-          
-          {business.bank_account_details ? (
-            <div className="bg-white rounded-lg p-4 border">
-              <h4 className="font-medium mb-2">Datos Bancarios:</h4>
-              <pre className="text-sm text-gray-700 whitespace-pre-wrap">
-                {business.bank_account_details}
-              </pre>
-            </div>
-          ) : (
-            <div className="bg-white rounded-lg p-4 border">
-              <p className="text-gray-600">
-                Los datos bancarios serán enviados por correo electrónico.
-              </p>
-            </div>
-          )}
-          
-          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
-            <p className="text-yellow-800 text-sm">
-              <strong>Importante:</strong> Tu cita quedará confirmada una vez que subas el comprobante de pago 
-              y sea validado por nuestro equipo.
-            </p>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Payment Proof Upload */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Upload className="h-5 w-5" />
-            Subir Comprobante de Pago
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <p className="text-gray-600">
-            Sube tu comprobante de pago aquí o hazlo más tarde a través del correo de confirmación.
-          </p>
-          
-          <div className="space-y-3">
-            <div>
-              <Label htmlFor="payment-proof">Comprobante de Pago</Label>
-              <Input
-                id="payment-proof"
-                type="file"
-                accept="image/*"
-                onChange={handleFileSelect}
-                className="mt-1"
-              />
-            </div>
-            
-            {paymentProof && (
-              <div className="flex items-center justify-between bg-gray-50 p-3 rounded-lg">
-                <span className="text-sm text-gray-700">
-                  {paymentProof.name}
-                </span>
-                <Button
-                  onClick={handleUploadProof}
-                  disabled={isUploading}
-                  size="sm"
-                >
-                  {isUploading ? 'Subiendo...' : 'Subir'}
-                </Button>
               </div>
             )}
-          </div>
-        </CardContent>
-      </Card>
 
-      {/* Contact Info */}
-      <Card>
-        <CardContent className="pt-6">
-          <div className="text-center text-gray-600">
-            <p className="mb-2">¿Tienes preguntas sobre tu reserva?</p>
-            <p className="text-sm">
-              Recibirás un correo de confirmación con todos los detalles y nuestros datos de contacto.
-            </p>
+            {/* Información del Cliente */}
+            <div className="bg-purple-50 border border-purple-200 rounded-lg p-6">
+              <h3 className="text-lg font-semibold text-purple-900 mb-4 flex items-center">
+                <User className="h-5 w-5 mr-2" />
+                Información de Contacto
+              </h3>
+              <div className="space-y-2">
+                <div className="flex justify-between">
+                  <span className="text-purple-700">Nombre:</span>
+                  <span className="font-medium text-purple-900">{appointment.client_name}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-purple-700">Email:</span>
+                  <span className="font-medium text-purple-900">{appointment.client_email}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-purple-700">Teléfono:</span>
+                  <span className="font-medium text-purple-900">{appointment.client_phone}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Mensaje de Confirmación del Servicio */}
+            {service.confirmation_message && (
+              <div className="bg-green-50 border border-green-200 rounded-lg p-6">
+                <h3 className="text-lg font-semibold text-green-900 mb-3">
+                  Mensaje del Negocio
+                </h3>
+                <p className="text-green-800">{service.confirmation_message}</p>
+              </div>
+            )}
+
+            <Separator />
+
+            {/* Información Importante */}
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
+              <h3 className="text-lg font-semibold text-blue-900 mb-3">
+                Información Importante
+              </h3>
+              <ul className="space-y-2 text-blue-800 text-sm">
+                <li>• Recibirás un email de confirmación en breve</li>
+                <li>• Por favor, llega 5 minutos antes de tu cita</li>
+                <li>• Si necesitas cancelar o reprogramar, contacta al negocio con anticipación</li>
+                {business.address && (
+                  <li className="flex items-start">
+                    <MapPin className="h-4 w-4 mr-1 mt-0.5 flex-shrink-0" />
+                    <span>Dirección: {business.address}</span>
+                  </li>
+                )}
+              </ul>
+            </div>
+
+            {/* Botón de Finalizar */}
+            <div className="text-center pt-4">
+              <Button 
+                onClick={() => window.location.href = '/'}
+                className="px-8 py-3 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800"
+              >
+                Finalizar
+              </Button>
+            </div>
           </div>
         </CardContent>
       </Card>
