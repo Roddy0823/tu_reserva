@@ -5,6 +5,33 @@ import { AppointmentInsert } from "@/types/database";
 import { useToast } from "@/hooks/use-toast";
 import { useBusiness } from "./useBusiness";
 
+// Interfaz para el valor de retorno de la función RPC
+interface CreateAppointmentResponse {
+  success: boolean;
+  error?: string;
+  appointment?: {
+    id: string;
+    business_id: string;
+    service_id: string;
+    staff_id: string;
+    start_time: string;
+    end_time: string;
+    client_name: string;
+    client_email: string;
+    client_phone?: string;
+    status: string;
+    created_at: string;
+    staff_members: {
+      full_name: string;
+    };
+    services: {
+      name: string;
+      duration_minutes: number;
+      price: number;
+    };
+  };
+}
+
 export const useCreateAppointment = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -34,14 +61,17 @@ export const useCreateAppointment = () => {
 
       console.log('📝 RPC response:', data);
 
+      // Hacer casting del tipo Json al tipo específico que esperamos
+      const result = data as CreateAppointmentResponse;
+
       // Verificar si la función devolvió un error
-      if (!data.success) {
-        console.error('❌ Appointment creation failed:', data.error);
-        throw new Error(data.error);
+      if (!result.success) {
+        console.error('❌ Appointment creation failed:', result.error);
+        throw new Error(result.error || 'Error desconocido al crear la cita');
       }
 
-      console.log('✅ Appointment created successfully:', data.appointment);
-      return data.appointment;
+      console.log('✅ Appointment created successfully:', result.appointment);
+      return result.appointment;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['appointments'] });
