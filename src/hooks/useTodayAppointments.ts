@@ -25,7 +25,7 @@ export const useTodayAppointments = () => {
         .from('appointments')
         .select(`
           *,
-          staff_members!inner (
+          staff_members (
             full_name,
             business_id
           ),
@@ -35,14 +35,20 @@ export const useTodayAppointments = () => {
             price
           )
         `)
-        .eq('staff_members.business_id', business.id)
+        .eq('business_id', business.id)
         .gte('start_time', startOfDay.toISOString())
         .lte('start_time', endOfDay.toISOString())
         .order('start_time', { ascending: true });
 
       if (error) throw error;
-      return data as (Appointment & { 
-        staff_members: { full_name: string }, 
+      
+      // Filter out appointments without proper staff_members or services data
+      const validAppointments = (data || []).filter(appointment => 
+        appointment.staff_members && appointment.services
+      );
+      
+      return validAppointments as (Appointment & { 
+        staff_members: { full_name: string, business_id: string }, 
         services: { name: string, duration_minutes: number, price: number } 
       })[];
     },

@@ -22,20 +22,23 @@ const AppointmentsList = ({ appointments, onEdit, onRefresh, isLoading }: Appoin
   const [statusFilter, setStatusFilter] = useState('all');
   const [staffFilter, setStaffFilter] = useState('all');
 
-  // Get unique staff members for filter
+  // Get unique staff members for filter - with safety check
   const staffMembers = Array.from(
-    new Set(appointments.map(apt => apt.staff_members.full_name))
+    new Set(appointments
+      .filter(apt => apt.staff_members?.full_name)
+      .map(apt => apt.staff_members.full_name)
+    )
   );
 
   // Filter appointments
   const filteredAppointments = appointments.filter(appointment => {
     const matchesSearch = 
-      appointment.client_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      appointment.client_email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      appointment.services.name.toLowerCase().includes(searchTerm.toLowerCase());
+      appointment.client_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      appointment.client_email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      appointment.services?.name?.toLowerCase().includes(searchTerm.toLowerCase());
     
     const matchesStatus = statusFilter === 'all' || appointment.status === statusFilter;
-    const matchesStaff = staffFilter === 'all' || appointment.staff_members.full_name === staffFilter;
+    const matchesStaff = staffFilter === 'all' || appointment.staff_members?.full_name === staffFilter;
 
     return matchesSearch && matchesStatus && matchesStaff;
   });
