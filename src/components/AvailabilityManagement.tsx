@@ -1,27 +1,20 @@
 
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useTimeBlocks } from '@/hooks/useTimeBlocks';
 import { useStaff } from '@/hooks/useStaff';
-import { useServices } from '@/hooks/useServices';
-import { useAppointments } from '@/hooks/useAppointments';
 import TimeBlockForm from './TimeBlockForm';
-import CalendarView from './CalendarView';
-import TimeBlockCard from './TimeBlockCard';
+import StaffAvailabilityCard from './StaffAvailabilityCard';
 import EmptyTimeBlocksState from './EmptyTimeBlocksState';
-import { TimeBlock, Appointment } from '@/types/database';
-import { Plus, Calendar, List } from 'lucide-react';
+import { TimeBlock } from '@/types/database';
+import { Plus } from 'lucide-react';
 
 const AvailabilityManagement = () => {
   const [showForm, setShowForm] = useState(false);
   const [editingTimeBlock, setEditingTimeBlock] = useState<(TimeBlock & { staff_members: { full_name: string } }) | null>(null);
-  const [currentView, setCurrentView] = useState<'calendar' | 'list'>('calendar');
   
   const { getAllTimeBlocks, createTimeBlock, updateTimeBlock, deleteTimeBlock, isCreating, isUpdating, isDeleting } = useTimeBlocks();
   const { staffMembers } = useStaff();
-  const { services } = useServices();
-  const { appointments } = useAppointments();
   const { data: timeBlocks = [], isLoading } = getAllTimeBlocks();
 
   const handleCreateTimeBlock = (data: any) => {
@@ -51,11 +44,6 @@ const AvailabilityManagement = () => {
     setShowForm(true);
   };
 
-  const handleEditAppointment = (appointment: Appointment & { staff_members: { full_name: string }, services: { name: string } }) => {
-    // TODO: Implementar edición de citas
-    console.log('Editar cita:', appointment);
-  };
-
   const handleDelete = (timeBlockId: string) => {
     if (confirm('¿Estás seguro de que quieres eliminar este bloqueo?')) {
       deleteTimeBlock(timeBlockId);
@@ -81,70 +69,49 @@ const AvailabilityManagement = () => {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center py-8">
-        <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+      <div className="flex items-center justify-center py-12">
+        <div className="w-8 h-8 border-4 border-gray-300 border-t-gray-600 rounded-full animate-spin"></div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-3xl font-bold text-gray-900">Gestión de Disponibilidad</h2>
-          <p className="text-gray-600 mt-2">Administra los horarios bloqueados y visualiza las citas programadas</p>
+          <h2 className="text-2xl font-semibold text-gray-900">Gestión de Disponibilidad</h2>
+          <p className="text-gray-600 mt-1">Administra los bloqueos de horario para tu personal</p>
         </div>
-        <div className="flex items-center space-x-4">
-          <Tabs value={currentView} onValueChange={(value) => setCurrentView(value as 'calendar' | 'list')}>
-            <TabsList>
-              <TabsTrigger value="calendar" className="gap-2">
-                <Calendar className="h-4 w-4" />
-                Calendario
-              </TabsTrigger>
-              <TabsTrigger value="list" className="gap-2">
-                <List className="h-4 w-4" />
-                Lista
-              </TabsTrigger>
-            </TabsList>
-          </Tabs>
-          <Button onClick={() => setShowForm(true)} className="gap-2">
-            <Plus className="h-4 w-4" />
-            Bloquear Horario
-          </Button>
-        </div>
+        <Button onClick={() => setShowForm(true)} className="bg-gray-900 hover:bg-gray-800 text-white">
+          <Plus className="h-4 w-4 mr-2" />
+          Bloquear Horario
+        </Button>
       </div>
 
-      <Tabs value={currentView} onValueChange={(value) => setCurrentView(value as 'calendar' | 'list')}>
-        <TabsContent value="calendar">
-          <CalendarView
-            timeBlocks={timeBlocks}
-            appointments={appointments}
-            staffMembers={staffMembers}
-            services={services}
-            onCreateTimeBlock={() => setShowForm(true)}
-            onEditTimeBlock={handleEditTimeBlock}
-            onEditAppointment={handleEditAppointment}
-          />
-        </TabsContent>
-        
-        <TabsContent value="list">
-          {timeBlocks.length === 0 ? (
-            <EmptyTimeBlocksState onCreateTimeBlock={() => setShowForm(true)} />
-          ) : (
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {timeBlocks.map((timeBlock) => (
-                <TimeBlockCard
-                  key={timeBlock.id}
-                  timeBlock={timeBlock}
-                  onEdit={handleEditTimeBlock}
-                  onDelete={handleDelete}
-                  isDeleting={isDeleting}
-                />
-              ))}
-            </div>
-          )}
-        </TabsContent>
-      </Tabs>
+      <div className="space-y-6">
+        {staffMembers.length === 0 ? (
+          <div className="text-center py-12 text-gray-500">
+            <p>No hay personal registrado</p>
+          </div>
+        ) : (
+          staffMembers.map((staff) => (
+            <StaffAvailabilityCard
+              key={staff.id}
+              staff={staff}
+              timeBlocks={timeBlocks.filter(block => block.staff_id === staff.id)}
+              onEditTimeBlock={handleEditTimeBlock}
+              onDeleteTimeBlock={handleDelete}
+              isDeleting={isDeleting}
+            />
+          ))
+        )}
+      </div>
+
+      {timeBlocks.length === 0 && staffMembers.length > 0 && (
+        <div className="mt-8">
+          <EmptyTimeBlocksState onCreateTimeBlock={() => setShowForm(true)} />
+        </div>
+      )}
     </div>
   );
 };

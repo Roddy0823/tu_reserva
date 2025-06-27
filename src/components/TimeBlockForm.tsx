@@ -9,7 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { TimeBlock, StaffMember } from '@/types/database';
-import { X } from 'lucide-react';
+import { X, Calendar } from 'lucide-react';
 import { format } from 'date-fns';
 
 const timeBlockSchema = z.object({
@@ -56,107 +56,136 @@ const TimeBlockForm = ({ timeBlock, staffMembers, onSubmit, onCancel, isLoading 
   };
 
   return (
-    <Card className="w-full max-w-2xl mx-auto">
-      <CardHeader>
-        <div className="flex justify-between items-center">
-          <div>
-            <CardTitle>{timeBlock ? 'Editar Bloqueo de Horario' : 'Nuevo Bloqueo de Horario'}</CardTitle>
-            <CardDescription>
-              {timeBlock ? 'Modifica el bloqueo de horario' : 'Bloquea un rango de fecha y hora para un miembro del personal'}
-            </CardDescription>
+    <div className="max-w-2xl mx-auto">
+      <Card className="shadow-sm border-gray-200">
+        <CardHeader className="border-b border-gray-100">
+          <div className="flex justify-between items-center">
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center">
+                <Calendar className="h-5 w-5 text-gray-600" />
+              </div>
+              <div>
+                <CardTitle className="text-xl font-semibold text-gray-900">
+                  {timeBlock ? 'Editar Bloqueo' : 'Nuevo Bloqueo de Horario'}
+                </CardTitle>
+                <CardDescription className="text-gray-500">
+                  {timeBlock ? 'Modifica la excepción de disponibilidad' : 'Crea una excepción de disponibilidad para bloquear un horario específico'}
+                </CardDescription>
+              </div>
+            </div>
+            <Button variant="ghost" size="sm" onClick={onCancel} className="h-8 w-8 p-0">
+              <X className="h-4 w-4" />
+            </Button>
           </div>
-          <Button variant="ghost" size="sm" onClick={onCancel}>
-            <X className="h-4 w-4" />
-          </Button>
-        </div>
-      </CardHeader>
-      <CardContent>
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
-            <FormField
-              control={form.control}
-              name="staff_id"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Miembro del Personal</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Selecciona un miembro del personal" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {staffMembers.map((staff) => (
-                        <SelectItem key={staff.id} value={staff.id}>
-                          {staff.full_name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        </CardHeader>
+        
+        <CardContent className="p-6">
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
               <FormField
                 control={form.control}
-                name="start_time"
+                name="staff_id"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Fecha y Hora de Inicio</FormLabel>
+                    <FormLabel className="text-sm font-medium text-gray-700">Miembro del Personal</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger className="border-gray-200 focus:border-gray-400">
+                          <SelectValue placeholder="Selecciona un miembro del personal" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {staffMembers.map((staff) => (
+                          <SelectItem key={staff.id} value={staff.id}>
+                            {staff.full_name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <FormField
+                  control={form.control}
+                  name="start_time"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-sm font-medium text-gray-700">Fecha y Hora de Inicio</FormLabel>
+                      <FormControl>
+                        <Input 
+                          type="datetime-local" 
+                          className="border-gray-200 focus:border-gray-400"
+                          {...field} 
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="end_time"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-sm font-medium text-gray-700">Fecha y Hora de Fin</FormLabel>
+                      <FormControl>
+                        <Input 
+                          type="datetime-local" 
+                          className="border-gray-200 focus:border-gray-400"
+                          {...field} 
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <FormField
+                control={form.control}
+                name="reason"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-sm font-medium text-gray-700">Motivo (Opcional)</FormLabel>
                     <FormControl>
-                      <Input type="datetime-local" {...field} />
+                      <Textarea 
+                        placeholder="Ej: Vacaciones, Cita médica, Capacitación..."
+                        className="border-gray-200 focus:border-gray-400 resize-none"
+                        rows={3}
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
 
-              <FormField
-                control={form.control}
-                name="end_time"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Fecha y Hora de Fin</FormLabel>
-                    <FormControl>
-                      <Input type="datetime-local" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            <FormField
-              control={form.control}
-              name="reason"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Motivo (Opcional)</FormLabel>
-                  <FormControl>
-                    <Textarea 
-                      placeholder="Ej: Vacaciones, Cita médica, Capacitación..."
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <div className="flex justify-end space-x-2 pt-4">
-              <Button type="button" variant="outline" onClick={onCancel}>
-                Cancelar
-              </Button>
-              <Button type="submit" disabled={isLoading}>
-                {isLoading ? 'Guardando...' : timeBlock ? 'Actualizar' : 'Crear Bloqueo'}
-              </Button>
-            </div>
-          </form>
-        </Form>
-      </CardContent>
-    </Card>
+              <div className="flex justify-end space-x-3 pt-6 border-t border-gray-100">
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  onClick={onCancel}
+                  className="border-gray-200 text-gray-700 hover:bg-gray-50"
+                >
+                  Cancelar
+                </Button>
+                <Button 
+                  type="submit" 
+                  disabled={isLoading}
+                  className="bg-gray-900 hover:bg-gray-800 text-white"
+                >
+                  {isLoading ? 'Guardando...' : timeBlock ? 'Actualizar Bloqueo' : 'Crear Bloqueo'}
+                </Button>
+              </div>
+            </form>
+          </Form>
+        </CardContent>
+      </Card>
+    </div>
   );
 };
 
