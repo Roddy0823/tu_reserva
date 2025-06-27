@@ -51,14 +51,22 @@ export const useStaff = () => {
       if (error) throw error;
       return data as StaffMember;
     },
-    onSuccess: () => {
+    onSuccess: (newStaff) => {
+      // Actualizar cache de manera optimista
+      queryClient.setQueryData(['staff', business?.id], (old: StaffMember[] = []) => {
+        return [newStaff, ...old];
+      });
+      
+      // Invalidar query para asegurar consistencia
       queryClient.invalidateQueries({ queryKey: ['staff', business?.id] });
+      
       toast({
         title: "Miembro del personal agregado",
-        description: "El miembro del personal se ha agregado correctamente",
+        description: `${newStaff.full_name} se ha agregado correctamente`,
       });
     },
     onError: (error) => {
+      console.error('Error creating staff:', error);
       toast({
         title: "Error al agregar miembro del personal",
         description: error.message,
@@ -80,14 +88,26 @@ export const useStaff = () => {
       if (error) throw error;
       return data as StaffMember;
     },
-    onSuccess: () => {
+    onSuccess: (updatedStaff) => {
+      // Actualizar cache de manera optimista
+      queryClient.setQueryData(['staff', business?.id], (old: StaffMember[] = []) => {
+        return old.map(staff => 
+          staff.id === updatedStaff.id ? updatedStaff : staff
+        );
+      });
+      
+      // Invalidar queries relacionadas para mantener consistencia
       queryClient.invalidateQueries({ queryKey: ['staff', business?.id] });
+      queryClient.invalidateQueries({ queryKey: ['appointments'] });
+      queryClient.invalidateQueries({ queryKey: ['staff-services'] });
+      
       toast({
         title: "Miembro del personal actualizado",
-        description: "Los cambios se han guardado correctamente",
+        description: `Los cambios de ${updatedStaff.full_name} se han guardado correctamente`,
       });
     },
     onError: (error) => {
+      console.error('Error updating staff:', error);
       toast({
         title: "Error al actualizar miembro del personal",
         description: error.message,
@@ -99,21 +119,43 @@ export const useStaff = () => {
   // Eliminar un miembro del personal
   const deleteStaffMutation = useMutation({
     mutationFn: async (id: string) => {
+      // Verificar si el miembro del personal tiene citas futuras
+      const { data: futureAppointments } = await supabase
+        .from('appointments')
+        .select('id')
+        .eq('staff_id', id)
+        .gte('start_time', new Date().toISOString())
+        .limit(1);
+
+      if (futureAppointments && futureAppointments.length > 0) {
+        throw new Error('No se puede eliminar este miembro del personal porque tiene citas futuras programadas');
+      }
+
       const { error } = await supabase
         .from('staff_members')
         .delete()
         .eq('id', id);
 
       if (error) throw error;
+      return id;
     },
-    onSuccess: () => {
+    onSuccess: (deletedId) => {
+      // Actualizar cache de manera optimista
+      queryClient.setQueryData(['staff', business?.id], (old: StaffMember[] = []) => {
+        return old.filter(staff => staff.id !== deletedId);
+      });
+      
+      // Invalidar queries relacionadas
       queryClient.invalidateQueries({ queryKey: ['staff', business?.id] });
+      queryClient.invalidateQueries({ queryKey: ['staff-services'] });
+      
       toast({
         title: "Miembro del personal eliminado",
         description: "El miembro del personal se ha eliminado correctamente",
       });
     },
     onError: (error) => {
+      console.error('Error deleting staff:', error);
       toast({
         title: "Error al eliminar miembro del personal",
         description: error.message,

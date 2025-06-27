@@ -36,13 +36,13 @@ const menuItems = [
     icon: Home,
   },
   {
-    title: "Servicios y Personal",
+    title: "Servicios",
     url: "/services",
     icon: Package,
   },
   {
     title: "Personal",
-    url: "/services?tab=staff",
+    url: "/staff",
     icon: Users,
   },
   {
@@ -98,9 +98,6 @@ export function AppSidebar() {
 
   // Función para determinar si un elemento del menú está activo
   const isItemActive = (url: string) => {
-    if (url === "/services?tab=staff") {
-      return location.pathname === "/services" && location.search === "?tab=staff";
-    }
     return location.pathname === url;
   };
 
