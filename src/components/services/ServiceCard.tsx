@@ -13,11 +13,11 @@ interface ServiceCardProps {
 
 const ServiceCard = ({ service, onEdit, onDelete }: ServiceCardProps) => {
   return (
-    <Card className="group border-gray-200 hover:border-gray-300 hover:shadow-lg transition-all duration-200 bg-white">
+    <Card className="group border-gray-200 hover:shadow-lg transition-all duration-200 bg-white">
       <CardHeader className="pb-4">
         <div className="flex items-start justify-between">
           <div className="flex-1 min-w-0">
-            <CardTitle className="text-lg font-semibold text-gray-900 group-hover:text-slate-700 transition-colors truncate">
+            <CardTitle className="text-base font-medium text-gray-900 group-hover:text-slate-700 transition-colors truncate">
               {service.name}
             </CardTitle>
             {service.description && (
@@ -38,7 +38,7 @@ const ServiceCard = ({ service, onEdit, onDelete }: ServiceCardProps) => {
         </div>
       </CardHeader>
       
-      <CardContent className="pt-0 space-y-4">
+      <CardContent className="space-y-4">
         {/* Price and Duration */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2 text-sm text-gray-600">
@@ -69,22 +69,22 @@ const ServiceCard = ({ service, onEdit, onDelete }: ServiceCardProps) => {
           </div>
         )}
 
-        {/* Actions */}
-        <div className="flex gap-2 pt-2 border-t border-gray-100">
-          <Button 
-            variant="outline" 
-            size="sm" 
+        {/* Actions - Updated to match StaffCard style */}
+        <div className="flex justify-end space-x-2 pt-4 border-t border-gray-100">
+          <Button
+            variant="ghost"
+            size="sm"
             onClick={() => onEdit(service)}
-            className="flex-1 border-gray-200 hover:border-slate-300 hover:bg-slate-50 text-gray-700 hover:text-slate-900"
+            className="text-gray-400 hover:text-blue-600 hover:bg-blue-50"
           >
-            <Edit className="h-3 w-3 mr-2" />
+            <Edit className="h-3 w-3 mr-1" />
             Editar
           </Button>
-          <Button 
-            variant="outline" 
-            size="sm" 
+          <Button
+            variant="ghost"
+            size="sm"
             onClick={() => onDelete(service.id)}
-            className="border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 hover:text-red-700"
+            className="text-gray-400 hover:text-red-600 hover:bg-red-50"
           >
             <Trash2 className="h-3 w-3" />
           </Button>
