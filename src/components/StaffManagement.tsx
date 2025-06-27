@@ -85,34 +85,34 @@ const StaffManagement = () => {
       {/* Header with action */}
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-3xl font-bold tracking-tight text-gray-900">Personal</h2>
-          <p className="text-gray-500 mt-1">Administra los miembros de tu equipo</p>
+          <h2 className="text-lg font-medium text-gray-900">Personal</h2>
+          <p className="text-sm text-gray-600">Administra los miembros de tu equipo</p>
         </div>
         <Button 
           onClick={() => setShowForm(true)} 
-          className="bg-slate-900 hover:bg-slate-800 text-white shadow-sm"
+          className="bg-blue-600 hover:bg-blue-700 text-white"
         >
           <Plus className="h-4 w-4 mr-2" />
-          Nuevo Miembro
+          Agregar Personal
         </Button>
       </div>
 
       {staffMembers.length === 0 ? (
-        <Card className="border-dashed border-2 border-gray-200 bg-gray-50/50">
-          <CardContent className="flex flex-col items-center justify-center py-16 text-center">
-            <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-6">
-              <User className="h-8 w-8 text-gray-400" />
+        <Card className="border border-gray-200">
+          <CardContent className="flex flex-col items-center justify-center py-16">
+            <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center mb-4">
+              <User className="h-6 w-6 text-gray-400" />
             </div>
-            <h3 className="text-xl font-semibold text-gray-900 mb-3">No hay personal registrado</h3>
-            <p className="text-gray-500 max-w-md mb-8 leading-relaxed">
+            <h3 className="text-lg font-medium text-gray-900 mb-2">No hay personal registrado</h3>
+            <p className="text-gray-600 text-center mb-6 max-w-md">
               Comienza agregando miembros a tu equipo para gestionar las citas de manera eficiente
             </p>
             <Button 
               onClick={() => setShowForm(true)} 
-              className="bg-slate-900 hover:bg-slate-800 text-white"
+              className="bg-blue-600 hover:bg-blue-700"
             >
               <Plus className="h-4 w-4 mr-2" />
-              Crear Primer Miembro
+              Agregar Primer Miembro
             </Button>
           </CardContent>
         </Card>
@@ -160,7 +160,7 @@ const StaffCard = ({
   };
 
   return (
-    <Card className="group border-gray-200 hover:shadow-lg transition-all duration-200 bg-white">
+    <Card className="border border-gray-200 hover:shadow-md transition-shadow">
       <CardHeader className="pb-4">
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-4">
@@ -218,25 +218,25 @@ const StaffCard = ({
           </div>
         )}
         
-        {/* Actions - Updated to match ServiceCard style */}
-        <div className="flex gap-2 pt-4 border-t border-gray-100">
+        <div className="flex justify-end space-x-2 pt-4 border-t border-gray-100">
           <Button
-            variant="outline"
+            variant="ghost"
             size="sm"
             onClick={() => onEdit(staff)}
-            className="flex-1 border-gray-200 hover:border-slate-300 hover:bg-slate-50 text-gray-700 hover:text-slate-900"
+            className="text-gray-400 hover:text-blue-600 hover:bg-blue-50"
           >
-            <Edit className="h-3 w-3 mr-2" />
+            <Edit className="h-3 w-3 mr-1" />
             Editar
           </Button>
           <Button
-            variant="outline"
+            variant="ghost"
             size="sm"
             onClick={() => onDelete(staff.id)}
             disabled={isDeleting}
-            className="border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 hover:text-red-700"
+            className="text-gray-400 hover:text-red-600 hover:bg-red-50"
           >
-            <Trash2 className="h-3 w-3" />
+            <Trash2 className="h-3 w-3 mr-1" />
+            Eliminar
           </Button>
         </div>
       </CardContent>
