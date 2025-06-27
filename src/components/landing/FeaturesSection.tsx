@@ -1,5 +1,5 @@
 
-import { CalendarDays, Users, TrendingUp, BarChart3 } from "lucide-react";
+import { CalendarDays, Users, TrendingUp } from "lucide-react";
 
 const FeaturesSection = () => {
   return (
@@ -14,7 +14,7 @@ const FeaturesSection = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           <div className="bg-white rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow">
             <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
               <CalendarDays className="h-6 w-6 text-blue-600" />
@@ -37,14 +37,6 @@ const FeaturesSection = () => {
             </div>
             <h3 className="text-lg font-semibold text-gray-900 mb-2">Control de Pagos</h3>
             <p className="text-gray-600">Gestiona pagos en efectivo y transferencias con comprobantes automáticos</p>
-          </div>
-
-          <div className="bg-white rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow">
-            <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center mb-4">
-              <BarChart3 className="h-6 w-6 text-orange-600" />
-            </div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">Seguimiento Completo</h3>
-            <p className="text-gray-600">Analiza el rendimiento de tu negocio con reportes detallados</p>
           </div>
         </div>
       </div>
