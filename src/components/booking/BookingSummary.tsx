@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { BookingData } from '../BookingFlow';
+import { BookingData } from './hooks/useBookingData';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { CalendarDays, Clock, User, DollarSign, MapPin, CreditCard, Banknote, ArrowLeft, CheckCircle, Phone, Mail } from 'lucide-react';
