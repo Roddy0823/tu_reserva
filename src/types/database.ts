@@ -1,3 +1,4 @@
+
 export interface UserProfile {
   id: string;
   email: string;
@@ -10,9 +11,26 @@ export interface Business {
   id: string;
   owner_user_id: string;
   name: string;
+  description?: string;
+  address?: string;
+  contact_phone?: string;
+  contact_email?: string;
+  logo_url?: string;
   booking_url_slug: string;
   bank_account_details?: string;
   created_at: string;
+  updated_at?: string;
+}
+
+export interface BusinessInsert {
+  name: string;
+  description?: string;
+  address?: string;
+  contact_phone?: string;
+  contact_email?: string;
+  logo_url?: string;
+  booking_url_slug: string;
+  bank_account_details?: string;
 }
 
 export interface Service {
@@ -20,9 +38,34 @@ export interface Service {
   business_id: string;
   name: string;
   description?: string;
+  confirmation_message?: string;
   image_url?: string;
   duration_minutes: number;
   price: number;
+  accepts_cash?: boolean;
+  accepts_transfer?: boolean;
+  min_advance_days?: number;
+  is_monday_active?: boolean;
+  is_tuesday_active?: boolean;
+  is_wednesday_active?: boolean;
+  is_thursday_active?: boolean;
+  is_friday_active?: boolean;
+  is_saturday_active?: boolean;
+  is_sunday_active?: boolean;
+  monday_start?: string;
+  monday_end?: string;
+  tuesday_start?: string;
+  tuesday_end?: string;
+  wednesday_start?: string;
+  wednesday_end?: string;
+  thursday_start?: string;
+  thursday_end?: string;
+  friday_start?: string;
+  friday_end?: string;
+  saturday_start?: string;
+  saturday_end?: string;
+  sunday_start?: string;
+  sunday_end?: string;
   created_at: string;
 }
 
@@ -30,9 +73,34 @@ export interface ServiceInsert {
   business_id?: string;
   name: string;
   description?: string;
+  confirmation_message?: string;
   image_url?: string;
   duration_minutes: number;
   price: number;
+  accepts_cash?: boolean;
+  accepts_transfer?: boolean;
+  min_advance_days?: number;
+  is_monday_active?: boolean;
+  is_tuesday_active?: boolean;
+  is_wednesday_active?: boolean;
+  is_thursday_active?: boolean;
+  is_friday_active?: boolean;
+  is_saturday_active?: boolean;
+  is_sunday_active?: boolean;
+  monday_start?: string;
+  monday_end?: string;
+  tuesday_start?: string;
+  tuesday_end?: string;
+  wednesday_start?: string;
+  wednesday_end?: string;
+  thursday_start?: string;
+  thursday_end?: string;
+  friday_start?: string;
+  friday_end?: string;
+  saturday_start?: string;
+  saturday_end?: string;
+  sunday_start?: string;
+  sunday_end?: string;
 }
 
 export interface StaffMember {
@@ -53,7 +121,7 @@ export interface StaffMemberInsert {
   is_active: boolean;
 }
 
-export type AppointmentStatus = 'pendiente' | 'confirmado' | 'cancelado';
+export type AppointmentStatus = 'pendiente' | 'confirmado' | 'cancelado' | 'completado';
 export type PaymentValidationStatus = 'pendiente' | 'aprobado' | 'rechazado';
 
 export interface Appointment {
@@ -73,6 +141,7 @@ export interface Appointment {
   services?: {
     price: number;
     name: string;
+    duration_minutes: number;
   };
   staff_members?: {
     full_name: string;

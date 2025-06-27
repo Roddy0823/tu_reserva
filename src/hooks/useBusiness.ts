@@ -42,7 +42,7 @@ export const useBusiness = () => {
 
   // Crear un nuevo negocio
   const createBusinessMutation = useMutation({
-    mutationFn: async (businessData: Omit<BusinessInsert, 'owner_user_id'>) => {
+    mutationFn: async (businessData: BusinessInsert) => {
       const { data: { user } } = await supabase.auth.getUser();
       
       if (!user) {

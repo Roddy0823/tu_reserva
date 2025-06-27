@@ -105,7 +105,19 @@ const BookingFlow = ({ businessSlug }: BookingFlowProps) => {
 
     createAppointment(appointmentData, {
       onSuccess: (appointment) => {
-        setCreatedAppointment(appointment);
+        // Crear el objeto de appointment con la estructura correcta para el estado
+        const appointmentWithDetails: Appointment = {
+          ...appointment,
+          services: {
+            name: bookingData.service!.name,
+            price: bookingData.service!.price,
+            duration_minutes: bookingData.service!.duration_minutes
+          },
+          staff_members: {
+            full_name: bookingData.staffMember!.full_name
+          }
+        };
+        setCreatedAppointment(appointmentWithDetails);
         setCurrentStep(6);
       }
     });
