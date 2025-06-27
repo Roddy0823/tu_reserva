@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Navigate } from 'react-router-dom';
-import { Calendar, Users, Clock, CheckCircle } from 'lucide-react';
+import { Calendar, Users, Clock, CreditCard, Shield, Star } from 'lucide-react';
 
 const Auth = () => {
   const { user, loading, signIn, signUp } = useAuth();
@@ -74,46 +74,64 @@ const Auth = () => {
               La plataforma todo-en-uno para administrar reservas, clientes y servicios de tu negocio.
             </p>
             
+            {/* Trust indicators */}
+            <div className="flex items-center mb-8 space-x-6">
+              <div className="flex items-center">
+                <Shield className="h-5 w-5 mr-2" />
+                <span className="text-sm">100% Seguro</span>
+              </div>
+              <div className="flex items-center">
+                <Star className="h-5 w-5 mr-2 text-yellow-400" />
+                <span className="text-sm">4.9/5 Rating</span>
+              </div>
+            </div>
+            
             <div className="space-y-6">
               <div className="flex items-center">
-                <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center mr-4">
-                  <Calendar className="h-5 w-5" />
+                <div className="w-12 h-12 bg-blue-500 rounded-xl flex items-center justify-center mr-4">
+                  <Calendar className="h-6 w-6" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-lg">Reservas Online</h3>
-                  <p className="text-blue-100">Permite a tus clientes reservar 24/7</p>
+                  <h3 className="font-semibold text-lg">Reservas Online 24/7</h3>
+                  <p className="text-blue-100">Permite a tus clientes reservar en cualquier momento sin llamadas</p>
                 </div>
               </div>
               
               <div className="flex items-center">
-                <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center mr-4">
-                  <Users className="h-5 w-5" />
+                <div className="w-12 h-12 bg-blue-500 rounded-xl flex items-center justify-center mr-4">
+                  <Users className="h-6 w-6" />
                 </div>
                 <div>
                   <h3 className="font-semibold text-lg">Gestión de Clientes</h3>
-                  <p className="text-blue-100">Mantén un registro completo de tus clientes</p>
+                  <p className="text-blue-100">Mantén un registro completo con historial y preferencias</p>
                 </div>
               </div>
               
               <div className="flex items-center">
-                <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center mr-4">
-                  <Clock className="h-5 w-5" />
+                <div className="w-12 h-12 bg-blue-500 rounded-xl flex items-center justify-center mr-4">
+                  <Clock className="h-6 w-6" />
                 </div>
                 <div>
                   <h3 className="font-semibold text-lg">Horarios Flexibles</h3>
-                  <p className="text-blue-100">Configura tu disponibilidad fácilmente</p>
+                  <p className="text-blue-100">Configura tu disponibilidad y la de tu equipo fácilmente</p>
                 </div>
               </div>
               
               <div className="flex items-center">
-                <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center mr-4">
-                  <CheckCircle className="h-5 w-5" />
+                <div className="w-12 h-12 bg-blue-500 rounded-xl flex items-center justify-center mr-4">
+                  <CreditCard className="h-6 w-6" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-lg">Seguimiento Completo</h3>
-                  <p className="text-blue-100">Analiza el rendimiento de tu negocio</p>
+                  <h3 className="font-semibold text-lg">Pagos y Cobros</h3>
+                  <p className="text-blue-100">Gestiona pagos anticipados y controla tu flujo de efectivo</p>
                 </div>
               </div>
+            </div>
+
+            {/* Benefits highlight */}
+            <div className="mt-8 p-4 bg-blue-500/30 rounded-lg border border-blue-400/20">
+              <p className="text-sm font-medium mb-2">✨ Comienza gratis con 10 reservas</p>
+              <p className="text-xs text-blue-200">Sin tarjeta de crédito • Configuración en 5 minutos</p>
             </div>
           </div>
         </div>
@@ -232,6 +250,10 @@ const Auth = () => {
                           className="h-12 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
                         />
                       </div>
+                      <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                        <p className="text-sm text-blue-800 font-medium">🎉 Oferta de lanzamiento</p>
+                        <p className="text-xs text-blue-600">10 reservas gratis para probar el sistema</p>
+                      </div>
                       <p className="text-sm text-gray-600 text-center">
                         Al crear una cuenta, aceptas nuestros términos de servicio y política de privacidad.
                       </p>
@@ -246,7 +268,7 @@ const Auth = () => {
                             Creando cuenta...
                           </>
                         ) : (
-                          "Crear Cuenta"
+                          "Crear Cuenta Gratis"
                         )}
                       </Button>
                     </form>
