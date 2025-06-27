@@ -14,12 +14,13 @@ import { format } from 'date-fns';
 
 const timeBlockSchema = z.object({
   staff_id: z.string().min(1, 'Selecciona un miembro del personal'),
-  start_time: z.string().min(1, 'La fecha y hora de inicio es requerida'),
-  end_time: z.string().min(1, 'La fecha y hora de fin es requerida'),
+  date: z.string().min(1, 'La fecha es requerida'),
+  start_time: z.string().min(1, 'La hora de inicio es requerida'),
+  end_time: z.string().min(1, 'La hora de fin es requerida'),
   reason: z.string().optional(),
 }).refine((data) => {
-  const startTime = new Date(data.start_time);
-  const endTime = new Date(data.end_time);
+  const startTime = data.start_time;
+  const endTime = data.end_time;
   return endTime > startTime;
 }, {
   message: "La hora de fin debe ser posterior a la hora de inicio",
@@ -31,27 +32,34 @@ type TimeBlockFormData = z.infer<typeof timeBlockSchema>;
 interface TimeBlockFormProps {
   timeBlock?: TimeBlock & { staff_members: { full_name: string } };
   staffMembers: StaffMember[];
-  onSubmit: (data: TimeBlockFormData) => void;
+  selectedStaffId?: string | null;
+  onSubmit: (data: any) => void;
   onCancel: () => void;
   isLoading?: boolean;
 }
 
-const TimeBlockForm = ({ timeBlock, staffMembers, onSubmit, onCancel, isLoading }: TimeBlockFormProps) => {
+const TimeBlockForm = ({ timeBlock, staffMembers, selectedStaffId, onSubmit, onCancel, isLoading }: TimeBlockFormProps) => {
   const form = useForm<TimeBlockFormData>({
     resolver: zodResolver(timeBlockSchema),
     defaultValues: {
-      staff_id: timeBlock?.staff_id || '',
-      start_time: timeBlock?.start_time ? format(new Date(timeBlock.start_time), "yyyy-MM-dd'T'HH:mm") : '',
-      end_time: timeBlock?.end_time ? format(new Date(timeBlock.end_time), "yyyy-MM-dd'T'HH:mm") : '',
+      staff_id: timeBlock?.staff_id || selectedStaffId || '',
+      date: timeBlock?.start_time ? format(new Date(timeBlock.start_time), "yyyy-MM-dd") : '',
+      start_time: timeBlock?.start_time ? format(new Date(timeBlock.start_time), "HH:mm") : '',
+      end_time: timeBlock?.end_time ? format(new Date(timeBlock.end_time), "HH:mm") : '',
       reason: timeBlock?.reason || '',
     },
   });
 
   const handleSubmit = (data: TimeBlockFormData) => {
+    // Combinar fecha y horas para crear las fechas completas
+    const startDateTime = new Date(`${data.date}T${data.start_time}`);
+    const endDateTime = new Date(`${data.date}T${data.end_time}`);
+
     onSubmit({
-      ...data,
-      start_time: new Date(data.start_time).toISOString(),
-      end_time: new Date(data.end_time).toISOString(),
+      staff_id: data.staff_id,
+      start_time: startDateTime.toISOString(),
+      end_time: endDateTime.toISOString(),
+      reason: data.reason || null,
     });
   };
 
@@ -66,7 +74,7 @@ const TimeBlockForm = ({ timeBlock, staffMembers, onSubmit, onCancel, isLoading 
               </div>
               <div>
                 <CardTitle className="text-xl font-semibold text-gray-900">
-                  {timeBlock ? 'Editar Bloqueo' : 'Nuevo Bloqueo de Horario'}
+                  {timeBlock ? 'Editar Excepción' : 'Nueva Excepción de Disponibilidad'}
                 </CardTitle>
                 <CardDescription className="text-gray-500">
                   {timeBlock ? 'Modifica la excepción de disponibilidad' : 'Crea una excepción de disponibilidad para bloquear un horario específico'}
@@ -88,7 +96,7 @@ const TimeBlockForm = ({ timeBlock, staffMembers, onSubmit, onCancel, isLoading 
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="text-sm font-medium text-gray-700">Miembro del Personal</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select onValueChange={field.onChange} defaultValue={field.value} disabled={!!selectedStaffId}>
                       <FormControl>
                         <SelectTrigger className="border-gray-200 focus:border-gray-400">
                           <SelectValue placeholder="Selecciona un miembro del personal" />
@@ -107,16 +115,34 @@ const TimeBlockForm = ({ timeBlock, staffMembers, onSubmit, onCancel, isLoading 
                 )}
               />
 
+              <FormField
+                control={form.control}
+                name="date"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-sm font-medium text-gray-700">Fecha</FormLabel>
+                    <FormControl>
+                      <Input 
+                        type="date" 
+                        className="border-gray-200 focus:border-gray-400"
+                        {...field} 
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <FormField
                   control={form.control}
                   name="start_time"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-sm font-medium text-gray-700">Fecha y Hora de Inicio</FormLabel>
+                      <FormLabel className="text-sm font-medium text-gray-700">Hora Desde</FormLabel>
                       <FormControl>
                         <Input 
-                          type="datetime-local" 
+                          type="time" 
                           className="border-gray-200 focus:border-gray-400"
                           {...field} 
                         />
@@ -131,10 +157,10 @@ const TimeBlockForm = ({ timeBlock, staffMembers, onSubmit, onCancel, isLoading 
                   name="end_time"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-sm font-medium text-gray-700">Fecha y Hora de Fin</FormLabel>
+                      <FormLabel className="text-sm font-medium text-gray-700">Hora Hasta</FormLabel>
                       <FormControl>
                         <Input 
-                          type="datetime-local" 
+                          type="time" 
                           className="border-gray-200 focus:border-gray-400"
                           {...field} 
                         />
@@ -178,7 +204,7 @@ const TimeBlockForm = ({ timeBlock, staffMembers, onSubmit, onCancel, isLoading 
                   disabled={isLoading}
                   className="bg-gray-900 hover:bg-gray-800 text-white"
                 >
-                  {isLoading ? 'Guardando...' : timeBlock ? 'Actualizar Bloqueo' : 'Crear Bloqueo'}
+                  {isLoading ? 'Guardando...' : timeBlock ? 'Actualizar Excepción' : 'Crear Excepción'}
                 </Button>
               </div>
             </form>

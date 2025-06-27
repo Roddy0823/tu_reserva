@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { TimeBlock, StaffMember } from '@/types/database';
-import { Edit, Trash2, Calendar, Clock, User } from 'lucide-react';
+import { Edit, Trash2, Calendar, Clock, User, Plus } from 'lucide-react';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 
@@ -12,6 +12,7 @@ interface StaffAvailabilityCardProps {
   timeBlocks: (TimeBlock & { staff_members: { full_name: string } })[];
   onEditTimeBlock: (timeBlock: TimeBlock & { staff_members: { full_name: string } }) => void;
   onDeleteTimeBlock: (timeBlockId: string) => void;
+  onAddException: () => void;
   isDeleting: boolean;
 }
 
@@ -20,6 +21,7 @@ const StaffAvailabilityCard = ({
   timeBlocks, 
   onEditTimeBlock, 
   onDeleteTimeBlock, 
+  onAddException,
   isDeleting 
 }: StaffAvailabilityCardProps) => {
   const activeTimeBlocks = timeBlocks.filter(block => new Date(block.end_time) >= new Date());
@@ -63,15 +65,25 @@ const StaffAvailabilityCard = ({
               </p>
             </div>
           </div>
-          <div className="text-right">
-            <p className="text-sm text-gray-500">Horario regular</p>
-            <p className="text-xs text-gray-400">Disponible según servicios configurados</p>
+          <div className="flex items-center gap-3">
+            <div className="text-right">
+              <p className="text-sm text-gray-500">Horario regular</p>
+              <p className="text-xs text-gray-400">Disponible según servicios configurados</p>
+            </div>
+            <Button 
+              onClick={onAddException}
+              size="sm"
+              className="bg-gray-900 hover:bg-gray-800 text-white"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Agregar Excepción
+            </Button>
           </div>
         </div>
       </CardHeader>
 
       <CardContent className="space-y-6">
-        {/* Bloqueos activos */}
+        {/* Excepciones activas */}
         {activeTimeBlocks.length > 0 && (
           <div>
             <h4 className="text-sm font-medium text-gray-900 mb-3">Excepciones de Disponibilidad</h4>
@@ -125,10 +137,10 @@ const StaffAvailabilityCard = ({
           </div>
         )}
 
-        {/* Bloqueos pasados */}
+        {/* Excepciones pasadas */}
         {pastTimeBlocks.length > 0 && (
           <div>
-            <h4 className="text-sm font-medium text-gray-500 mb-3">Historial de Bloqueos</h4>
+            <h4 className="text-sm font-medium text-gray-500 mb-3">Historial de Excepciones</h4>
             <div className="space-y-2">
               {pastTimeBlocks.slice(0, 3).map((timeBlock) => (
                 <div key={timeBlock.id} className="bg-gray-25 rounded-lg p-3 border border-gray-100">
@@ -148,14 +160,14 @@ const StaffAvailabilityCard = ({
               ))}
               {pastTimeBlocks.length > 3 && (
                 <p className="text-xs text-gray-400 text-center py-2">
-                  +{pastTimeBlocks.length - 3} bloqueos anteriores
+                  +{pastTimeBlocks.length - 3} excepciones anteriores
                 </p>
               )}
             </div>
           </div>
         )}
 
-        {/* Estado sin bloqueos */}
+        {/* Estado sin excepciones */}
         {timeBlocks.length === 0 && (
           <div className="text-center py-8 text-gray-500">
             <Calendar className="h-8 w-8 mx-auto mb-2 text-gray-300" />

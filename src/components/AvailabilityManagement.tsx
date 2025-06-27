@@ -1,17 +1,15 @@
 
 import { useState } from 'react';
-import { Button } from '@/components/ui/button';
 import { useTimeBlocks } from '@/hooks/useTimeBlocks';
 import { useStaff } from '@/hooks/useStaff';
 import TimeBlockForm from './TimeBlockForm';
 import StaffAvailabilityCard from './StaffAvailabilityCard';
-import EmptyTimeBlocksState from './EmptyTimeBlocksState';
 import { TimeBlock } from '@/types/database';
-import { Plus } from 'lucide-react';
 
 const AvailabilityManagement = () => {
   const [showForm, setShowForm] = useState(false);
   const [editingTimeBlock, setEditingTimeBlock] = useState<(TimeBlock & { staff_members: { full_name: string } }) | null>(null);
+  const [selectedStaffId, setSelectedStaffId] = useState<string | null>(null);
   
   const { getAllTimeBlocks, createTimeBlock, updateTimeBlock, deleteTimeBlock, isCreating, isUpdating, isDeleting } = useTimeBlocks();
   const { staffMembers } = useStaff();
@@ -21,6 +19,7 @@ const AvailabilityManagement = () => {
     createTimeBlock(data, {
       onSuccess: () => {
         setShowForm(false);
+        setSelectedStaffId(null);
       }
     });
   };
@@ -33,6 +32,7 @@ const AvailabilityManagement = () => {
           onSuccess: () => {
             setEditingTimeBlock(null);
             setShowForm(false);
+            setSelectedStaffId(null);
           }
         }
       );
@@ -41,6 +41,11 @@ const AvailabilityManagement = () => {
 
   const handleEditTimeBlock = (timeBlock: TimeBlock & { staff_members: { full_name: string } }) => {
     setEditingTimeBlock(timeBlock);
+    setShowForm(true);
+  };
+
+  const handleAddException = (staffId: string) => {
+    setSelectedStaffId(staffId);
     setShowForm(true);
   };
 
@@ -53,6 +58,7 @@ const AvailabilityManagement = () => {
   const handleCancel = () => {
     setShowForm(false);
     setEditingTimeBlock(null);
+    setSelectedStaffId(null);
   };
 
   if (showForm) {
@@ -60,6 +66,7 @@ const AvailabilityManagement = () => {
       <TimeBlockForm
         timeBlock={editingTimeBlock || undefined}
         staffMembers={staffMembers}
+        selectedStaffId={selectedStaffId}
         onSubmit={editingTimeBlock ? handleUpdateTimeBlock : handleCreateTimeBlock}
         onCancel={handleCancel}
         isLoading={isCreating || isUpdating}
@@ -77,15 +84,9 @@ const AvailabilityManagement = () => {
 
   return (
     <div className="space-y-8">
-      <div className="flex justify-between items-center">
-        <div>
-          <h2 className="text-2xl font-semibold text-gray-900">Gestión de Disponibilidad</h2>
-          <p className="text-gray-600 mt-1">Administra los bloqueos de horario para tu personal</p>
-        </div>
-        <Button onClick={() => setShowForm(true)} className="bg-gray-900 hover:bg-gray-800 text-white">
-          <Plus className="h-4 w-4 mr-2" />
-          Bloquear Horario
-        </Button>
+      <div>
+        <h2 className="text-2xl font-semibold text-gray-900">Gestión de Disponibilidad</h2>
+        <p className="text-gray-600 mt-1">Administra las excepciones de disponibilidad para tu personal</p>
       </div>
 
       <div className="space-y-6">
@@ -101,17 +102,12 @@ const AvailabilityManagement = () => {
               timeBlocks={timeBlocks.filter(block => block.staff_id === staff.id)}
               onEditTimeBlock={handleEditTimeBlock}
               onDeleteTimeBlock={handleDelete}
+              onAddException={() => handleAddException(staff.id)}
               isDeleting={isDeleting}
             />
           ))
         )}
       </div>
-
-      {timeBlocks.length === 0 && staffMembers.length > 0 && (
-        <div className="mt-8">
-          <EmptyTimeBlocksState onCreateTimeBlock={() => setShowForm(true)} />
-        </div>
-      )}
     </div>
   );
 };
