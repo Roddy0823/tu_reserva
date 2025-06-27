@@ -1,9 +1,9 @@
-
 import { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Service, StaffMember } from '@/types/database';
 import { User, ArrowLeft, Clock } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
 
 interface StaffSelectionProps {
   service: Service;
@@ -18,24 +18,73 @@ const StaffSelection = ({ service, staffMembers, isLoading, onStaffSelect, onBac
   const [loadingStaff, setLoadingStaff] = useState(true);
 
   useEffect(() => {
-    // Simplificar: por ahora, mostrar todo el personal activo
-    // En una versión futura se puede implementar la lógica de servicios específicos
-    const activeStaff = staffMembers.filter(staff => staff.is_active);
-    setAvailableStaff(activeStaff);
-    setLoadingStaff(false);
+    const fetchAvailableStaff = async () => {
+      setLoadingStaff(true);
+      try {
+        // Obtener el personal que puede realizar este servicio específico
+        const { data: staffServices, error } = await supabase
+          .from('staff_services')
+          .select(`
+            staff_id,
+            staff_members!inner (
+              id,
+              full_name,
+              email,
+              is_active,
+              photo_url
+            )
+          `)
+          .eq('service_id', service.id);
 
-    // Auto-seleccionar si solo hay un miembro del personal
-    if (activeStaff.length === 1) {
-      setTimeout(() => onStaffSelect(activeStaff[0]), 1000);
+        if (error) {
+          console.error('Error fetching staff services:', error);
+          // Si no hay relaciones staff_services, mostrar todo el personal activo
+          const activeStaff = staffMembers.filter(staff => staff.is_active);
+          setAvailableStaff(activeStaff);
+        } else {
+          // Filtrar solo el personal activo que puede realizar este servicio
+          const serviceStaff = staffServices
+            .map(ss => ss.staff_members)
+            .filter(staff => staff?.is_active);
+          
+          console.log('Staff that can perform this service:', serviceStaff);
+          
+          if (serviceStaff.length === 0) {
+            // Si no hay personal específico, mostrar todo el personal activo
+            const activeStaff = staffMembers.filter(staff => staff.is_active);
+            setAvailableStaff(activeStaff);
+          } else {
+            setAvailableStaff(serviceStaff as StaffMember[]);
+          }
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        // Fallback: mostrar todo el personal activo
+        const activeStaff = staffMembers.filter(staff => staff.is_active);
+        setAvailableStaff(activeStaff);
+      } finally {
+        setLoadingStaff(false);
+      }
+    };
+
+    if (staffMembers.length > 0) {
+      fetchAvailableStaff();
     }
-  }, [staffMembers, onStaffSelect]);
+  }, [staffMembers, service.id]);
+
+  // Auto-seleccionar si solo hay un miembro del personal
+  useEffect(() => {
+    if (availableStaff.length === 1 && !loadingStaff) {
+      setTimeout(() => onStaffSelect(availableStaff[0]), 1500);
+    }
+  }, [availableStaff, loadingStaff, onStaffSelect]);
 
   if (isLoading || loadingStaff) {
     return (
       <Card className="w-full max-w-2xl mx-auto">
         <CardContent className="flex flex-col items-center justify-center py-16">
-          <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mb-4"></div>
-          <p className="text-gray-600 text-lg">Cargando personal disponible...</p>
+          <div className="w-12 h-12 border-4 border-slate-600 border-t-transparent rounded-full animate-spin mb-4"></div>
+          <p className="text-slate-600 text-lg">Cargando personal disponible...</p>
         </CardContent>
       </Card>
     );
@@ -51,7 +100,7 @@ const StaffSelection = ({ service, staffMembers, isLoading, onStaffSelect, onBac
             </Button>
             <div>
               <CardTitle className="text-xl text-red-600">Personal no disponible</CardTitle>
-              <p className="text-gray-600">No encontramos personal disponible para este servicio</p>
+              <p className="text-slate-600">No encontramos personal disponible para este servicio</p>
             </div>
           </div>
         </CardHeader>
@@ -76,13 +125,13 @@ const StaffSelection = ({ service, staffMembers, isLoading, onStaffSelect, onBac
         <CardContent className="flex flex-col items-center justify-center py-16">
           <div className="w-12 h-12 border-4 border-green-600 border-t-transparent rounded-full animate-spin mb-4"></div>
           <div className="text-center">
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+            <h3 className="text-lg font-semibold text-slate-900 mb-2">
               Personal asignado automáticamente
             </h3>
-            <p className="text-gray-600 mb-2">
+            <p className="text-slate-600 mb-2">
               {availableStaff[0].full_name} realizará tu servicio
             </p>
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-slate-500">
               Redirigiendo automáticamente...
             </p>
           </div>
@@ -99,64 +148,51 @@ const StaffSelection = ({ service, staffMembers, isLoading, onStaffSelect, onBac
             <ArrowLeft className="h-5 w-5" />
           </Button>
           <div className="flex-1">
-            <CardTitle className="text-xl">Selecciona el Personal</CardTitle>
-            <p className="text-gray-600">¿Quién te gustaría que realice tu servicio?</p>
+            <CardTitle className="text-xl text-slate-900">Selecciona el Personal</CardTitle>
+            <p className="text-slate-600">¿Quién te gustaría que realice tu servicio?</p>
           </div>
         </div>
         
         {/* Información del servicio seleccionado */}
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mt-4">
-          <div className="flex items-center gap-2 text-blue-800">
+        <div className="bg-slate-50 border border-slate-200 rounded-lg p-3 mt-4">
+          <div className="flex items-center gap-2 text-slate-800">
             <Clock className="h-4 w-4" />
             <span className="font-medium">{service.name}</span>
-            <span className="text-blue-600">• {service.duration_minutes} min</span>
-            <span className="text-blue-600">• ${service.price?.toLocaleString()} COP</span>
+            <span className="text-slate-600">• {service.duration_minutes} min</span>
+            <span className="text-slate-600">• ${service.price?.toLocaleString()} COP</span>
           </div>
         </div>
       </CardHeader>
       
       <CardContent className="space-y-4">
-        {/* Opción para cualquier personal disponible */}
-        <div
-          className="border-2 border-dashed border-gray-300 rounded-lg p-6 hover:border-blue-300 hover:bg-blue-50 transition-all cursor-pointer group"
-          onClick={() => onStaffSelect(availableStaff[0])}
-        >
-          <div className="flex items-center gap-4">
-            <div className="w-16 h-16 bg-gradient-to-br from-blue-100 to-blue-200 rounded-full flex items-center justify-center group-hover:from-blue-200 group-hover:to-blue-300 transition-all">
-              <User className="h-8 w-8 text-blue-600" />
-            </div>
-            <div className="flex-1">
-              <h3 className="font-semibold text-gray-900 text-lg">Cualquier persona disponible</h3>
-              <p className="text-gray-600">
-                Te asignaremos el personal más pronto disponible
-              </p>
-              <p className="text-sm text-green-600 font-medium mt-1">
-                ✓ Recomendado para mayor flexibilidad
-              </p>
-            </div>
-          </div>
-        </div>
-
         {/* Lista del personal individual */}
         <div className="space-y-3">
-          <h4 className="font-medium text-gray-700 border-b pb-2">O elige una persona específica:</h4>
           {availableStaff.map((staff) => (
             <div
               key={staff.id}
-              className="border border-gray-200 rounded-lg p-4 hover:border-blue-300 hover:bg-blue-50 transition-all cursor-pointer group"
+              className="border border-slate-200 rounded-lg p-4 hover:border-slate-400 hover:bg-slate-50 transition-all cursor-pointer group"
               onClick={() => onStaffSelect(staff)}
             >
               <div className="flex items-center gap-4">
-                <div className="w-14 h-14 bg-gradient-to-br from-gray-100 to-gray-200 rounded-full flex items-center justify-center group-hover:from-blue-100 group-hover:to-blue-200 transition-all">
-                  <User className="h-7 w-7 text-gray-600 group-hover:text-blue-600" />
-                </div>
-                <div className="flex-1">
-                  <h3 className="font-semibold text-gray-900">{staff.full_name}</h3>
-                  {staff.email && (
-                    <p className="text-gray-600 text-sm">{staff.email}</p>
+                <div className="w-14 h-14 bg-gradient-to-br from-slate-100 to-slate-200 rounded-full flex items-center justify-center group-hover:from-slate-200 group-hover:to-slate-300 transition-all">
+                  {staff.photo_url ? (
+                    <img 
+                      src={staff.photo_url} 
+                      alt={staff.full_name}
+                      className="w-14 h-14 rounded-full object-cover"
+                    />
+                  ) : (
+                    <User className="h-7 w-7 text-slate-600" />
                   )}
                 </div>
-                <div className="text-blue-600 opacity-0 group-hover:opacity-100 transition-opacity">
+                <div className="flex-1">
+                  <h3 className="font-semibold text-slate-900">{staff.full_name}</h3>
+                  {staff.email && (
+                    <p className="text-slate-600 text-sm">{staff.email}</p>
+                  )}
+                  <p className="text-xs text-green-600 mt-1">✓ Especialista en {service.name}</p>
+                </div>
+                <div className="text-slate-600 opacity-0 group-hover:opacity-100 transition-opacity">
                   <ArrowLeft className="h-5 w-5 rotate-180" />
                 </div>
               </div>
