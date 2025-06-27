@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -8,7 +9,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Badge } from '@/types/database';
+import { Badge } from '@/components/ui/badge';
 import { Service } from '@/types/database';
 import { X, Clock, DollarSign, Calendar, Users, Camera, MessageSquare, CreditCard } from 'lucide-react';
 import FileUpload from '@/components/ui/file-upload';
