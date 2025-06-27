@@ -3,18 +3,40 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { format, addMinutes, startOfDay, endOfDay, isAfter, isBefore, parseISO, getDay } from "date-fns";
 
-export const useAvailableTimeSlots = (staffId?: string, date?: Date, serviceDuration?: number) => {
+export const useAvailableTimeSlots = (staffId?: string, date?: Date, serviceDuration?: number, serviceId?: string) => {
   const query = useQuery({
-    queryKey: ['available-time-slots', staffId, date, serviceDuration],
+    queryKey: ['available-time-slots', staffId, date, serviceDuration, serviceId],
     queryFn: async () => {
       if (!staffId || !date || !serviceDuration) return [];
 
-      console.log('Checking availability for:', { staffId, date, serviceDuration });
+      console.log('Checking availability for:', { staffId, date, serviceDuration, serviceId });
+
+      // 1. VALIDACIÓN CRÍTICA: Verificar que el personal puede realizar el servicio
+      if (serviceId) {
+        const { data: staffService, error: serviceError } = await supabase
+          .from('staff_services')
+          .select('*')
+          .eq('staff_id', staffId)
+          .eq('service_id', serviceId)
+          .single();
+
+        if (serviceError) {
+          console.error('Staff cannot perform this service:', serviceError);
+          return []; // No slots available if staff can't perform service
+        }
+
+        if (!staffService) {
+          console.log('No staff-service relationship found');
+          return [];
+        }
+
+        console.log('Staff service validation passed:', staffService);
+      }
 
       const dayStart = startOfDay(date);
       const dayEnd = endOfDay(date);
 
-      // Obtener información del personal incluyendo horarios de trabajo y días laborales
+      // 2. Obtener información del personal incluyendo horarios de trabajo y días laborales
       const { data: staffMember, error: staffError } = await supabase
         .from('staff_members')
         .select(`
@@ -40,12 +62,19 @@ export const useAvailableTimeSlots = (staffId?: string, date?: Date, serviceDura
           saturday_start_time,
           saturday_end_time,
           sunday_start_time,
-          sunday_end_time
+          sunday_end_time,
+          is_active
         `)
         .eq('id', staffId)
         .single();
 
       if (staffError) throw staffError;
+
+      // Verificar que el personal está activo
+      if (!staffMember?.is_active) {
+        console.log('Staff member is not active');
+        return [];
+      }
 
       console.log('Staff member work schedule:', staffMember);
 
@@ -87,7 +116,7 @@ export const useAvailableTimeSlots = (staffId?: string, date?: Date, serviceDura
 
       console.log('Day-specific work hours:', { workStartTime, workEndTime, dayOfWeek });
 
-      // Obtener citas existentes ACTIVAS para el día (excluir canceladas)
+      // 3. Obtener citas existentes ACTIVAS para el día (excluir canceladas)
       const { data: appointments, error: appointmentsError } = await supabase
         .from('appointments')
         .select('start_time, end_time, status')
@@ -100,7 +129,7 @@ export const useAvailableTimeSlots = (staffId?: string, date?: Date, serviceDura
 
       console.log('Existing active appointments:', appointments);
 
-      // Obtener bloqueos de tiempo para el día
+      // 4. Obtener bloqueos de tiempo para el día
       const { data: timeBlocks, error: timeBlocksError } = await supabase
         .from('time_blocks')
         .select('start_time, end_time, reason')
@@ -118,7 +147,7 @@ export const useAvailableTimeSlots = (staffId?: string, date?: Date, serviceDura
 
       console.log('Work hours for this day:', { workStartTime, workEndTime, startHour, startMinute, endHour, endMinute });
 
-      // Generar slots de tiempo disponibles dentro del horario de trabajo
+      // 5. Generar slots de tiempo disponibles dentro del horario de trabajo
       const availableSlots: string[] = [];
       const slotDuration = 30; // minutos
 
@@ -148,7 +177,8 @@ export const useAvailableTimeSlots = (staffId?: string, date?: Date, serviceDura
             (isAfter(currentSlot, appointmentStart) && isBefore(currentSlot, appointmentEnd)) ||
             (isAfter(slotEnd, appointmentStart) && isBefore(slotEnd, appointmentEnd)) ||
             (isBefore(currentSlot, appointmentStart) && isAfter(slotEnd, appointmentEnd)) ||
-            currentSlot.getTime() === appointmentStart.getTime()
+            currentSlot.getTime() === appointmentStart.getTime() ||
+            slotEnd.getTime() === appointmentEnd.getTime()
           );
         });
 
@@ -161,7 +191,8 @@ export const useAvailableTimeSlots = (staffId?: string, date?: Date, serviceDura
             (isAfter(currentSlot, blockStart) && isBefore(currentSlot, blockEnd)) ||
             (isAfter(slotEnd, blockStart) && isBefore(slotEnd, blockEnd)) ||
             (isBefore(currentSlot, blockStart) && isAfter(slotEnd, blockEnd)) ||
-            currentSlot.getTime() === blockStart.getTime()
+            currentSlot.getTime() === blockStart.getTime() ||
+            slotEnd.getTime() === blockEnd.getTime()
           );
         });
 

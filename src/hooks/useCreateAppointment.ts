@@ -15,11 +15,67 @@ export const useCreateAppointment = () => {
     mutationFn: async (appointmentData: AppointmentInsert) => {
       console.log('Creating appointment with data:', appointmentData);
 
-      // Validaciones antes de crear la cita
       const startTime = parseISO(appointmentData.start_time);
       const endTime = parseISO(appointmentData.end_time);
 
-      // 1. Verificar que no hay conflictos con otras citas ACTIVAS (no canceladas)
+      // 1. VALIDACIÓN CRÍTICA: Verificar que el personal puede realizar este servicio
+      const { data: staffService, error: serviceError } = await supabase
+        .from('staff_services')
+        .select('*')
+        .eq('staff_id', appointmentData.staff_id)
+        .eq('service_id', appointmentData.service_id)
+        .single();
+
+      if (serviceError) {
+        console.error('Error checking staff service capability:', serviceError);
+        if (serviceError.code === 'PGRST116') {
+          throw new Error('El personal seleccionado no está habilitado para realizar este servicio. Por favor selecciona otro especialista.');
+        }
+        throw new Error('Error al verificar las capacidades del personal');
+      }
+
+      if (!staffService) {
+        throw new Error('El personal seleccionado no puede realizar este servicio');
+      }
+
+      console.log('Staff service validation passed:', staffService);
+
+      // 2. Verificar que el personal está activo
+      const { data: staffMember, error: staffError } = await supabase
+        .from('staff_members')
+        .select('is_active, full_name')
+        .eq('id', appointmentData.staff_id)
+        .single();
+
+      if (staffError) {
+        console.error('Error checking staff member:', staffError);
+        throw new Error('Error al verificar el estado del personal');
+      }
+
+      if (!staffMember?.is_active) {
+        throw new Error('El personal seleccionado no está activo actualmente');
+      }
+
+      // 3. Validar duración del servicio
+      const { data: service, error: serviceDurationError } = await supabase
+        .from('services')
+        .select('duration_minutes, name')
+        .eq('id', appointmentData.service_id)
+        .single();
+
+      if (serviceDurationError) {
+        console.error('Error fetching service details:', serviceDurationError);
+        throw new Error('Error al verificar los detalles del servicio');
+      }
+
+      // Verificar que la duración calculada coincide con la duración del servicio
+      const calculatedDurationMinutes = Math.round((endTime.getTime() - startTime.getTime()) / (1000 * 60));
+      if (calculatedDurationMinutes !== service.duration_minutes) {
+        console.error('Duration mismatch:', { calculated: calculatedDurationMinutes, expected: service.duration_minutes });
+        throw new Error(`La duración de la cita (${calculatedDurationMinutes} min) no coincide con la duración del servicio ${service.name} (${service.duration_minutes} min)`);
+      }
+
+      // 4. Verificar que no hay conflictos con otras citas ACTIVAS (no canceladas)
       const { data: conflictingAppointments, error: conflictError } = await supabase
         .from('appointments')
         .select('id, start_time, end_time, status')
@@ -37,7 +93,7 @@ export const useCreateAppointment = () => {
         throw new Error('Este horario ya está ocupado. Por favor selecciona otro horario.');
       }
 
-      // 2. Verificar que no hay bloqueos de tiempo que se superpongan
+      // 5. Verificar que no hay bloqueos de tiempo que se superpongan
       const { data: timeBlocks, error: blockError } = await supabase
         .from('time_blocks')
         .select('id, start_time, end_time, reason')
@@ -54,24 +110,6 @@ export const useCreateAppointment = () => {
         throw new Error('Este horario no está disponible debido a un bloqueo programado.');
       }
 
-      // 3. Verificar que el personal puede realizar este servicio
-      const { data: staffService, error: serviceError } = await supabase
-        .from('staff_services')
-        .select('*')
-        .eq('staff_id', appointmentData.staff_id)
-        .eq('service_id', appointmentData.service_id)
-        .single();
-
-      if (serviceError && serviceError.code !== 'PGRST116') {
-        console.error('Error checking staff service:', serviceError);
-        throw new Error('Error al verificar los servicios del personal');
-      }
-
-      // Si no hay relación staff_services, permitir (para compatibilidad)
-      if (!staffService) {
-        console.log('No specific staff-service relation found, allowing appointment');
-      }
-
       // Si todas las validaciones pasan, crear la cita
       const { data, error } = await supabase
         .from('appointments')
@@ -82,7 +120,8 @@ export const useCreateAppointment = () => {
             full_name
           ),
           services (
-            name
+            name,
+            duration_minutes
           )
         `)
         .single();
@@ -100,7 +139,7 @@ export const useCreateAppointment = () => {
       queryClient.invalidateQueries({ queryKey: ['available-time-slots'] });
       toast({
         title: "Cita creada exitosamente",
-        description: "Tu cita se ha agendado correctamente",
+        description: "Tu cita se ha agendado correctamente con el especialista",
       });
     },
     onError: (error: Error) => {

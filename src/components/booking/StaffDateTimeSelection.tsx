@@ -20,10 +20,12 @@ const StaffDateTimeSelection = ({ service, staffMember, onDateTimeSelect, onBack
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
   const [selectedTime, setSelectedTime] = useState<string>('');
 
+  // Pasar el serviceId para validar que el personal puede realizar el servicio
   const { availableSlots, isLoading, error } = useAvailableTimeSlots(
     staffMember.id,
     selectedDate,
-    service.duration_minutes
+    service.duration_minutes,
+    service.id // Importante: pasar el ID del servicio
   );
 
   const handleDateSelect = (date: Date | undefined) => {
@@ -81,6 +83,9 @@ const StaffDateTimeSelection = ({ service, staffMember, onDateTimeSelect, onBack
             <span className="text-slate-600">• {service.duration_minutes} min</span>
             <span className="text-slate-600">• ${service.price?.toLocaleString()} COP</span>
           </div>
+          <p className="text-xs text-green-600 mt-1">
+            ✓ {staffMember.full_name} está certificado para este servicio
+          </p>
         </div>
       </CardHeader>
       
@@ -125,7 +130,7 @@ const StaffDateTimeSelection = ({ service, staffMember, onDateTimeSelect, onBack
             {isLoading ? (
               <div className="flex items-center justify-center py-8">
                 <div className="w-6 h-6 border-4 border-slate-600 border-t-transparent rounded-full animate-spin mr-2"></div>
-                <span className="text-slate-600">Verificando disponibilidad...</span>
+                <span className="text-slate-600">Verificando disponibilidad del especialista...</span>
               </div>
             ) : availableSlots.length === 0 ? (
               <div className="text-center py-8">
@@ -133,12 +138,13 @@ const StaffDateTimeSelection = ({ service, staffMember, onDateTimeSelect, onBack
                   <AlertCircle className="h-8 w-8 text-amber-600 mx-auto mb-2" />
                   <p className="text-amber-800 font-medium mb-1">No hay horarios disponibles</p>
                   <p className="text-amber-700 text-sm">
-                    Esta fecha no tiene espacios libres. Esto puede deberse a:
+                    {staffMember.full_name} no tiene espacios libres esta fecha para el servicio {service.name}
                   </p>
                   <ul className="text-amber-700 text-sm text-left mt-2 space-y-1">
                     <li>• Citas ya programadas</li>
-                    <li>• Bloqueos de horario del personal</li>
+                    <li>• Bloqueos de horario del especialista</li>
                     <li>• Horarios fuera del rango laboral</li>
+                    <li>• Duración del servicio ({service.duration_minutes} min)</li>
                   </ul>
                   <p className="text-amber-600 text-sm mt-3 font-medium">
                     Selecciona otra fecha para ver más opciones.
@@ -170,7 +176,7 @@ const StaffDateTimeSelection = ({ service, staffMember, onDateTimeSelect, onBack
               <h4 className="font-semibold text-green-900 mb-2">Resumen de tu cita:</h4>
               <div className="space-y-1 text-sm text-green-800">
                 <p><strong>Servicio:</strong> {service.name}</p>
-                <p><strong>Personal:</strong> {staffMember.full_name}</p>
+                <p><strong>Especialista:</strong> {staffMember.full_name}</p>
                 <p><strong>Fecha:</strong> {format(selectedDate, "EEEE, dd 'de' MMMM 'de' yyyy", { locale: es })}</p>
                 <p><strong>Hora:</strong> {selectedTime}</p>
                 <p><strong>Duración:</strong> {service.duration_minutes} minutos</p>

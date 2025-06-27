@@ -1,8 +1,9 @@
+
 import { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Service, StaffMember } from '@/types/database';
-import { User, ArrowLeft, Clock } from 'lucide-react';
+import { User, ArrowLeft, Clock, AlertTriangle } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 
 interface StaffSelectionProps {
@@ -21,7 +22,9 @@ const StaffSelection = ({ service, staffMembers, isLoading, onStaffSelect, onBac
     const fetchAvailableStaff = async () => {
       setLoadingStaff(true);
       try {
-        // Obtener el personal que puede realizar este servicio específico
+        console.log('Checking staff that can perform service:', service.id);
+
+        // Obtener SOLO el personal que puede realizar este servicio específico
         const { data: staffServices, error } = await supabase
           .from('staff_services')
           .select(`
@@ -38,30 +41,29 @@ const StaffSelection = ({ service, staffMembers, isLoading, onStaffSelect, onBac
 
         if (error) {
           console.error('Error fetching staff services:', error);
-          // Si no hay relaciones staff_services, mostrar todo el personal activo
-          const activeStaff = staffMembers.filter(staff => staff.is_active);
-          setAvailableStaff(activeStaff);
-        } else {
-          // Filtrar solo el personal activo que puede realizar este servicio
-          const serviceStaff = staffServices
-            .map(ss => ss.staff_members)
-            .filter(staff => staff?.is_active);
-          
-          console.log('Staff that can perform this service:', serviceStaff);
-          
-          if (serviceStaff.length === 0) {
-            // Si no hay personal específico, mostrar todo el personal activo
-            const activeStaff = staffMembers.filter(staff => staff.is_active);
-            setAvailableStaff(activeStaff);
-          } else {
-            setAvailableStaff(serviceStaff as StaffMember[]);
-          }
+          setAvailableStaff([]);
+          return;
         }
+
+        console.log('Staff services found:', staffServices);
+
+        if (!staffServices || staffServices.length === 0) {
+          console.log('No staff assigned to this service');
+          setAvailableStaff([]);
+          return;
+        }
+
+        // Filtrar solo el personal activo que puede realizar este servicio
+        const serviceStaff = staffServices
+          .map(ss => ss.staff_members)
+          .filter(staff => staff?.is_active) as StaffMember[];
+        
+        console.log('Active staff that can perform this service:', serviceStaff);
+        setAvailableStaff(serviceStaff);
+
       } catch (error) {
         console.error('Error:', error);
-        // Fallback: mostrar todo el personal activo
-        const activeStaff = staffMembers.filter(staff => staff.is_active);
-        setAvailableStaff(activeStaff);
+        setAvailableStaff([]);
       } finally {
         setLoadingStaff(false);
       }
@@ -84,7 +86,7 @@ const StaffSelection = ({ service, staffMembers, isLoading, onStaffSelect, onBac
       <Card className="w-full max-w-2xl mx-auto">
         <CardContent className="flex flex-col items-center justify-center py-16">
           <div className="w-12 h-12 border-4 border-slate-600 border-t-transparent rounded-full animate-spin mb-4"></div>
-          <p className="text-slate-600 text-lg">Cargando personal disponible...</p>
+          <p className="text-slate-600 text-lg">Verificando personal especializado...</p>
         </CardContent>
       </Card>
     );
@@ -100,15 +102,31 @@ const StaffSelection = ({ service, staffMembers, isLoading, onStaffSelect, onBac
             </Button>
             <div>
               <CardTitle className="text-xl text-red-600">Personal no disponible</CardTitle>
-              <p className="text-slate-600">No encontramos personal disponible para este servicio</p>
+              <p className="text-slate-600">No hay personal especializado para este servicio</p>
             </div>
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-            <p className="text-red-800">
-              No hay personal disponible para el servicio <strong>"{service.name}"</strong> en este momento.
-            </p>
+            <div className="flex items-start gap-3">
+              <AlertTriangle className="h-5 w-5 text-red-600 mt-0.5 flex-shrink-0" />
+              <div>
+                <p className="text-red-800 font-medium mb-2">
+                  No hay personal habilitado para "{service.name}"
+                </p>
+                <p className="text-red-700 text-sm mb-3">
+                  Para poder ofrecer este servicio, necesitas:
+                </p>
+                <ul className="text-red-700 text-sm space-y-1 ml-4">
+                  <li>• Personal activo en tu equipo</li>
+                  <li>• Asignar este servicio específico al personal</li>
+                  <li>• Configurar horarios de trabajo para el personal</li>
+                </ul>
+                <p className="text-red-600 text-sm mt-3 font-medium">
+                  Contacta al administrador para configurar el personal.
+                </p>
+              </div>
+            </div>
           </div>
           <Button variant="outline" onClick={onBack} className="w-full">
             ← Seleccionar otro servicio
@@ -126,10 +144,10 @@ const StaffSelection = ({ service, staffMembers, isLoading, onStaffSelect, onBac
           <div className="w-12 h-12 border-4 border-green-600 border-t-transparent rounded-full animate-spin mb-4"></div>
           <div className="text-center">
             <h3 className="text-lg font-semibold text-slate-900 mb-2">
-              Personal asignado automáticamente
+              Especialista asignado automáticamente
             </h3>
             <p className="text-slate-600 mb-2">
-              {availableStaff[0].full_name} realizará tu servicio
+              {availableStaff[0].full_name} está especializado en este servicio
             </p>
             <p className="text-sm text-slate-500">
               Redirigiendo automáticamente...
@@ -148,8 +166,8 @@ const StaffSelection = ({ service, staffMembers, isLoading, onStaffSelect, onBac
             <ArrowLeft className="h-5 w-5" />
           </Button>
           <div className="flex-1">
-            <CardTitle className="text-xl text-slate-900">Selecciona el Personal</CardTitle>
-            <p className="text-slate-600">¿Quién te gustaría que realice tu servicio?</p>
+            <CardTitle className="text-xl text-slate-900">Selecciona tu Especialista</CardTitle>
+            <p className="text-slate-600">Personal especializado en este servicio</p>
           </div>
         </div>
         
@@ -165,7 +183,7 @@ const StaffSelection = ({ service, staffMembers, isLoading, onStaffSelect, onBac
       </CardHeader>
       
       <CardContent className="space-y-4">
-        {/* Lista del personal individual */}
+        {/* Lista del personal especializado */}
         <div className="space-y-3">
           {availableStaff.map((staff) => (
             <div
@@ -190,7 +208,9 @@ const StaffSelection = ({ service, staffMembers, isLoading, onStaffSelect, onBac
                   {staff.email && (
                     <p className="text-slate-600 text-sm">{staff.email}</p>
                   )}
-                  <p className="text-xs text-green-600 mt-1">✓ Especialista en {service.name}</p>
+                  <p className="text-xs text-green-600 mt-1 font-medium">
+                    ✓ Especialista certificado en {service.name}
+                  </p>
                 </div>
                 <div className="text-slate-600 opacity-0 group-hover:opacity-100 transition-opacity">
                   <ArrowLeft className="h-5 w-5 rotate-180" />
@@ -198,6 +218,12 @@ const StaffSelection = ({ service, staffMembers, isLoading, onStaffSelect, onBac
               </div>
             </div>
           ))}
+        </div>
+
+        <div className="pt-4 border-t border-slate-200">
+          <p className="text-xs text-slate-500 text-center">
+            Solo se muestra personal especializado y activo para este servicio
+          </p>
         </div>
       </CardContent>
     </Card>
