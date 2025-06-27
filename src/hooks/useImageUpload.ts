@@ -14,8 +14,11 @@ export const useImageUpload = () => {
       const fileExt = file.name.split('.').pop();
       const fileName = `${folder}/${Date.now()}.${fileExt}`;
       
+      // Determinar el bucket basado en la carpeta
+      const bucketName = folder === 'staff' ? 'staff-photos' : 'service-images';
+      
       const { data, error } = await supabase.storage
-        .from('service-images')
+        .from(bucketName)
         .upload(fileName, file, {
           cacheControl: '3600',
           upsert: false
@@ -26,7 +29,7 @@ export const useImageUpload = () => {
       }
 
       const { data: { publicUrl } } = supabase.storage
-        .from('service-images')
+        .from(bucketName)
         .getPublicUrl(data.path);
 
       return publicUrl;
@@ -42,14 +45,17 @@ export const useImageUpload = () => {
     }
   };
 
-  const deleteImage = async (url: string): Promise<boolean> => {
+  const deleteImage = async (url: string, folder: string = 'services'): Promise<boolean> => {
     try {
       // Extract path from URL
       const urlParts = url.split('/');
       const path = urlParts.slice(-2).join('/'); // Get last two parts (folder/filename)
       
+      // Determinar el bucket basado en la carpeta
+      const bucketName = folder === 'staff' ? 'staff-photos' : 'service-images';
+      
       const { error } = await supabase.storage
-        .from('service-images')
+        .from(bucketName)
         .remove([path]);
 
       if (error) {

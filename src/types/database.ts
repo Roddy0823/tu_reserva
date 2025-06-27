@@ -1,25 +1,89 @@
+export interface UserProfile {
+  id: string;
+  email: string;
+  full_name: string;
+  avatar_url?: string;
+  updated_at?: string;
+}
 
-import { Database } from "@/integrations/supabase/types";
+export interface Business {
+  id: string;
+  owner_user_id: string;
+  name: string;
+  booking_url_slug: string;
+  bank_account_details?: string;
+  created_at: string;
+}
 
-// Tipos derivados de la base de datos
-export type Business = Database['public']['Tables']['businesses']['Row'];
-export type Service = Database['public']['Tables']['services']['Row'];
-export type StaffMember = Database['public']['Tables']['staff_members']['Row'];
-export type Appointment = Database['public']['Tables']['appointments']['Row'];
-export type TimeBlock = Database['public']['Tables']['time_blocks']['Row'];
-export type BusinessSettings = Database['public']['Tables']['business_settings']['Row'];
-export type SubscriptionPlan = Database['public']['Tables']['subscription_plans']['Row'];
-export type BusinessSubscription = Database['public']['Tables']['business_subscriptions']['Row'];
-export type MonthlyUsage = Database['public']['Tables']['monthly_usage']['Row'];
+export interface Service {
+  id: string;
+  business_id: string;
+  name: string;
+  description?: string;
+  image_url?: string;
+  duration_minutes: number;
+  price: number;
+  created_at: string;
+}
 
-// Tipos para inserción
-export type BusinessInsert = Database['public']['Tables']['businesses']['Insert'];
-export type ServiceInsert = Database['public']['Tables']['services']['Insert'];
-export type StaffMemberInsert = Database['public']['Tables']['staff_members']['Insert'];
-export type AppointmentInsert = Database['public']['Tables']['appointments']['Insert'];
-export type TimeBlockInsert = Database['public']['Tables']['time_blocks']['Insert'];
-export type BusinessSettingsInsert = Database['public']['Tables']['business_settings']['Insert'];
+export interface ServiceInsert {
+  business_id?: string;
+  name: string;
+  description?: string;
+  image_url?: string;
+  duration_minutes: number;
+  price: number;
+}
 
-// Enums
-export type AppointmentStatus = Database['public']['Enums']['appointment_status'];
-export type PaymentValidationStatus = Database['public']['Enums']['payment_validation_status'];
+export interface StaffMember {
+  id: string;
+  business_id: string;
+  full_name: string;
+  email?: string;
+  photo_url?: string;
+  is_active: boolean;
+  created_at: string;
+}
+
+export interface StaffMemberInsert {
+  business_id?: string;
+  full_name: string;
+  email?: string;
+  photo_url?: string;
+  is_active: boolean;
+}
+
+export type AppointmentStatus = 'pendiente' | 'confirmado' | 'cancelado';
+export type PaymentValidationStatus = 'pendiente' | 'aprobado' | 'rechazado';
+
+export interface Appointment {
+  id: string;
+  business_id: string;
+  service_id: string;
+  staff_id: string;
+  start_time: string;
+  end_time: string;
+  client_name: string;
+  client_email: string;
+  client_phone?: string;
+  status: AppointmentStatus;
+  payment_proof_url?: string;
+  payment_status?: PaymentValidationStatus;
+  created_at: string;
+  services?: {
+    price: number;
+    name: string;
+  };
+  staff_members?: {
+    full_name: string;
+  };
+}
+
+export interface TimeBlock {
+  id: string;
+  staff_id: string;
+  start_time: string;
+  end_time: string;
+  reason?: string;
+  created_at: string;
+}

@@ -1,7 +1,7 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { CalendarDays, Package, TrendingUp, Users, Settings, Clock, CheckCircle, ArrowRight, Sparkles } from "lucide-react";
+import { CalendarDays, Package, TrendingUp, Settings, CheckCircle, ArrowRight, Sparkles } from "lucide-react";
 import { useBusiness } from "@/hooks/useBusiness";
 import { useDashboardStats } from "@/hooks/useDashboardStats";
 import { Link } from "react-router-dom";
@@ -83,13 +83,13 @@ const Dashboard = () => {
         {/* Subscription Limit Banner */}
         <SubscriptionLimitBanner />
 
-        {/* Stats Overview Cards */}
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 mb-8">
+        {/* Main Stats Overview Cards */}
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-2 mb-8">
           <Link to="/services">
             <Card className="group cursor-pointer hover:shadow-xl transition-all duration-300 hover:-translate-y-1 bg-gradient-to-br from-white to-blue-50 border-0 shadow-lg">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
                 <div className="space-y-1">
-                  <CardTitle className="text-sm font-medium text-gray-600">Gestión de Servicios</CardTitle>
+                  <CardTitle className="text-sm font-medium text-gray-600">Gestión de Servicios y Personal</CardTitle>
                   <div className="text-3xl font-bold text-blue-600">{stats?.total_services || 0}</div>
                 </div>
                 <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center group-hover:bg-blue-200 transition-colors">
@@ -100,26 +100,6 @@ const Dashboard = () => {
                 <div className="flex items-center justify-between">
                   <p className="text-xs text-gray-500">servicios registrados</p>
                   <ArrowRight className="h-4 w-4 text-gray-400 group-hover:text-blue-600 transition-colors" />
-                </div>
-              </CardContent>
-            </Card>
-          </Link>
-
-          <Link to="/staff">
-            <Card className="group cursor-pointer hover:shadow-xl transition-all duration-300 hover:-translate-y-1 bg-gradient-to-br from-white to-purple-50 border-0 shadow-lg">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-                <div className="space-y-1">
-                  <CardTitle className="text-sm font-medium text-gray-600">Gestión de Personal</CardTitle>
-                  <div className="text-3xl font-bold text-purple-600">{stats?.total_staff || 0}</div>
-                </div>
-                <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center group-hover:bg-purple-200 transition-colors">
-                  <Users className="h-6 w-6 text-purple-600" />
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center justify-between">
-                  <p className="text-xs text-gray-500">miembros del equipo</p>
-                  <ArrowRight className="h-4 w-4 text-gray-400 group-hover:text-purple-600 transition-colors" />
                 </div>
               </CardContent>
             </Card>
