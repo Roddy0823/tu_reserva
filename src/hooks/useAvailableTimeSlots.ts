@@ -131,7 +131,7 @@ export const useAvailableTimeSlots = (staffId?: string, date?: Date, serviceDura
 
       console.log('Time blocks:', timeBlocks?.length || 0);
 
-      // 5. Generar slots disponibles
+      // 5. Generar slots disponibles con lógica mejorada
       const [startHour, startMinute] = workStartTime.split(':').map(Number);
       const [endHour, endMinute] = workEndTime.split(':').map(Number);
 
@@ -142,73 +142,73 @@ export const useAvailableTimeSlots = (staffId?: string, date?: Date, serviceDura
       workEnd.setHours(endHour, endMinute, 0, 0);
 
       const availableSlots: string[] = [];
-      const slotInterval = 30; // Intervalos de 30 minutos
+      
+      // Usar intervalos de 15 minutos para mayor precisión
+      const slotInterval = 15;
       let currentSlot = new Date(workStart);
 
       console.log('Generating slots from', format(workStart, 'HH:mm'), 'to', format(workEnd, 'HH:mm'));
+      console.log('Service duration:', serviceDuration, 'minutes');
 
       while (currentSlot < workEnd) {
         const slotEnd = addMinutes(currentSlot, serviceDuration);
         
         // Verificar que el servicio completo cabe en el horario laboral
         if (slotEnd > workEnd) {
-          console.log('⏰ Slot', format(currentSlot, 'HH:mm'), 'would end after work hours');
+          console.log('⏰ Slot', format(currentSlot, 'HH:mm'), 'would end after work hours at', format(slotEnd, 'HH:mm'));
           break;
         }
 
-        // Verificar conflictos con citas existentes
+        // Verificar conflictos con citas existentes - lógica mejorada
         const hasAppointmentConflict = appointments?.some(appointment => {
           const appointmentStart = parseISO(appointment.start_time);
           const appointmentEnd = parseISO(appointment.end_time);
           
-          // Conflicto si hay superposición de cualquier tipo
+          // Un slot está en conflicto si:
+          // 1. El nuevo slot empieza antes de que termine una cita existente Y termina después de que empiece
           const hasOverlap = (
-            // El nuevo slot empieza durante una cita existente
-            (currentSlot >= appointmentStart && currentSlot < appointmentEnd) ||
-            // El nuevo slot termina durante una cita existente
-            (slotEnd > appointmentStart && slotEnd <= appointmentEnd) ||
-            // El nuevo slot engloba completamente una cita existente
-            (currentSlot <= appointmentStart && slotEnd >= appointmentEnd) ||
-            // Coincidencia exacta de tiempos
-            isSameMinute(currentSlot, appointmentStart) ||
-            isSameMinute(slotEnd, appointmentEnd)
+            currentSlot < appointmentEnd && slotEnd > appointmentStart
           );
 
           if (hasOverlap) {
-            console.log('❌ Conflict with appointment:', format(appointmentStart, 'HH:mm'), '-', format(appointmentEnd, 'HH:mm'));
+            console.log('❌ Conflict with appointment:', 
+              format(appointmentStart, 'HH:mm'), '-', format(appointmentEnd, 'HH:mm'),
+              'vs proposed slot:', format(currentSlot, 'HH:mm'), '-', format(slotEnd, 'HH:mm'));
           }
 
           return hasOverlap;
         });
 
-        // Verificar conflictos con bloqueos de tiempo
+        // Verificar conflictos con bloqueos de tiempo - lógica mejorada
         const hasTimeBlockConflict = timeBlocks?.some(block => {
           const blockStart = parseISO(block.start_time);
           const blockEnd = parseISO(block.end_time);
           
           const hasOverlap = (
-            (currentSlot >= blockStart && currentSlot < blockEnd) ||
-            (slotEnd > blockStart && slotEnd <= blockEnd) ||
-            (currentSlot <= blockStart && slotEnd >= blockEnd) ||
-            isSameMinute(currentSlot, blockStart) ||
-            isSameMinute(slotEnd, blockEnd)
+            currentSlot < blockEnd && slotEnd > blockStart
           );
 
           if (hasOverlap) {
-            console.log('❌ Conflict with time block:', format(blockStart, 'HH:mm'), '-', format(blockEnd, 'HH:mm'));
+            console.log('❌ Conflict with time block:', 
+              format(blockStart, 'HH:mm'), '-', format(blockEnd, 'HH:mm'),
+              'vs proposed slot:', format(currentSlot, 'HH:mm'), '-', format(slotEnd, 'HH:mm'));
           }
 
           return hasOverlap;
         });
 
-        // Si no hay conflictos, agregar el slot
+        // Si no hay conflictos, agregar el slot solo si coincide con intervalos de 30 minutos para mostrar
         if (!hasAppointmentConflict && !hasTimeBlockConflict) {
-          const slotTime = format(currentSlot, 'HH:mm');
-          availableSlots.push(slotTime);
-          console.log('✅ Available slot:', slotTime, '(duration:', serviceDuration, 'min)');
+          const minutes = currentSlot.getMinutes();
+          // Solo mostrar slots que empiecen en :00 o :30 para mantener la UI limpia
+          if (minutes % 30 === 0) {
+            const slotTime = format(currentSlot, 'HH:mm');
+            availableSlots.push(slotTime);
+            console.log('✅ Available slot:', slotTime, '(will end at:', format(slotEnd, 'HH:mm'), ')');
+          }
         }
 
-        // Avanzar al siguiente intervalo
+        // Avanzar con el intervalo más pequeño para detectar todos los conflictos
         currentSlot = addMinutes(currentSlot, slotInterval);
       }
 
