@@ -1,4 +1,5 @@
 
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -8,20 +9,121 @@ import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { CalendarDays, Clock, User, DollarSign, MapPin, CreditCard, Banknote } from 'lucide-react';
 import { useBusiness } from '@/hooks/useBusiness';
+import PaymentProofUpload from '../PaymentProofUpload';
 
 interface BookingSummaryProps {
   bookingData: BookingData;
   onConfirm: () => void;
   onBack: () => void;
   isLoading?: boolean;
+  createdAppointment?: any;
 }
 
-const BookingSummary = ({ bookingData, onConfirm, onBack, isLoading }: BookingSummaryProps) => {
+const BookingSummary = ({ bookingData, onConfirm, onBack, isLoading, createdAppointment }: BookingSummaryProps) => {
   const { business } = useBusiness();
   const { service, staffMember, date, time, clientName, clientEmail, clientPhone } = bookingData;
+  const [showPaymentUpload, setShowPaymentUpload] = useState(false);
 
   if (!service || !staffMember || !date || !time) {
     return null;
+  }
+
+  // Si ya se creó la cita y acepta transferencias, mostrar opción de subir comprobante
+  if (createdAppointment && service.accepts_transfer) {
+    return (
+      <div className="max-w-2xl mx-auto space-y-6">
+        <Card className="shadow-lg border-0 bg-gradient-to-br from-white to-gray-50">
+          <CardHeader className="bg-gradient-to-r from-green-600 to-green-700 text-white rounded-t-lg">
+            <CardTitle className="text-2xl font-bold text-center">
+              ¡Reserva Confirmada!
+            </CardTitle>
+            <CardDescription className="text-green-100 text-center">
+              Tu cita ha sido creada exitosamente
+            </CardDescription>
+          </CardHeader>
+          
+          <CardContent className="p-8">
+            <div className="space-y-6">
+              {/* Información de la Cita */}
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
+                <h3 className="text-lg font-semibold text-blue-900 mb-4">
+                  Detalles de tu Cita
+                </h3>
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center">
+                    <span className="text-blue-800 font-medium">Servicio:</span>
+                    <span className="text-blue-900 font-semibold">{service.name}</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-blue-800 font-medium">Profesional:</span>
+                    <span className="text-blue-900">{staffMember.full_name}</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-blue-800 font-medium">Fecha:</span>
+                    <span className="text-blue-900 font-semibold">
+                      {format(date, 'EEEE, d MMMM yyyy', { locale: es })} a las {time}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-blue-800 font-medium">Precio:</span>
+                    <Badge variant="secondary" className="bg-green-100 text-green-800">
+                      <DollarSign className="h-3 w-3 mr-1" />
+                      ${service.price?.toLocaleString()} COP
+                    </Badge>
+                  </div>
+                </div>
+              </div>
+
+              {/* Opciones de Pago */}
+              {service.accepts_transfer && (
+                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6">
+                  <h3 className="text-lg font-semibold text-yellow-900 mb-4">
+                    Completa tu Reserva
+                  </h3>
+                  <p className="text-yellow-800 mb-4">
+                    Para confirmar tu cita, puedes:
+                  </p>
+                  <div className="space-y-3">
+                    {service.accepts_cash && (
+                      <div className="flex items-center space-x-3">
+                        <Banknote className="h-4 w-4 text-yellow-700" />
+                        <span className="text-yellow-800">Pagar en efectivo el día de la cita</span>
+                      </div>
+                    )}
+                    {service.accepts_transfer && (
+                      <div className="space-y-2">
+                        <div className="flex items-center space-x-3">
+                          <CreditCard className="h-4 w-4 text-yellow-700" />
+                          <span className="text-yellow-800">Realizar transferencia bancaria</span>
+                        </div>
+                        <Button 
+                          onClick={() => setShowPaymentUpload(true)}
+                          variant="outline"
+                          className="w-full mt-2"
+                          disabled={showPaymentUpload}
+                        >
+                          Subir Comprobante de Transferencia
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Componente de subida de comprobante */}
+              {showPaymentUpload && service.accepts_transfer && (
+                <PaymentProofUpload
+                  appointmentId={createdAppointment.id}
+                  bankAccountDetails={business?.bank_account_details}
+                  serviceName={service.name}
+                  servicePrice={service.price || 0}
+                />
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
   }
 
   // Determinar métodos de pago aceptados

@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useBusinessBySlug } from '@/hooks/useBusinessBySlug';
 import { useServices } from '@/hooks/useServices';
@@ -32,6 +31,7 @@ const BookingFlow = ({ businessSlug }: BookingFlowProps) => {
   const [currentStep, setCurrentStep] = useState(1);
   const [bookingData, setBookingData] = useState<BookingData>({});
   const [createdAppointment, setCreatedAppointment] = useState<Appointment | null>(null);
+  const [showPaymentStep, setShowPaymentStep] = useState(false);
 
   const { business, isLoading: businessLoading, error: businessError } = useBusinessBySlug(businessSlug);
   const { services, isLoading: servicesLoading } = useServices();
@@ -105,7 +105,6 @@ const BookingFlow = ({ businessSlug }: BookingFlowProps) => {
 
     createAppointment(appointmentData, {
       onSuccess: (appointment) => {
-        // Crear el objeto de appointment con la estructura correcta para el estado
         const appointmentWithDetails: Appointment = {
           ...appointment,
           services: {
@@ -118,7 +117,13 @@ const BookingFlow = ({ businessSlug }: BookingFlowProps) => {
           }
         };
         setCreatedAppointment(appointmentWithDetails);
-        setCurrentStep(6);
+        
+        // Si el servicio acepta transferencias, mostrar paso de pago
+        if (bookingData.service!.accepts_transfer) {
+          setShowPaymentStep(true);
+        } else {
+          setCurrentStep(6);
+        }
       }
     });
   };
@@ -127,6 +132,10 @@ const BookingFlow = ({ businessSlug }: BookingFlowProps) => {
     if (currentStep > 1) {
       setCurrentStep(currentStep - 1);
     }
+  };
+
+  const handlePaymentComplete = () => {
+    setCurrentStep(6);
   };
 
   if (businessLoading) {
@@ -161,6 +170,24 @@ const BookingFlow = ({ businessSlug }: BookingFlowProps) => {
             appointment={createdAppointment}
             service={bookingData.service!}
             staffMember={bookingData.staffMember!}
+          />
+        </div>
+      </div>
+    );
+  }
+
+  // Payment step after confirmation
+  if (showPaymentStep && createdAppointment && bookingData.service) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50">
+        <div className="container mx-auto px-4 py-8">
+          <BookingHeader business={business} />
+          <BookingSummary
+            bookingData={bookingData}
+            onConfirm={handlePaymentComplete}
+            onBack={() => setShowPaymentStep(false)}
+            isLoading={false}
+            createdAppointment={createdAppointment}
           />
         </div>
       </div>
