@@ -1,9 +1,9 @@
 
 import Navigation from "@/components/landing/Navigation";
 import HeroSection from "@/components/landing/HeroSection";
-import GoogleCalendarSection from "@/components/landing/GoogleCalendarSection";
+import FeaturesOverviewSection from "@/components/landing/FeaturesOverviewSection";
 import PaymentFeaturesSection from "@/components/landing/PaymentFeaturesSection";
-import FeaturesSection from "@/components/landing/FeaturesSection";
+import GoogleCalendarSection from "@/components/landing/GoogleCalendarSection";
 import CompleteSoftwareSection from "@/components/landing/CompleteSoftwareSection";
 import PricingSection from "@/components/landing/PricingSection";
 import CTASection from "@/components/landing/CTASection";
@@ -14,9 +14,9 @@ const Index = () => {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-indigo-50">
       <Navigation />
       <HeroSection />
-      <GoogleCalendarSection />
+      <FeaturesOverviewSection />
       <PaymentFeaturesSection />
-      <FeaturesSection />
+      <GoogleCalendarSection />
       <CompleteSoftwareSection />
       <PricingSection />
       <CTASection />
