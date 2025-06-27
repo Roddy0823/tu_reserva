@@ -10,20 +10,25 @@ const Services = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="flex flex-col items-center gap-4">
-          <div className="w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-          <p className="text-sm text-gray-600">Cargando...</p>
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p>Cargando...</p>
         </div>
       </div>
     );
   }
 
+  // Si el usuario no tiene negocio registrado, mostrar formulario de configuración
   if (!business) {
     return <BusinessSetup />;
   }
 
-  return <ServicesAndStaffManagement />;
+  return (
+    <div className="container mx-auto px-4 py-4">
+      <ServicesAndStaffManagement />
+    </div>
+  );
 };
 
 export default Services;

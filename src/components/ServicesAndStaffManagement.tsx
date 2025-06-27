@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Package, Users } from 'lucide-react';
 import ServicesManagement from './ServicesManagement';
 import StaffManagement from './StaffManagement';
@@ -26,43 +26,48 @@ const ServicesAndStaffManagement = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 py-8">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+      <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-semibold text-gray-900 mb-2">Servicios y Personal</h1>
-          <p className="text-gray-600">Gestiona los servicios que ofreces y tu equipo de trabajo</p>
+          <h1 className="text-4xl font-bold text-gray-900 mb-2">Gestión de Servicios y Personal</h1>
+          <p className="text-lg text-gray-600">Administra los servicios y el personal de tu negocio</p>
         </div>
 
-        <Card className="border border-gray-200 shadow-sm bg-white">
+        <Card className="shadow-xl border-0 bg-gradient-to-br from-white to-gray-50">
+          <CardHeader className="bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-t-lg">
+            <CardTitle className="text-2xl font-bold flex items-center gap-2">
+              <Package className="h-6 w-6" />
+              Panel de Administración
+            </CardTitle>
+            <CardDescription className="text-blue-100">
+              Gestiona todos los aspectos de tu negocio desde un solo lugar
+            </CardDescription>
+          </CardHeader>
+          
           <CardContent className="p-0">
             <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
-              {/* Navigation Tabs - Centered */}
-              <div className="border-b border-gray-200 px-6">
-                <TabsList className="h-12 bg-transparent p-0 w-full justify-start">
-                  <TabsTrigger 
-                    value="services" 
-                    className="flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:text-blue-600 data-[state=active]:bg-transparent bg-transparent hover:text-gray-900 text-gray-600"
-                  >
-                    <Package className="h-4 w-4" />
-                    Servicios
-                  </TabsTrigger>
-                  <TabsTrigger 
-                    value="staff" 
-                    className="flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:text-blue-600 data-[state=active]:bg-transparent bg-transparent hover:text-gray-900 text-gray-600"
-                  >
-                    <Users className="h-4 w-4" />
-                    Personal
-                  </TabsTrigger>
-                </TabsList>
-              </div>
+              <TabsList className="grid w-full grid-cols-2 bg-gray-100 m-6 mb-0">
+                <TabsTrigger value="services" className="flex items-center gap-2 text-base py-3">
+                  <Package className="h-4 w-4" />
+                  Servicios
+                </TabsTrigger>
+                <TabsTrigger value="staff" className="flex items-center gap-2 text-base py-3">
+                  <Users className="h-4 w-4" />
+                  Personal
+                </TabsTrigger>
+              </TabsList>
               
-              <TabsContent value="services" className="mt-0 p-6">
-                <ServicesManagement />
+              <TabsContent value="services" className="mt-0">
+                <div className="p-6">
+                  <ServicesManagement />
+                </div>
               </TabsContent>
               
-              <TabsContent value="staff" className="mt-0 p-6">
-                <StaffManagement />
+              <TabsContent value="staff" className="mt-0">
+                <div className="p-6">
+                  <StaffManagement />
+                </div>
               </TabsContent>
             </Tabs>
           </CardContent>
