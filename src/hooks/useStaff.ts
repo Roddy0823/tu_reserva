@@ -34,7 +34,7 @@ export const useStaff = () => {
 
   // Crear un nuevo miembro del personal
   const createStaffMutation = useMutation({
-    mutationFn: async (staffData: Omit<StaffMemberInsert, 'business_id'> & { work_start_time?: string; work_end_time?: string }) => {
+    mutationFn: async (staffData: Omit<StaffMemberInsert, 'business_id'>) => {
       if (!business?.id) {
         throw new Error('No hay negocio seleccionado');
       }
@@ -77,7 +77,7 @@ export const useStaff = () => {
 
   // Actualizar un miembro del personal
   const updateStaffMutation = useMutation({
-    mutationFn: async ({ id, updates }: { id: string; updates: Partial<StaffMemberInsert> & { work_start_time?: string; work_end_time?: string } }) => {
+    mutationFn: async ({ id, updates }: { id: string; updates: Partial<StaffMemberInsert> }) => {
       const { data, error } = await supabase
         .from('staff_members')
         .update(updates)

@@ -1,7 +1,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { format, addMinutes, startOfDay, endOfDay, isAfter, isBefore, parseISO } from "date-fns";
+import { format, addMinutes, startOfDay, endOfDay, isAfter, isBefore, parseISO, getDay } from "date-fns";
 
 export const useAvailableTimeSlots = (staffId?: string, date?: Date, serviceDuration?: number) => {
   const query = useQuery({
@@ -14,16 +14,35 @@ export const useAvailableTimeSlots = (staffId?: string, date?: Date, serviceDura
       const dayStart = startOfDay(date);
       const dayEnd = endOfDay(date);
 
-      // Obtener información del personal incluyendo horarios de trabajo
+      // Obtener información del personal incluyendo horarios de trabajo y días laborales
       const { data: staffMember, error: staffError } = await supabase
         .from('staff_members')
-        .select('work_start_time, work_end_time')
+        .select('work_start_time, work_end_time, works_monday, works_tuesday, works_wednesday, works_thursday, works_friday, works_saturday, works_sunday')
         .eq('id', staffId)
         .single();
 
       if (staffError) throw staffError;
 
-      console.log('Staff member work hours:', staffMember);
+      console.log('Staff member work schedule:', staffMember);
+
+      // Verificar si el personal trabaja en el día seleccionado
+      const dayOfWeek = getDay(date); // 0 = domingo, 1 = lunes, etc.
+      const workDayFields = [
+        'works_sunday',
+        'works_monday', 
+        'works_tuesday', 
+        'works_wednesday', 
+        'works_thursday', 
+        'works_friday', 
+        'works_saturday'
+      ];
+      
+      const worksOnSelectedDay = staffMember?.[workDayFields[dayOfWeek]];
+      
+      if (!worksOnSelectedDay) {
+        console.log('Staff member does not work on this day');
+        return [];
+      }
 
       // Obtener citas existentes para el día
       const { data: appointments, error: appointmentsError } = await supabase

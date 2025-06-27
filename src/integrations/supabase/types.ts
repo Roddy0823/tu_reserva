@@ -427,6 +427,15 @@ export type Database = {
           id: string
           is_active: boolean
           photo_url: string | null
+          work_end_time: string | null
+          work_start_time: string | null
+          works_friday: boolean | null
+          works_monday: boolean | null
+          works_saturday: boolean | null
+          works_sunday: boolean | null
+          works_thursday: boolean | null
+          works_tuesday: boolean | null
+          works_wednesday: boolean | null
         }
         Insert: {
           business_id: string
@@ -436,6 +445,15 @@ export type Database = {
           id?: string
           is_active?: boolean
           photo_url?: string | null
+          work_end_time?: string | null
+          work_start_time?: string | null
+          works_friday?: boolean | null
+          works_monday?: boolean | null
+          works_saturday?: boolean | null
+          works_sunday?: boolean | null
+          works_thursday?: boolean | null
+          works_tuesday?: boolean | null
+          works_wednesday?: boolean | null
         }
         Update: {
           business_id?: string
@@ -445,6 +463,15 @@ export type Database = {
           id?: string
           is_active?: boolean
           photo_url?: string | null
+          work_end_time?: string | null
+          work_start_time?: string | null
+          works_friday?: boolean | null
+          works_monday?: boolean | null
+          works_saturday?: boolean | null
+          works_sunday?: boolean | null
+          works_thursday?: boolean | null
+          works_tuesday?: boolean | null
+          works_wednesday?: boolean | null
         }
         Relationships: [
           {

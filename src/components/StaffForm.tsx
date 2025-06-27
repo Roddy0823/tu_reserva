@@ -11,7 +11,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDes
 import { Checkbox } from '@/components/ui/checkbox';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { StaffMember, Service } from '@/types/database';
-import { X, User, Clock } from 'lucide-react';
+import { X, User, Clock, Calendar } from 'lucide-react';
 import { useStaffServices } from '@/hooks/useStaffServices';
 import { useImageUpload } from '@/hooks/useImageUpload';
 import FileUpload from '@/components/ui/file-upload';
@@ -22,11 +22,24 @@ const staffSchema = z.object({
   is_active: z.boolean(),
   work_start_time: z.string().min(1, 'La hora de inicio es requerida'),
   work_end_time: z.string().min(1, 'La hora de fin es requerida'),
+  works_monday: z.boolean(),
+  works_tuesday: z.boolean(),
+  works_wednesday: z.boolean(),
+  works_thursday: z.boolean(),
+  works_friday: z.boolean(),
+  works_saturday: z.boolean(),
+  works_sunday: z.boolean(),
 }).refine((data) => {
   return data.work_end_time > data.work_start_time;
 }, {
   message: "La hora de fin debe ser posterior a la hora de inicio",
   path: ["work_end_time"],
+}).refine((data) => {
+  return data.works_monday || data.works_tuesday || data.works_wednesday || 
+         data.works_thursday || data.works_friday || data.works_saturday || data.works_sunday;
+}, {
+  message: "Debe seleccionar al menos un día de trabajo",
+  path: ["works_monday"],
 });
 
 type StaffFormData = z.infer<typeof staffSchema>;
@@ -58,6 +71,13 @@ const StaffForm = ({ staffMember, services, onSubmit, onCancel, isLoading }: Sta
       is_active: staffMember?.is_active ?? true,
       work_start_time: staffMember?.work_start_time || '08:00',
       work_end_time: staffMember?.work_end_time || '18:00',
+      works_monday: staffMember?.works_monday ?? true,
+      works_tuesday: staffMember?.works_tuesday ?? true,
+      works_wednesday: staffMember?.works_wednesday ?? true,
+      works_thursday: staffMember?.works_thursday ?? true,
+      works_friday: staffMember?.works_friday ?? true,
+      works_saturday: staffMember?.works_saturday ?? false,
+      works_sunday: staffMember?.works_sunday ?? false,
     },
   });
 
@@ -135,6 +155,16 @@ const StaffForm = ({ staffMember, services, onSubmit, onCancel, isLoading }: Sta
       .toUpperCase()
       .slice(0, 2);
   };
+
+  const weekDays = [
+    { key: 'works_monday', label: 'Lunes' },
+    { key: 'works_tuesday', label: 'Martes' },
+    { key: 'works_wednesday', label: 'Miércoles' },
+    { key: 'works_thursday', label: 'Jueves' },
+    { key: 'works_friday', label: 'Viernes' },
+    { key: 'works_saturday', label: 'Sábado' },
+    { key: 'works_sunday', label: 'Domingo' },
+  ];
 
   return (
     <Card className="w-full max-w-5xl mx-auto shadow-xl border-0 bg-gradient-to-br from-white to-gray-50">
@@ -296,6 +326,45 @@ const StaffForm = ({ staffMember, services, onSubmit, onCancel, isLoading }: Sta
                     </FormItem>
                   )}
                 />
+              </div>
+            </div>
+
+            {/* Sección de días de trabajo */}
+            <div className="space-y-6">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                  <Calendar className="h-5 w-5 text-green-600" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900">Días de Trabajo</h3>
+                  <p className="text-sm text-gray-600">Selecciona los días que trabaja este miembro del personal</p>
+                </div>
+              </div>
+              
+              <div className="p-6 bg-green-50 rounded-lg border border-green-200">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  {weekDays.map((day) => (
+                    <FormField
+                      key={day.key}
+                      control={form.control}
+                      name={day.key as keyof StaffFormData}
+                      render={({ field }) => (
+                        <FormItem className="flex flex-row items-center space-x-3 space-y-0">
+                          <FormControl>
+                            <Checkbox
+                              checked={field.value as boolean}
+                              onCheckedChange={field.onChange}
+                            />
+                          </FormControl>
+                          <FormLabel className="text-sm font-medium text-green-900">
+                            {day.label}
+                          </FormLabel>
+                        </FormItem>
+                      )}
+                    />
+                  ))}
+                </div>
+                <FormMessage className="mt-2" />
               </div>
             </div>
 

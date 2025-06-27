@@ -110,6 +110,15 @@ export interface StaffMember {
   email?: string;
   photo_url?: string;
   is_active: boolean;
+  work_start_time?: string;
+  work_end_time?: string;
+  works_monday?: boolean;
+  works_tuesday?: boolean;
+  works_wednesday?: boolean;
+  works_thursday?: boolean;
+  works_friday?: boolean;
+  works_saturday?: boolean;
+  works_sunday?: boolean;
   created_at: string;
 }
 
@@ -119,6 +128,15 @@ export interface StaffMemberInsert {
   email?: string;
   photo_url?: string;
   is_active: boolean;
+  work_start_time?: string;
+  work_end_time?: string;
+  works_monday?: boolean;
+  works_tuesday?: boolean;
+  works_wednesday?: boolean;
+  works_thursday?: boolean;
+  works_friday?: boolean;
+  works_saturday?: boolean;
+  works_sunday?: boolean;
 }
 
 export type AppointmentStatus = 'pendiente' | 'confirmado' | 'cancelado' | 'completado';

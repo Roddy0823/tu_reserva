@@ -50,6 +50,18 @@ const StaffAvailabilityCard = ({
     }
   };
 
+  const getWorkingDays = () => {
+    const days = [];
+    if (staff.works_monday) days.push('L');
+    if (staff.works_tuesday) days.push('M');
+    if (staff.works_wednesday) days.push('X');
+    if (staff.works_thursday) days.push('J');
+    if (staff.works_friday) days.push('V');
+    if (staff.works_saturday) days.push('S');
+    if (staff.works_sunday) days.push('D');
+    return days.join('-');
+  };
+
   return (
     <Card className="shadow-sm border-gray-200">
       <CardHeader className="pb-4">
@@ -92,14 +104,19 @@ const StaffAvailabilityCard = ({
             <Briefcase className="h-4 w-4 text-blue-600" />
             <h4 className="text-sm font-medium text-blue-900">Horario Regular de Trabajo</h4>
           </div>
-          <div className="flex items-center gap-2 text-blue-800">
-            <Clock className="h-4 w-4" />
-            <span className="text-sm font-medium">
-              {staff.work_start_time || '08:00'} - {staff.work_end_time || '18:00'}
-            </span>
-            <Badge className="bg-blue-200 text-blue-800 text-xs ml-2">
-              Lunes a Viernes
-            </Badge>
+          <div className="space-y-2">
+            <div className="flex items-center gap-2 text-blue-800">
+              <Clock className="h-4 w-4" />
+              <span className="text-sm font-medium">
+                {staff.work_start_time || '08:00'} - {staff.work_end_time || '18:00'}
+              </span>
+            </div>
+            <div className="flex items-center gap-2 text-blue-800">
+              <Calendar className="h-4 w-4" />
+              <Badge className="bg-blue-200 text-blue-800 text-xs">
+                {getWorkingDays() || 'L-V'}
+              </Badge>
+            </div>
           </div>
           <p className="text-xs text-blue-700 mt-2">
             Horario base para la disponibilidad de reservas
@@ -199,7 +216,7 @@ const StaffAvailabilityCard = ({
             <Calendar className="h-6 w-6 mx-auto mb-2 text-gray-300" />
             <p className="text-sm font-medium">Sin excepciones de disponibilidad</p>
             <p className="text-xs text-gray-400 mt-1">
-              Disponible según horario regular: {staff.work_start_time || '08:00'} - {staff.work_end_time || '18:00'}
+              Disponible según horario regular: {staff.work_start_time || '08:00'} - {staff.work_end_time || '18:00'} ({getWorkingDays() || 'L-V'})
             </p>
           </div>
         )}
