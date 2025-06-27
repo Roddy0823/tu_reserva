@@ -1,7 +1,7 @@
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { AppointmentInsert } from "@/types/database";
+import { AppointmentInsert, AppointmentStatus } from "@/types/database";
 import { useToast } from "@/hooks/use-toast";
 import { useBusiness } from "./useBusiness";
 
@@ -19,7 +19,7 @@ interface CreateAppointmentResponse {
     client_name: string;
     client_email: string;
     client_phone?: string;
-    status: string;
+    status: AppointmentStatus;
     created_at: string;
     staff_members: {
       full_name: string;
@@ -62,7 +62,7 @@ export const useCreateAppointment = () => {
       console.log('📝 RPC response:', data);
 
       // Hacer casting del tipo Json al tipo específico que esperamos
-      const result = data as CreateAppointmentResponse;
+      const result = data as unknown as CreateAppointmentResponse;
 
       // Verificar si la función devolvió un error
       if (!result.success) {

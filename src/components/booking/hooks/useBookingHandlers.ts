@@ -1,5 +1,5 @@
 
-import { Service, StaffMember, Appointment } from '@/types/database';
+import { Service, StaffMember, Appointment, AppointmentStatus } from '@/types/database';
 import { BookingData } from './useBookingData';
 import { useCreateAppointment } from '@/hooks/useCreateAppointment';
 
@@ -75,6 +75,7 @@ export const useBookingHandlers = ({
       onSuccess: (appointment) => {
         const appointmentWithDetails: Appointment = {
           ...appointment,
+          status: appointment.status as AppointmentStatus,
           services: {
             name: bookingData.service!.name,
             price: bookingData.service!.price,
