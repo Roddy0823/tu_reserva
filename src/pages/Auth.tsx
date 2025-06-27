@@ -93,7 +93,7 @@ const Auth = () => {
                 </div>
                 <div>
                   <h3 className="font-semibold text-lg">Reservas Online 24/7</h3>
-                  <p className="text-blue-100">Permite a tus clientes reservar en cualquier momento sin llamadas</p>
+                  <p className="text-blue-100">Permite a tus clientes reservar en cualquier momento</p>
                 </div>
               </div>
               
@@ -103,7 +103,7 @@ const Auth = () => {
                 </div>
                 <div>
                   <h3 className="font-semibold text-lg">Gestión de Clientes</h3>
-                  <p className="text-blue-100">Mantén un registro completo con historial y preferencias</p>
+                  <p className="text-blue-100">Mantén un registro completo de tus clientes</p>
                 </div>
               </div>
               
@@ -113,7 +113,7 @@ const Auth = () => {
                 </div>
                 <div>
                   <h3 className="font-semibold text-lg">Horarios Flexibles</h3>
-                  <p className="text-blue-100">Configura tu disponibilidad y la de tu equipo fácilmente</p>
+                  <p className="text-blue-100">Configura tu disponibilidad fácilmente</p>
                 </div>
               </div>
               
