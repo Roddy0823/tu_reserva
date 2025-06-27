@@ -10,7 +10,7 @@ import ServiceForm from './ServiceForm';
 const ServicesManagement = () => {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingService, setEditingService] = useState(null);
-  const { services, isLoading, deleteService } = useServices();
+  const { services, isLoading, deleteService, createService, updateService } = useServices();
   const { toast } = useToast();
 
   const handleEdit = (service) => {
@@ -41,11 +41,38 @@ const ServicesManagement = () => {
     setEditingService(null);
   };
 
+  const handleFormSubmit = async (data) => {
+    try {
+      if (editingService) {
+        await updateService({ id: editingService.id, ...data });
+        toast({
+          title: "Servicio actualizado",
+          description: "El servicio se ha actualizado correctamente",
+        });
+      } else {
+        await createService(data);
+        toast({
+          title: "Servicio creado",
+          description: "El servicio se ha creado correctamente",
+        });
+      }
+      handleFormClose();
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
+
   if (isFormOpen) {
     return (
       <ServiceForm
-        editingService={editingService}
-        onClose={handleFormClose}
+        service={editingService}
+        onSubmit={handleFormSubmit}
+        onCancel={handleFormClose}
+        isLoading={false}
       />
     );
   }
