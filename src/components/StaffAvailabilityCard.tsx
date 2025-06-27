@@ -62,6 +62,21 @@ const StaffAvailabilityCard = ({
     return days.join('-');
   };
 
+  const getDaySchedules = () => {
+    const schedules = [];
+    const dayMapping = [
+      { day: 'Lunes', works: staff.works_monday, start: staff.monday_start_time, end: staff.monday_end_time },
+      { day: 'Martes', works: staff.works_tuesday, start: staff.tuesday_start_time, end: staff.tuesday_end_time },
+      { day: 'Miércoles', works: staff.works_wednesday, start: staff.wednesday_start_time, end: staff.wednesday_end_time },
+      { day: 'Jueves', works: staff.works_thursday, start: staff.thursday_start_time, end: staff.thursday_end_time },
+      { day: 'Viernes', works: staff.works_friday, start: staff.friday_start_time, end: staff.friday_end_time },
+      { day: 'Sábado', works: staff.works_saturday, start: staff.saturday_start_time, end: staff.saturday_end_time },
+      { day: 'Domingo', works: staff.works_sunday, start: staff.sunday_start_time, end: staff.sunday_end_time },
+    ];
+
+    return dayMapping.filter(d => d.works);
+  };
+
   return (
     <Card className="shadow-sm border-gray-200">
       <CardHeader className="pb-4">
@@ -102,24 +117,26 @@ const StaffAvailabilityCard = ({
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
           <div className="flex items-center gap-2 mb-3">
             <Briefcase className="h-4 w-4 text-blue-600" />
-            <h4 className="text-sm font-medium text-blue-900">Horario Regular de Trabajo</h4>
+            <h4 className="text-sm font-medium text-blue-900">Horarios de Trabajo por Día</h4>
           </div>
           <div className="space-y-2">
-            <div className="flex items-center gap-2 text-blue-800">
-              <Clock className="h-4 w-4" />
-              <span className="text-sm font-medium">
-                {staff.work_start_time || '08:00'} - {staff.work_end_time || '18:00'}
-              </span>
-            </div>
-            <div className="flex items-center gap-2 text-blue-800">
-              <Calendar className="h-4 w-4" />
-              <Badge className="bg-blue-200 text-blue-800 text-xs">
-                {getWorkingDays() || 'L-V'}
-              </Badge>
-            </div>
+            {getDaySchedules().map((schedule, index) => (
+              <div key={index} className="flex items-center justify-between p-2 bg-blue-25 rounded">
+                <span className="text-sm font-medium text-blue-800">{schedule.day}</span>
+                <div className="flex items-center gap-2 text-blue-700">
+                  <Clock className="h-3 w-3" />
+                  <span className="text-sm">
+                    {schedule.start || staff.work_start_time || '08:00'} - {schedule.end || staff.work_end_time || '18:00'}
+                  </span>
+                </div>
+              </div>
+            ))}
+            {getDaySchedules().length === 0 && (
+              <p className="text-sm text-blue-700">No hay días de trabajo configurados</p>
+            )}
           </div>
           <p className="text-xs text-blue-700 mt-2">
-            Horario base para la disponibilidad de reservas
+            Horarios específicos configurados para cada día de trabajo
           </p>
         </div>
 
@@ -216,7 +233,7 @@ const StaffAvailabilityCard = ({
             <Calendar className="h-6 w-6 mx-auto mb-2 text-gray-300" />
             <p className="text-sm font-medium">Sin excepciones de disponibilidad</p>
             <p className="text-xs text-gray-400 mt-1">
-              Disponible según horario regular: {staff.work_start_time || '08:00'} - {staff.work_end_time || '18:00'} ({getWorkingDays() || 'L-V'})
+              Disponible según horarios configurados por día ({getWorkingDays() || 'L-V'})
             </p>
           </div>
         )}

@@ -11,26 +11,26 @@ interface StaffWorkScheduleProps {
 
 const StaffWorkSchedule = ({ control }: StaffWorkScheduleProps) => {
   const weekDays = [
-    { key: 'works_monday', label: 'Lunes' },
-    { key: 'works_tuesday', label: 'Martes' },
-    { key: 'works_wednesday', label: 'Miércoles' },
-    { key: 'works_thursday', label: 'Jueves' },
-    { key: 'works_friday', label: 'Viernes' },
-    { key: 'works_saturday', label: 'Sábado' },
-    { key: 'works_sunday', label: 'Domingo' },
+    { key: 'monday', label: 'Lunes', workKey: 'works_monday', startKey: 'monday_start_time', endKey: 'monday_end_time' },
+    { key: 'tuesday', label: 'Martes', workKey: 'works_tuesday', startKey: 'tuesday_start_time', endKey: 'tuesday_end_time' },
+    { key: 'wednesday', label: 'Miércoles', workKey: 'works_wednesday', startKey: 'wednesday_start_time', endKey: 'wednesday_end_time' },
+    { key: 'thursday', label: 'Jueves', workKey: 'works_thursday', startKey: 'thursday_start_time', endKey: 'thursday_end_time' },
+    { key: 'friday', label: 'Viernes', workKey: 'works_friday', startKey: 'friday_start_time', endKey: 'friday_end_time' },
+    { key: 'saturday', label: 'Sábado', workKey: 'works_saturday', startKey: 'saturday_start_time', endKey: 'saturday_end_time' },
+    { key: 'sunday', label: 'Domingo', workKey: 'works_sunday', startKey: 'sunday_start_time', endKey: 'sunday_end_time' },
   ];
 
   return (
     <div className="space-y-6">
-      {/* Sección de horarios de trabajo */}
+      {/* Sección de horarios generales (mantenida para compatibilidad) */}
       <div className="space-y-6">
         <div className="flex items-center gap-3 mb-4">
           <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
             <Clock className="h-5 w-5 text-blue-600" />
           </div>
           <div>
-            <h3 className="text-lg font-semibold text-gray-900">Horario de Trabajo</h3>
-            <p className="text-sm text-gray-600">Define el horario laboral disponible para reservas</p>
+            <h3 className="text-lg font-semibold text-gray-900">Horario Base de Trabajo</h3>
+            <p className="text-sm text-gray-600">Horario general que se aplicará por defecto a todos los días</p>
           </div>
         </div>
         
@@ -40,7 +40,7 @@ const StaffWorkSchedule = ({ control }: StaffWorkScheduleProps) => {
             name="work_start_time"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-base font-semibold text-blue-900">Hora de Inicio</FormLabel>
+                <FormLabel className="text-base font-semibold text-blue-900">Hora de Inicio General</FormLabel>
                 <FormControl>
                   <Input 
                     type="time" 
@@ -58,7 +58,7 @@ const StaffWorkSchedule = ({ control }: StaffWorkScheduleProps) => {
             name="work_end_time"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-base font-semibold text-blue-900">Hora de Fin</FormLabel>
+                <FormLabel className="text-base font-semibold text-blue-900">Hora de Fin General</FormLabel>
                 <FormControl>
                   <Input 
                     type="time" 
@@ -73,42 +73,82 @@ const StaffWorkSchedule = ({ control }: StaffWorkScheduleProps) => {
         </div>
       </div>
 
-      {/* Sección de días de trabajo */}
+      {/* Sección de días de trabajo con horarios específicos */}
       <div className="space-y-6">
         <div className="flex items-center gap-3 mb-4">
           <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
             <Calendar className="h-5 w-5 text-green-600" />
           </div>
           <div>
-            <h3 className="text-lg font-semibold text-gray-900">Días de Trabajo</h3>
-            <p className="text-sm text-gray-600">Selecciona los días que trabaja este miembro del personal</p>
+            <h3 className="text-lg font-semibold text-gray-900">Horarios Específicos por Día</h3>
+            <p className="text-sm text-gray-600">Configura horarios específicos para cada día de la semana</p>
           </div>
         </div>
         
         <div className="p-6 bg-green-50 rounded-lg border border-green-200">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="space-y-6">
             {weekDays.map((day) => (
-              <FormField
-                key={day.key}
-                control={control}
-                name={day.key}
-                render={({ field }) => (
-                  <FormItem className="flex flex-row items-center space-x-3 space-y-0">
-                    <FormControl>
-                      <Checkbox
-                        checked={field.value as boolean}
-                        onCheckedChange={field.onChange}
-                      />
-                    </FormControl>
-                    <FormLabel className="text-sm font-medium text-green-900">
-                      {day.label}
-                    </FormLabel>
-                  </FormItem>
-                )}
-              />
+              <div key={day.key} className="bg-white p-4 rounded-lg border border-green-200">
+                <div className="flex items-center justify-between mb-4">
+                  <FormField
+                    control={control}
+                    name={day.workKey}
+                    render={({ field }) => (
+                      <FormItem className="flex flex-row items-center space-x-3 space-y-0">
+                        <FormControl>
+                          <Checkbox
+                            checked={field.value as boolean}
+                            onCheckedChange={field.onChange}
+                          />
+                        </FormControl>
+                        <FormLabel className="text-base font-semibold text-gray-900">
+                          {day.label}
+                        </FormLabel>
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <FormField
+                    control={control}
+                    name={day.startKey}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-sm font-medium text-gray-700">Hora de Inicio</FormLabel>
+                        <FormControl>
+                          <Input 
+                            type="time" 
+                            className="h-10 text-sm border-gray-200 focus:border-green-400"
+                            {...field} 
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={control}
+                    name={day.endKey}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-sm font-medium text-gray-700">Hora de Fin</FormLabel>
+                        <FormControl>
+                          <Input 
+                            type="time" 
+                            className="h-10 text-sm border-gray-200 focus:border-green-400"
+                            {...field} 
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              </div>
             ))}
           </div>
-          <FormMessage className="mt-2" />
         </div>
       </div>
     </div>

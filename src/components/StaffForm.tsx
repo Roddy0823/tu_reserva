@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -28,6 +27,20 @@ const staffSchema = z.object({
   works_friday: z.boolean(),
   works_saturday: z.boolean(),
   works_sunday: z.boolean(),
+  monday_start_time: z.string().optional(),
+  monday_end_time: z.string().optional(),
+  tuesday_start_time: z.string().optional(),
+  tuesday_end_time: z.string().optional(),
+  wednesday_start_time: z.string().optional(),
+  wednesday_end_time: z.string().optional(),
+  thursday_start_time: z.string().optional(),
+  thursday_end_time: z.string().optional(),
+  friday_start_time: z.string().optional(),
+  friday_end_time: z.string().optional(),
+  saturday_start_time: z.string().optional(),
+  saturday_end_time: z.string().optional(),
+  sunday_start_time: z.string().optional(),
+  sunday_end_time: z.string().optional(),
 }).refine((data) => {
   return data.work_end_time > data.work_start_time;
 }, {
@@ -77,6 +90,20 @@ const StaffForm = ({ staffMember, services, onSubmit, onCancel, isLoading }: Sta
       works_friday: staffMember?.works_friday ?? true,
       works_saturday: staffMember?.works_saturday ?? false,
       works_sunday: staffMember?.works_sunday ?? false,
+      monday_start_time: staffMember?.monday_start_time || '08:00',
+      monday_end_time: staffMember?.monday_end_time || '18:00',
+      tuesday_start_time: staffMember?.tuesday_start_time || '08:00',
+      tuesday_end_time: staffMember?.tuesday_end_time || '18:00',
+      wednesday_start_time: staffMember?.wednesday_start_time || '08:00',
+      wednesday_end_time: staffMember?.wednesday_end_time || '18:00',
+      thursday_start_time: staffMember?.thursday_start_time || '08:00',
+      thursday_end_time: staffMember?.thursday_end_time || '18:00',
+      friday_start_time: staffMember?.friday_start_time || '08:00',
+      friday_end_time: staffMember?.friday_end_time || '18:00',
+      saturday_start_time: staffMember?.saturday_start_time || '08:00',
+      saturday_end_time: staffMember?.saturday_end_time || '18:00',
+      sunday_start_time: staffMember?.sunday_start_time || '08:00',
+      sunday_end_time: staffMember?.sunday_end_time || '18:00',
     },
   });
 

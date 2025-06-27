@@ -1,4 +1,3 @@
-
 export interface UserProfile {
   id: string;
   email: string;
@@ -119,6 +118,20 @@ export interface StaffMember {
   works_friday?: boolean;
   works_saturday?: boolean;
   works_sunday?: boolean;
+  monday_start_time?: string;
+  monday_end_time?: string;
+  tuesday_start_time?: string;
+  tuesday_end_time?: string;
+  wednesday_start_time?: string;
+  wednesday_end_time?: string;
+  thursday_start_time?: string;
+  thursday_end_time?: string;
+  friday_start_time?: string;
+  friday_end_time?: string;
+  saturday_start_time?: string;
+  saturday_end_time?: string;
+  sunday_start_time?: string;
+  sunday_end_time?: string;
   created_at: string;
 }
 
@@ -137,6 +150,20 @@ export interface StaffMemberInsert {
   works_friday?: boolean;
   works_saturday?: boolean;
   works_sunday?: boolean;
+  monday_start_time?: string;
+  monday_end_time?: string;
+  tuesday_start_time?: string;
+  tuesday_end_time?: string;
+  wednesday_start_time?: string;
+  wednesday_end_time?: string;
+  thursday_start_time?: string;
+  thursday_end_time?: string;
+  friday_start_time?: string;
+  friday_end_time?: string;
+  saturday_start_time?: string;
+  saturday_end_time?: string;
+  sunday_start_time?: string;
+  sunday_end_time?: string;
 }
 
 export type AppointmentStatus = 'pendiente' | 'confirmado' | 'cancelado' | 'completado';

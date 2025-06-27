@@ -423,10 +423,24 @@ export type Database = {
           business_id: string
           created_at: string
           email: string | null
+          friday_end_time: string | null
+          friday_start_time: string | null
           full_name: string
           id: string
           is_active: boolean
+          monday_end_time: string | null
+          monday_start_time: string | null
           photo_url: string | null
+          saturday_end_time: string | null
+          saturday_start_time: string | null
+          sunday_end_time: string | null
+          sunday_start_time: string | null
+          thursday_end_time: string | null
+          thursday_start_time: string | null
+          tuesday_end_time: string | null
+          tuesday_start_time: string | null
+          wednesday_end_time: string | null
+          wednesday_start_time: string | null
           work_end_time: string | null
           work_start_time: string | null
           works_friday: boolean | null
@@ -441,10 +455,24 @@ export type Database = {
           business_id: string
           created_at?: string
           email?: string | null
+          friday_end_time?: string | null
+          friday_start_time?: string | null
           full_name: string
           id?: string
           is_active?: boolean
+          monday_end_time?: string | null
+          monday_start_time?: string | null
           photo_url?: string | null
+          saturday_end_time?: string | null
+          saturday_start_time?: string | null
+          sunday_end_time?: string | null
+          sunday_start_time?: string | null
+          thursday_end_time?: string | null
+          thursday_start_time?: string | null
+          tuesday_end_time?: string | null
+          tuesday_start_time?: string | null
+          wednesday_end_time?: string | null
+          wednesday_start_time?: string | null
           work_end_time?: string | null
           work_start_time?: string | null
           works_friday?: boolean | null
@@ -459,10 +487,24 @@ export type Database = {
           business_id?: string
           created_at?: string
           email?: string | null
+          friday_end_time?: string | null
+          friday_start_time?: string | null
           full_name?: string
           id?: string
           is_active?: boolean
+          monday_end_time?: string | null
+          monday_start_time?: string | null
           photo_url?: string | null
+          saturday_end_time?: string | null
+          saturday_start_time?: string | null
+          sunday_end_time?: string | null
+          sunday_start_time?: string | null
+          thursday_end_time?: string | null
+          thursday_start_time?: string | null
+          tuesday_end_time?: string | null
+          tuesday_start_time?: string | null
+          wednesday_end_time?: string | null
+          wednesday_start_time?: string | null
           work_end_time?: string | null
           work_start_time?: string | null
           works_friday?: boolean | null

@@ -17,7 +17,31 @@ export const useAvailableTimeSlots = (staffId?: string, date?: Date, serviceDura
       // Obtener información del personal incluyendo horarios de trabajo y días laborales
       const { data: staffMember, error: staffError } = await supabase
         .from('staff_members')
-        .select('work_start_time, work_end_time, works_monday, works_tuesday, works_wednesday, works_thursday, works_friday, works_saturday, works_sunday')
+        .select(`
+          work_start_time, 
+          work_end_time, 
+          works_monday, 
+          works_tuesday, 
+          works_wednesday, 
+          works_thursday, 
+          works_friday, 
+          works_saturday, 
+          works_sunday,
+          monday_start_time,
+          monday_end_time,
+          tuesday_start_time,
+          tuesday_end_time,
+          wednesday_start_time,
+          wednesday_end_time,
+          thursday_start_time,
+          thursday_end_time,
+          friday_start_time,
+          friday_end_time,
+          saturday_start_time,
+          saturday_end_time,
+          sunday_start_time,
+          sunday_end_time
+        `)
         .eq('id', staffId)
         .single();
 
@@ -44,6 +68,25 @@ export const useAvailableTimeSlots = (staffId?: string, date?: Date, serviceDura
         return [];
       }
 
+      // Obtener horarios específicos para el día seleccionado
+      const dayTimeFields = [
+        { start: 'sunday_start_time', end: 'sunday_end_time' },
+        { start: 'monday_start_time', end: 'monday_end_time' },
+        { start: 'tuesday_start_time', end: 'tuesday_end_time' },
+        { start: 'wednesday_start_time', end: 'wednesday_end_time' },
+        { start: 'thursday_start_time', end: 'thursday_end_time' },
+        { start: 'friday_start_time', end: 'friday_end_time' },
+        { start: 'saturday_start_time', end: 'saturday_end_time' }
+      ];
+      
+      const dayTimeField = dayTimeFields[dayOfWeek];
+      
+      // Usar horarios específicos del día o horarios generales como fallback
+      const workStartTime = staffMember?.[dayTimeField.start] || staffMember?.work_start_time || '08:00';
+      const workEndTime = staffMember?.[dayTimeField.end] || staffMember?.work_end_time || '18:00';
+
+      console.log('Day-specific work hours:', { workStartTime, workEndTime, dayOfWeek });
+
       // Obtener citas existentes ACTIVAS para el día (excluir canceladas)
       const { data: appointments, error: appointmentsError } = await supabase
         .from('appointments')
@@ -69,21 +112,17 @@ export const useAvailableTimeSlots = (staffId?: string, date?: Date, serviceDura
 
       console.log('Time blocks:', timeBlocks);
 
-      // Usar horarios de trabajo del personal o valores por defecto
-      const workStartTime = staffMember?.work_start_time || '08:00';
-      const workEndTime = staffMember?.work_end_time || '18:00';
-      
       // Convertir horarios de trabajo a horas numéricas
       const [startHour, startMinute] = workStartTime.split(':').map(Number);
       const [endHour, endMinute] = workEndTime.split(':').map(Number);
 
-      console.log('Work hours:', { workStartTime, workEndTime, startHour, startMinute, endHour, endMinute });
+      console.log('Work hours for this day:', { workStartTime, workEndTime, startHour, startMinute, endHour, endMinute });
 
       // Generar slots de tiempo disponibles dentro del horario de trabajo
       const availableSlots: string[] = [];
       const slotDuration = 30; // minutos
 
-      // Crear fecha de inicio basada en el horario de trabajo
+      // Crear fecha de inicio basada en el horario de trabajo del día específico
       const workStart = new Date(date);
       workStart.setHours(startHour, startMinute, 0, 0);
       
