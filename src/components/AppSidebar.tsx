@@ -8,7 +8,8 @@ import {
   CreditCard, 
   Crown, 
   Settings,
-  LogOut
+  LogOut,
+  Users
 } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import {
@@ -35,9 +36,14 @@ const menuItems = [
     icon: Home,
   },
   {
-    title: "Gestión de Servicios",
+    title: "Servicios y Personal",
     url: "/services",
     icon: Package,
+  },
+  {
+    title: "Personal",
+    url: "/services?tab=staff",
+    icon: Users,
   },
   {
     title: "Gestión de Disponibilidad",
@@ -90,6 +96,14 @@ export function AppSidebar() {
   // Determinar si la navegación debe estar deshabilitada
   const isNavigationDisabled = !business && !isLoading;
 
+  // Función para determinar si un elemento del menú está activo
+  const isItemActive = (url: string) => {
+    if (url === "/services?tab=staff") {
+      return location.pathname === "/services" && location.search === "?tab=staff";
+    }
+    return location.pathname === url;
+  };
+
   return (
     <Sidebar>
       <SidebarHeader className="p-4">
@@ -123,7 +137,7 @@ export function AppSidebar() {
                   <SidebarMenuItem key={item.title}>
                     <SidebarMenuButton 
                       asChild 
-                      isActive={location.pathname === item.url}
+                      isActive={isItemActive(item.url)}
                       disabled={isLoading}
                     >
                       <Link to={item.url}>

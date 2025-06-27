@@ -1,7 +1,7 @@
 
 import { useAuth } from '@/hooks/useAuth';
 import { useBusiness } from '@/hooks/useBusiness';
-import ServicesManagement from '@/components/ServicesManagement';
+import ServicesAndStaffManagement from '@/components/ServicesAndStaffManagement';
 import BusinessSetup from '@/components/BusinessSetup';
 
 const Services = () => {
@@ -26,7 +26,7 @@ const Services = () => {
 
   return (
     <div className="container mx-auto px-4 py-4">
-      <ServicesManagement />
+      <ServicesAndStaffManagement />
     </div>
   );
 };
