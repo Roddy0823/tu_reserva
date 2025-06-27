@@ -12,7 +12,7 @@ const Navigation = () => {
             <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
               <CalendarDays className="h-5 w-5 text-white" />
             </div>
-            <span className="text-xl font-bold text-blue-600">ReservaSimple</span>
+            <span className="text-xl font-bold text-blue-600">Tu Reserva</span>
           </div>
           
           <div className="hidden md:flex items-center space-x-8">

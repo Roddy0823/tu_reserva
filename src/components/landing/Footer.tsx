@@ -12,7 +12,7 @@ const Footer = () => {
               <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
                 <CalendarDays className="h-5 w-5 text-white" />
               </div>
-              <span className="text-xl font-bold">ReservaSimple</span>
+              <span className="text-xl font-bold">Tu Reserva</span>
             </div>
             <p className="text-gray-400">
               El sistema de reservas más simple y efectivo para tu negocio.
@@ -44,7 +44,7 @@ const Footer = () => {
           </div>
         </div>
         <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-          <p>&copy; 2024 ReservaSimple. Todos los derechos reservados.</p>
+          <p>&copy; 2024 Tu Reserva. Todos los derechos reservados.</p>
         </div>
       </div>
     </footer>

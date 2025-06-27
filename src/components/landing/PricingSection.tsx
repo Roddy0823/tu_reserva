@@ -27,7 +27,7 @@ const PricingSection = () => {
             <ul className="space-y-3 mb-8">
               <li className="flex items-center gap-3">
                 <Check className="h-5 w-5 text-green-500" />
-                <span>Hasta 30 reservas/mes</span>
+                <span>Hasta 10 reservas/mes</span>
               </li>
               <li className="flex items-center gap-3">
                 <Check className="h-5 w-5 text-green-500" />

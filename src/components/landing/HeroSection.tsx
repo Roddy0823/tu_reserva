@@ -31,7 +31,7 @@ const HeroSection = () => {
 
         <div className="flex items-center justify-center gap-2 text-sm text-gray-500">
           <Shield className="h-4 w-4" />
-          <span>Sin tarjeta de crédito • 30 turnos gratis</span>
+          <span>Sin tarjeta de crédito • 10 reservas gratis</span>
         </div>
       </div>
     </section>
