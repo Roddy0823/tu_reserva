@@ -1,84 +1,162 @@
 
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { CalendarDays, Users, Building2, Settings, FileText, Clock, Check, Star, ArrowRight, Zap, Shield, TrendingUp } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const Index = () => {
   return (
-    <div className="min-h-screen bg-white">
-      {/* Hero Section */}
-      <section className="bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-800 text-white relative overflow-hidden">
-        <div className="absolute inset-0 bg-black/20"></div>
-        <div className="container mx-auto px-4 py-20 relative z-10">
-          <div className="max-w-4xl mx-auto text-center">
-            <Badge className="mb-6 bg-white/20 text-white border-white/30 hover:bg-white/30">
-              ✨ Nuevo: Sistema de Reservas Inteligente
-            </Badge>
-            <h1 className="text-5xl md:text-6xl font-bold mb-6 leading-tight">
-              Transforma tu Negocio con
-              <span className="bg-gradient-to-r from-yellow-400 to-orange-400 bg-clip-text text-transparent"> Reservas Inteligentes</span>
-            </h1>
-            <p className="text-xl md:text-2xl mb-8 text-blue-100 max-w-3xl mx-auto">
-              El sistema completo para PyMEs que automatiza tus citas, gestiona tu personal y maximiza tus ingresos. 
-              <strong className="text-white">Sin complicaciones, solo resultados.</strong>
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
-              <Link to="/auth">
-                <Button size="lg" className="bg-white text-blue-600 hover:bg-gray-100 font-semibold px-8 py-4 text-lg">
-                  Comenzar Gratis
-                  <ArrowRight className="ml-2 h-5 w-5" />
-                </Button>
-              </Link>
-              <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10 px-8 py-4 text-lg">
-                Ver Demo
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-indigo-50">
+      {/* Navigation Header */}
+      <nav className="bg-white/80 backdrop-blur-sm border-b border-gray-200/50 sticky top-0 z-50">
+        <div className="container mx-auto px-4 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+                <CalendarDays className="h-5 w-5 text-white" />
+              </div>
+              <span className="text-xl font-bold text-blue-600">ReservaSimple</span>
+            </div>
+            
+            <div className="hidden md:flex items-center space-x-8">
+              <a href="#caracteristicas" className="text-gray-600 hover:text-blue-600 transition-colors">Características</a>
+              <a href="#precios" className="text-gray-600 hover:text-blue-600 transition-colors">Precios</a>
+              <a href="#faq" className="text-gray-600 hover:text-blue-600 transition-colors">FAQ</a>
+              <a href="#reseñas" className="text-gray-600 hover:text-blue-600 transition-colors">Reseñas</a>
+            </div>
+
+            <Link to="/auth">
+              <Button className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-full">
+                Ingresa a tu cuenta
               </Button>
-            </div>
-            <div className="flex items-center justify-center gap-8 text-sm text-blue-200">
-              <div className="flex items-center gap-2">
-                <Check className="h-4 w-4" />
-                Sin tarjeta de crédito
-              </div>
-              <div className="flex items-center gap-2">
-                <Check className="h-4 w-4" />
-                Configuración en 5 minutos
-              </div>
-              <div className="flex items-center gap-2">
-                <Check className="h-4 w-4" />
-                Soporte 24/7
-              </div>
-            </div>
+            </Link>
+          </div>
+        </div>
+      </nav>
+
+      {/* Hero Section */}
+      <section className="container mx-auto px-4 py-20 text-center">
+        <div className="max-w-4xl mx-auto">
+          <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight">
+            Automatiza tus reservas y<br />
+            <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              potencia tu negocio
+            </span>
+          </h1>
+          
+          <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto leading-relaxed">
+            Software de turnos para América Latina y España. Reservas<br />
+            24/7, pagos seguros en línea y Google Calendar. Para barberías,<br />
+            peluquerías, médicos y profesionales.
+          </p>
+
+          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
+            <Link to="/auth">
+              <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 text-lg rounded-full">
+                <Zap className="mr-2 h-5 w-5" />
+                Comenzar ahora
+              </Button>
+            </Link>
+          </div>
+
+          <div className="flex items-center justify-center gap-2 text-sm text-gray-500">
+            <Shield className="h-4 w-4" />
+            <span>Sin tarjeta de crédito • 30 turnos gratis</span>
           </div>
         </div>
       </section>
 
-      {/* Stats Section */}
-      <section className="py-16 bg-gray-50">
+      {/* Google Calendar Integration Section */}
+      <section id="caracteristicas" className="py-20 bg-white">
         <div className="container mx-auto px-4">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-            <div>
-              <div className="text-3xl font-bold text-blue-600 mb-2">500+</div>
-              <div className="text-gray-600">Negocios Activos</div>
-            </div>
-            <div>
-              <div className="text-3xl font-bold text-purple-600 mb-2">50K+</div>
-              <div className="text-gray-600">Citas Gestionadas</div>
-            </div>
-            <div>
-              <div className="text-3xl font-bold text-green-600 mb-2">98%</div>
-              <div className="text-gray-600">Satisfacción</div>
-            </div>
-            <div>
-              <div className="text-3xl font-bold text-orange-600 mb-2">45%</div>
-              <div className="text-gray-600">Aumento en Ventas</div>
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-blue-600 mb-4">
+              Sincroniza tu agenda con<br />Google Calendar
+            </h2>
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+              Integración perfecta con Google Calendar para que tus clientes reciban<br />
+              recordatorios automáticos y eviten conflictos de horarios
+            </p>
+          </div>
+
+          <div className="max-w-4xl mx-auto">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+              {/* Google Calendar Preview */}
+              <div className="bg-gray-50 rounded-2xl p-8">
+                <div className="bg-white rounded-xl shadow-lg p-6">
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+                      <span className="text-white text-sm font-bold">G</span>
+                    </div>
+                    <div>
+                      <div className="font-semibold text-gray-900">Google Calendar</div>
+                      <div className="text-sm text-gray-500">Sincronizado con ReservaSimple</div>
+                    </div>
+                    <div className="ml-auto">
+                      <Badge className="bg-green-100 text-green-800 border-green-200">Conectado</Badge>
+                    </div>
+                  </div>
+
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-3 p-3 bg-blue-50 rounded-lg border border-blue-200">
+                      <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                      <div className="text-sm text-blue-800">Sincronización con ReservaSimple</div>
+                      <div className="ml-auto text-xs text-blue-600">Activa</div>
+                    </div>
+
+                    <div className="p-3 bg-gray-50 rounded-lg">
+                      <div className="text-sm font-medium text-gray-900 mb-1">Corte de cabello - Juan P.</div>
+                      <div className="text-xs text-gray-500 flex items-center gap-1">
+                        <Clock className="h-3 w-3" />
+                        15 de julio, 2024 • 10:30
+                      </div>
+                      <div className="mt-2">
+                        <Badge variant="outline" className="text-xs">Reservado</Badge>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Benefits */}
+              <div className="space-y-6">
+                <div className="flex items-start gap-4">
+                  <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                    <Check className="h-5 w-5 text-green-600" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-gray-900 mb-2">Recordatorios automáticos</h3>
+                    <p className="text-gray-600">Tus clientes reciben notificaciones directamente en su calendario de Google</p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-4">
+                  <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                    <Check className="h-5 w-5 text-green-600" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-gray-900 mb-2">Evita solapamientos</h3>
+                    <p className="text-gray-600">Los clientes se dan cuenta si ya tienen otro evento en su calendario</p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-4">
+                  <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                    <Check className="h-5 w-5 text-green-600" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-gray-900 mb-2">Sincronización perfecta</h3>
+                    <p className="text-gray-600">Todos los cambios se reflejan automáticamente en ambas plataformas</p>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
       {/* Features Section */}
-      <section className="py-20">
+      <section className="py-20 bg-gray-50">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-gray-900 mb-4">
@@ -90,273 +168,35 @@ const Index = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <Card className="relative group hover:shadow-xl transition-all duration-300 border-l-4 border-l-blue-500">
-              <CardHeader>
-                <div className="flex items-center space-x-3">
-                  <div className="p-2 bg-blue-100 rounded-lg">
-                    <CalendarDays className="h-6 w-6 text-blue-600" />
-                  </div>
-                  <CardTitle className="text-lg">Reservas Automatizadas</CardTitle>
-                </div>
-                <CardDescription className="text-base">
-                  Tus clientes reservan 24/7 sin llamadas. Sistema inteligente que evita dobles citas y optimiza tu agenda.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ul className="space-y-2 text-sm text-gray-600">
-                  <li className="flex items-center gap-2">
-                    <Check className="h-4 w-4 text-green-500" />
-                    Calendario en tiempo real
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Check className="h-4 w-4 text-green-500" />
-                    Recordatorios automáticos
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Check className="h-4 w-4 text-green-500" />
-                    URL personalizada
-                  </li>
-                </ul>
-              </CardContent>
-            </Card>
+            <div className="bg-white rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow">
+              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
+                <CalendarDays className="h-6 w-6 text-blue-600" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">Reservas 24/7</h3>
+              <p className="text-gray-600">Tus clientes pueden reservar en cualquier momento sin necesidad de llamar</p>
+            </div>
 
-            <Card className="relative group hover:shadow-xl transition-all duration-300 border-l-4 border-l-purple-500">
-              <CardHeader>
-                <div className="flex items-center space-x-3">
-                  <div className="p-2 bg-purple-100 rounded-lg">
-                    <Users className="h-6 w-6 text-purple-600" />
-                  </div>
-                  <CardTitle className="text-lg">Gestión de Personal</CardTitle>
-                </div>
-                <CardDescription className="text-base">
-                  Organiza horarios, especialidades y disponibilidad de tu equipo desde un solo lugar.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ul className="space-y-2 text-sm text-gray-600">
-                  <li className="flex items-center gap-2">
-                    <Check className="h-4 w-4 text-green-500" />
-                    Horarios personalizados
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Check className="h-4 w-4 text-green-500" />
-                    Control de especialidades
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Check className="h-4 w-4 text-green-500" />
-                    Estadísticas de rendimiento
-                  </li>
-                </ul>
-              </CardContent>
-            </Card>
+            <div className="bg-white rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow">
+              <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mb-4">
+                <Users className="h-6 w-6 text-purple-600" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">Gestión de Personal</h3>
+              <p className="text-gray-600">Organiza horarios y disponibilidad de todo tu equipo</p>
+            </div>
 
-            <Card className="relative group hover:shadow-xl transition-all duration-300 border-l-4 border-l-green-500">
-              <CardHeader>
-                <div className="flex items-center space-x-3">
-                  <div className="p-2 bg-green-100 rounded-lg">
-                    <TrendingUp className="h-6 w-6 text-green-600" />
-                  </div>
-                  <CardTitle className="text-lg">Control de Pagos</CardTitle>
-                </div>
-                <CardDescription className="text-base">
-                  Gestiona pagos en efectivo y transferencias con comprobantes digitales automáticos.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ul className="space-y-2 text-sm text-gray-600">
-                  <li className="flex items-center gap-2">
-                    <Check className="h-4 w-4 text-green-500" />
-                    Múltiples métodos de pago
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Check className="h-4 w-4 text-green-500" />
-                    Comprobantes automáticos
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Check className="h-4 w-4 text-green-500" />
-                    Reportes financieros
-                  </li>
-                </ul>
-              </CardContent>
-            </Card>
-
-            <Card className="relative group hover:shadow-xl transition-all duration-300 border-l-4 border-l-orange-500">
-              <CardHeader>
-                <div className="flex items-center space-x-3">
-                  <div className="p-2 bg-orange-100 rounded-lg">
-                    <Building2 className="h-6 w-6 text-orange-600" />
-                  </div>
-                  <CardTitle className="text-lg">Multi-Negocio</CardTitle>
-                </div>
-                <CardDescription className="text-base">
-                  Perfecto para salones, clínicas, talleres, consultorías y cualquier negocio con citas.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ul className="space-y-2 text-sm text-gray-600">
-                  <li className="flex items-center gap-2">
-                    <Check className="h-4 w-4 text-green-500" />
-                    Salones de belleza
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Check className="h-4 w-4 text-green-500" />
-                    Consultorios médicos
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Check className="h-4 w-4 text-green-500" />
-                    Talleres y servicios
-                  </li>
-                </ul>
-              </CardContent>
-            </Card>
-
-            <Card className="relative group hover:shadow-xl transition-all duration-300 border-l-4 border-l-red-500">
-              <CardHeader>
-                <div className="flex items-center space-x-3">
-                  <div className="p-2 bg-red-100 rounded-lg">
-                    <Zap className="h-6 w-6 text-red-600" />
-                  </div>
-                  <CardTitle className="text-lg">Configuración Rápida</CardTitle>
-                </div>
-                <CardDescription className="text-base">
-                  En menos de 5 minutos tu negocio estará recibiendo reservas online.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ul className="space-y-2 text-sm text-gray-600">
-                  <li className="flex items-center gap-2">
-                    <Check className="h-4 w-4 text-green-500" />
-                    Setup automático
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Check className="h-4 w-4 text-green-500" />
-                    Sin conocimientos técnicos
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Check className="h-4 w-4 text-green-500" />
-                    Soporte incluido
-                  </li>
-                </ul>
-              </CardContent>
-            </Card>
-
-            <Card className="relative group hover:shadow-xl transition-all duration-300 border-l-4 border-l-indigo-500">
-              <CardHeader>
-                <div className="flex items-center space-x-3">
-                  <div className="p-2 bg-indigo-100 rounded-lg">
-                    <Shield className="h-6 w-6 text-indigo-600" />
-                  </div>
-                  <CardTitle className="text-lg">Seguro y Confiable</CardTitle>
-                </div>
-                <CardDescription className="text-base">
-                  Tus datos y los de tus clientes están protegidos con la mejor tecnología de seguridad.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ul className="space-y-2 text-sm text-gray-600">
-                  <li className="flex items-center gap-2">
-                    <Check className="h-4 w-4 text-green-500" />
-                    Encriptación SSL
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Check className="h-4 w-4 text-green-500" />
-                    Backups automáticos
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Check className="h-4 w-4 text-green-500" />
-                    Disponibilidad 99.9%
-                  </li>
-                </ul>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      </section>
-
-      {/* Testimonials Section */}
-      <section className="py-20 bg-gray-50">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">
-              Lo que dicen nuestros clientes
-            </h2>
-            <p className="text-xl text-gray-600">
-              Más de 500 negocios ya confían en nosotros
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <Card className="bg-white border-0 shadow-lg">
-              <CardContent className="p-8">
-                <div className="flex mb-4">
-                  {[1,2,3,4,5].map((i) => (
-                    <Star key={i} className="h-5 w-5 text-yellow-400 fill-current" />
-                  ))}
-                </div>
-                <p className="text-gray-700 mb-6 italic">
-                  "Antes perdía 3 horas diarias contestando llamadas para citas. Ahora mis clientes reservan solos y yo me enfoco en mi trabajo. ¡Increíble!"
-                </p>
-                <div className="flex items-center">
-                  <div className="w-12 h-12 bg-pink-100 rounded-full flex items-center justify-center mr-4">
-                    <span className="text-pink-600 font-bold">MR</span>
-                  </div>
-                  <div>
-                    <div className="font-semibold">María Rodríguez</div>
-                    <div className="text-sm text-gray-500">Salón de Belleza "Glamour"</div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-white border-0 shadow-lg">
-              <CardContent className="p-8">
-                <div className="flex mb-4">
-                  {[1,2,3,4,5].map((i) => (
-                    <Star key={i} className="h-5 w-5 text-yellow-400 fill-current" />
-                  ))}
-                </div>
-                <p className="text-gray-700 mb-6 italic">
-                  "El control de pagos es fantástico. Ya no se me olvida cobrar y tengo todo organizado. Mis ingresos aumentaron 40%."
-                </p>
-                <div className="flex items-center">
-                  <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mr-4">
-                    <span className="text-blue-600 font-bold">CL</span>
-                  </div>
-                  <div>
-                    <div className="font-semibold">Carlos López</div>
-                    <div className="text-sm text-gray-500">Taller Mecánico</div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-white border-0 shadow-lg">
-              <CardContent className="p-8">
-                <div className="flex mb-4">
-                  {[1,2,3,4,5].map((i) => (
-                    <Star key={i} className="h-5 w-5 text-yellow-400 fill-current" />
-                  ))}
-                </div>
-                <p className="text-gray-700 mb-6 italic">
-                  "La facilidad de uso es impresionante. En 5 minutos ya estaba funcionando. Mis pacientes están encantados con las reservas online."
-                </p>
-                <div className="flex items-center">
-                  <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mr-4">
-                    <span className="text-green-600 font-bold">AM</span>
-                  </div>
-                  <div>
-                    <div className="font-semibold">Ana Martínez</div>
-                    <div className="text-sm text-gray-500">Consultorio Dental</div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+            <div className="bg-white rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow">
+              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-4">
+                <TrendingUp className="h-6 w-6 text-green-600" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">Control de Pagos</h3>
+              <p className="text-gray-600">Gestiona pagos en efectivo y transferencias con comprobantes automáticos</p>
+            </div>
           </div>
         </div>
       </section>
 
       {/* Pricing Section */}
-      <section className="py-20">
+      <section id="precios" className="py-20 bg-white">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-gray-900 mb-4">
@@ -368,87 +208,67 @@ const Index = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-            <Card className="border-2 border-gray-200 relative">
-              <CardHeader className="text-center pb-8">
-                <CardTitle className="text-2xl mb-2">Plan Básico</CardTitle>
+            <div className="bg-gray-50 rounded-2xl p-8 border border-gray-200">
+              <div className="text-center mb-8">
+                <h3 className="text-2xl font-bold text-gray-900 mb-2">Plan Básico</h3>
                 <div className="text-4xl font-bold text-gray-900 mb-2">Gratis</div>
-                <CardDescription className="text-base">
-                  Perfect para comenzar y probar el sistema
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <ul className="space-y-3">
-                  <li className="flex items-center gap-3">
-                    <Check className="h-5 w-5 text-green-500" />
-                    <span>Hasta 50 reservas/mes</span>
-                  </li>
-                  <li className="flex items-center gap-3">
-                    <Check className="h-5 w-5 text-green-500" />
-                    <span>1 usuario administrador</span>
-                  </li>
-                  <li className="flex items-center gap-3">
-                    <Check className="h-5 w-5 text-green-500" />
-                    <span>Servicios ilimitados</span>
-                  </li>
-                  <li className="flex items-center gap-3">
-                    <Check className="h-5 w-5 text-green-500" />
-                    <span>Soporte por email</span>
-                  </li>
-                </ul>
-                <Link to="/auth" className="block">
-                  <Button className="w-full mt-8" variant="outline">
-                    Comenzar Gratis
-                  </Button>
-                </Link>
-              </CardContent>
-            </Card>
-
-            <Card className="border-2 border-blue-500 relative bg-gradient-to-br from-blue-50 to-purple-50">
-              <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                <Badge className="bg-blue-500 text-white">Más Popular</Badge>
+                <p className="text-gray-600">Perfecto para comenzar</p>
               </div>
-              <CardHeader className="text-center pb-8">
-                <CardTitle className="text-2xl mb-2">Plan Pro</CardTitle>
-                <div className="text-4xl font-bold text-blue-600 mb-2">$29.900</div>
-                <div className="text-sm text-gray-500 mb-4">/mes</div>
-                <CardDescription className="text-base">
-                  Para negocios en crecimiento que necesitan más poder
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <ul className="space-y-3">
-                  <li className="flex items-center gap-3">
-                    <Check className="h-5 w-5 text-green-500" />
-                    <span><strong>Reservas ilimitadas</strong></span>
-                  </li>
-                  <li className="flex items-center gap-3">
-                    <Check className="h-5 w-5 text-green-500" />
-                    <span>Personal ilimitado</span>
-                  </li>
-                  <li className="flex items-center gap-3">
-                    <Check className="h-5 w-5 text-green-500" />
-                    <span>Reportes avanzados</span>
-                  </li>
-                  <li className="flex items-center gap-3">
-                    <Check className="h-5 w-5 text-green-500" />
-                    <span>Notificaciones SMS</span>
-                  </li>
-                  <li className="flex items-center gap-3">
-                    <Check className="h-5 w-5 text-green-500" />
-                    <span>Soporte prioritario</span>
-                  </li>
-                  <li className="flex items-center gap-3">
-                    <Check className="h-5 w-5 text-green-500" />
-                    <span>Integración con redes sociales</span>
-                  </li>
-                </ul>
-                <Link to="/auth" className="block">
-                  <Button className="w-full mt-8 bg-blue-600 hover:bg-blue-700">
-                    Comenzar Prueba Gratuita
-                  </Button>
-                </Link>
-              </CardContent>
-            </Card>
+              <ul className="space-y-3 mb-8">
+                <li className="flex items-center gap-3">
+                  <Check className="h-5 w-5 text-green-500" />
+                  <span>Hasta 30 reservas/mes</span>
+                </li>
+                <li className="flex items-center gap-3">
+                  <Check className="h-5 w-5 text-green-500" />
+                  <span>1 usuario administrador</span>
+                </li>
+                <li className="flex items-center gap-3">
+                  <Check className="h-5 w-5 text-green-500" />
+                  <span>Integración Google Calendar</span>
+                </li>
+              </ul>
+              <Link to="/auth" className="block">
+                <Button className="w-full" variant="outline">
+                  Comenzar Gratis
+                </Button>
+              </Link>
+            </div>
+
+            <div className="bg-gradient-to-br from-blue-600 to-purple-600 rounded-2xl p-8 text-white relative">
+              <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
+                <Badge className="bg-white text-blue-600">Más Popular</Badge>
+              </div>
+              <div className="text-center mb-8">
+                <h3 className="text-2xl font-bold mb-2">Plan Pro</h3>
+                <div className="text-4xl font-bold mb-2">$29.900</div>
+                <div className="text-blue-100 mb-4">/mes</div>
+                <p className="text-blue-100">Para negocios en crecimiento</p>
+              </div>
+              <ul className="space-y-3 mb-8">
+                <li className="flex items-center gap-3">
+                  <Check className="h-5 w-5 text-white" />
+                  <span><strong>Reservas ilimitadas</strong></span>
+                </li>
+                <li className="flex items-center gap-3">
+                  <Check className="h-5 w-5 text-white" />
+                  <span>Personal ilimitado</span>
+                </li>
+                <li className="flex items-center gap-3">
+                  <Check className="h-5 w-5 text-white" />
+                  <span>Reportes avanzados</span>
+                </li>
+                <li className="flex items-center gap-3">
+                  <Check className="h-5 w-5 text-white" />
+                  <span>Soporte prioritario</span>
+                </li>
+              </ul>
+              <Link to="/auth" className="block">
+                <Button className="w-full bg-white text-blue-600 hover:bg-gray-100">
+                  Comenzar Prueba Gratuita
+                </Button>
+              </Link>
+            </div>
           </div>
         </div>
       </section>
@@ -457,24 +277,19 @@ const Index = () => {
       <section className="py-20 bg-gradient-to-r from-blue-600 to-purple-600 text-white">
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-4xl font-bold mb-6">
-            ¿Listo para revolucionar tu negocio?
+            ¿Listo para automatizar tu negocio?
           </h2>
-          <p className="text-xl mb-8 max-w-2xl mx-auto">
-            Únete a más de 500 negocios que ya están ahorrando tiempo y aumentando sus ingresos con nuestro sistema.
+          <p className="text-xl mb-8 max-w-2xl mx-auto text-blue-100">
+            Únete a cientos de negocios que ya están ahorrando tiempo y aumentando sus ingresos
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link to="/auth">
-              <Button size="lg" className="bg-white text-blue-600 hover:bg-gray-100 font-semibold px-8 py-4">
-                Comenzar Ahora - Es Gratis
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Button>
-            </Link>
-            <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10 px-8 py-4">
-              Agendar Demo Personalizada
+          <Link to="/auth">
+            <Button size="lg" className="bg-white text-blue-600 hover:bg-gray-100 font-semibold px-8 py-4 rounded-full">
+              Comenzar Ahora - Es Gratis
+              <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
-          </div>
-          <p className="text-sm text-blue-200 mt-6">
-            No se requiere tarjeta de crédito • Configuración en 5 minutos • Soporte incluido
+          </Link>
+          <p className="text-sm text-blue-200 mt-4">
+            No se requiere tarjeta de crédito • Configuración en 5 minutos
           </p>
         </div>
       </section>
@@ -484,16 +299,21 @@ const Index = () => {
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div>
-              <h3 className="text-xl font-bold mb-4">ReservasPro</h3>
+              <div className="flex items-center space-x-2 mb-4">
+                <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+                  <CalendarDays className="h-5 w-5 text-white" />
+                </div>
+                <span className="text-xl font-bold">ReservaSimple</span>
+              </div>
               <p className="text-gray-400">
-                El sistema de reservas más completo para PyMEs en Colombia.
+                El sistema de reservas más simple y efectivo para tu negocio.
               </p>
             </div>
             <div>
               <h4 className="font-semibold mb-4">Producto</h4>
               <ul className="space-y-2 text-gray-400">
-                <li><Link to="/auth" className="hover:text-white">Características</Link></li>
-                <li><Link to="/auth" className="hover:text-white">Precios</Link></li>
+                <li><a href="#caracteristicas" className="hover:text-white">Características</a></li>
+                <li><a href="#precios" className="hover:text-white">Precios</a></li>
                 <li><Link to="/auth" className="hover:text-white">Demo</Link></li>
               </ul>
             </div>
@@ -515,7 +335,7 @@ const Index = () => {
             </div>
           </div>
           <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-            <p>&copy; 2024 ReservasPro. Todos los derechos reservados.</p>
+            <p>&copy; 2024 ReservaSimple. Todos los derechos reservados.</p>
           </div>
         </div>
       </footer>
