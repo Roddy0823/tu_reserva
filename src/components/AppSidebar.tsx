@@ -8,8 +8,7 @@ import {
   CreditCard, 
   Crown, 
   Settings,
-  LogOut,
-  Users
+  LogOut
 } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import {
@@ -39,11 +38,6 @@ const menuItems = [
     title: "Servicios",
     url: "/services",
     icon: Package,
-  },
-  {
-    title: "Personal",
-    url: "/staff",
-    icon: Users,
   },
   {
     title: "Gestión de Disponibilidad",

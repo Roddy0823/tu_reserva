@@ -24,11 +24,7 @@ const Services = () => {
     return <BusinessSetup />;
   }
 
-  return (
-    <div className="container mx-auto px-4 py-4">
-      <ServicesAndStaffManagement />
-    </div>
-  );
+  return <ServicesAndStaffManagement />;
 };
 
 export default Services;
