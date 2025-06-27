@@ -26,29 +26,29 @@ const ServicesAndStaffManagement = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="mx-auto max-w-7xl px-4 py-6">
-        {/* Header */}
-        <div className="mb-8 border-b border-gray-200 pb-6">
-          <h1 className="text-2xl font-semibold text-gray-900">Gestión de Servicios y Personal</h1>
-          <p className="mt-2 text-sm text-gray-600">Administra los servicios y el personal de tu negocio</p>
+      <div className="mx-auto max-w-7xl px-6 py-8">
+        {/* Clean Header */}
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold tracking-tight text-gray-900">Gestión de Servicios y Personal</h1>
+          <p className="text-gray-500 mt-1">Administra los servicios y el personal de tu negocio</p>
         </div>
 
-        {/* Clean Tabs */}
+        {/* Minimal Tabs */}
         <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
-          <div className="border-b border-gray-200 mb-6">
-            <TabsList className="h-10 w-auto bg-transparent p-0 space-x-8">
+          <div className="border-b border-gray-200 mb-8">
+            <TabsList className="h-auto w-auto bg-transparent p-0 space-x-8">
               <TabsTrigger 
                 value="services" 
-                className="border-b-2 border-transparent bg-transparent px-1 pb-3 pt-2 text-sm font-medium text-gray-500 hover:text-gray-700 data-[state=active]:border-blue-500 data-[state=active]:text-blue-600 data-[state=active]:bg-transparent"
+                className="border-b-2 border-transparent bg-transparent px-1 pb-4 pt-2 text-base font-medium text-gray-500 hover:text-gray-700 data-[state=active]:border-slate-600 data-[state=active]:text-slate-900 data-[state=active]:bg-transparent shadow-none"
               >
-                <Package className="h-4 w-4 mr-2" />
+                <Package className="h-5 w-5 mr-2" />
                 Servicios
               </TabsTrigger>
               <TabsTrigger 
                 value="staff" 
-                className="border-b-2 border-transparent bg-transparent px-1 pb-3 pt-2 text-sm font-medium text-gray-500 hover:text-gray-700 data-[state=active]:border-blue-500 data-[state=active]:text-blue-600 data-[state=active]:bg-transparent"
+                className="border-b-2 border-transparent bg-transparent px-1 pb-4 pt-2 text-base font-medium text-gray-500 hover:text-gray-700 data-[state=active]:border-slate-600 data-[state=active]:text-slate-900 data-[state=active]:bg-transparent shadow-none"
               >
-                <Users className="h-4 w-4 mr-2" />
+                <Users className="h-5 w-5 mr-2" />
                 Personal
               </TabsTrigger>
             </TabsList>

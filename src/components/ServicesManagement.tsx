@@ -1,5 +1,6 @@
+
 import { useState } from 'react';
-import { Plus, Edit, Trash2, Package } from 'lucide-react';
+import { Plus, Edit, Trash2, Package, Clock, DollarSign } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -78,53 +79,56 @@ const ServicesManagement = () => {
   }
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
+    <div className="space-y-8">
+      {/* Clean Header */}
       <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-3">
-          <div className="p-2 bg-blue-50 rounded-lg">
-            <Package className="h-5 w-5 text-blue-600" />
-          </div>
-          <div>
-            <h2 className="text-xl font-semibold text-gray-900">Servicios</h2>
-            <p className="text-sm text-gray-500">Gestiona los servicios de tu negocio</p>
-          </div>
+        <div>
+          <h2 className="text-3xl font-bold tracking-tight text-gray-900">Servicios</h2>
+          <p className="text-gray-500 mt-1">Gestiona los servicios de tu negocio</p>
         </div>
-        <Button onClick={() => setIsFormOpen(true)} className="bg-blue-600 hover:bg-blue-700">
+        <Button 
+          onClick={() => setIsFormOpen(true)} 
+          className="bg-slate-900 hover:bg-slate-800 text-white shadow-sm"
+        >
           <Plus className="h-4 w-4 mr-2" />
           Nuevo Servicio
         </Button>
       </div>
 
-      {/* Services Grid */}
+      {/* Services Content */}
       {isLoading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {[...Array(6)].map((_, i) => (
-            <Card key={i} className="animate-pulse">
-              <CardHeader>
-                <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-                <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+            <Card key={i} className="border-gray-200 shadow-sm">
+              <CardHeader className="pb-4">
+                <div className="space-y-3">
+                  <div className="h-6 bg-gray-200 rounded animate-pulse"></div>
+                  <div className="h-4 bg-gray-100 rounded w-2/3 animate-pulse"></div>
+                </div>
               </CardHeader>
               <CardContent>
-                <div className="space-y-2">
-                  <div className="h-3 bg-gray-200 rounded"></div>
-                  <div className="h-3 bg-gray-200 rounded w-2/3"></div>
+                <div className="space-y-3">
+                  <div className="h-4 bg-gray-100 rounded animate-pulse"></div>
+                  <div className="h-4 bg-gray-100 rounded w-1/2 animate-pulse"></div>
                 </div>
               </CardContent>
             </Card>
           ))}
         </div>
       ) : services.length === 0 ? (
-        <Card className="border-dashed border-2 border-gray-300">
-          <CardContent className="flex flex-col items-center justify-center py-12">
-            <div className="p-3 bg-gray-100 rounded-full mb-4">
+        <Card className="border-dashed border-2 border-gray-200 bg-gray-50/50">
+          <CardContent className="flex flex-col items-center justify-center py-16 text-center">
+            <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-6">
               <Package className="h-8 w-8 text-gray-400" />
             </div>
-            <h3 className="text-lg font-medium text-gray-900 mb-2">No hay servicios</h3>
-            <p className="text-gray-500 text-center mb-6 max-w-sm">
+            <h3 className="text-xl font-semibold text-gray-900 mb-3">No hay servicios</h3>
+            <p className="text-gray-500 max-w-md mb-8 leading-relaxed">
               Comienza agregando tu primer servicio para que los clientes puedan hacer reservas
             </p>
-            <Button onClick={() => setIsFormOpen(true)} className="bg-blue-600 hover:bg-blue-700">
+            <Button 
+              onClick={() => setIsFormOpen(true)} 
+              className="bg-slate-900 hover:bg-slate-800 text-white"
+            >
               <Plus className="h-4 w-4 mr-2" />
               Crear Primer Servicio
             </Button>
@@ -133,65 +137,84 @@ const ServicesManagement = () => {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {services.map((service) => (
-            <Card key={service.id} className="group hover:shadow-md transition-all duration-200 border-gray-200">
-              <CardHeader className="pb-3">
+            <Card 
+              key={service.id} 
+              className="group border-gray-200 hover:border-gray-300 hover:shadow-lg transition-all duration-200 bg-white"
+            >
+              <CardHeader className="pb-4">
                 <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <CardTitle className="text-lg font-medium text-gray-900 group-hover:text-blue-600 transition-colors">
+                  <div className="flex-1 min-w-0">
+                    <CardTitle className="text-lg font-semibold text-gray-900 group-hover:text-slate-700 transition-colors truncate">
                       {service.name}
                     </CardTitle>
                     {service.description && (
-                      <p className="text-sm text-gray-500 mt-1 line-clamp-2">
+                      <p className="text-sm text-gray-500 mt-2 line-clamp-2 leading-relaxed">
                         {service.description}
                       </p>
                     )}
                   </div>
                   {service.image_url && (
-                    <img
-                      src={service.image_url}
-                      alt={service.name}
-                      className="w-12 h-12 rounded-lg object-cover ml-3"
-                    />
+                    <div className="ml-4 flex-shrink-0">
+                      <img
+                        src={service.image_url}
+                        alt={service.name}
+                        className="w-14 h-14 rounded-lg object-cover border border-gray-200"
+                      />
+                    </div>
                   )}
                 </div>
               </CardHeader>
-              <CardContent className="pt-0">
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium text-gray-900">${service.price?.toLocaleString()}</span>
-                    <Badge variant="secondary" className="text-xs">
-                      {service.duration_minutes} min
-                    </Badge>
+              
+              <CardContent className="pt-0 space-y-4">
+                {/* Price and Duration */}
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2 text-sm text-gray-600">
+                    <DollarSign className="h-4 w-4 text-emerald-500" />
+                    <span className="font-semibold text-gray-900">
+                      ${service.price?.toLocaleString()} COP
+                    </span>
                   </div>
-                  
-                  <div className="flex items-center space-x-2">
+                  <div className="flex items-center gap-2 text-sm text-gray-600">
+                    <Clock className="h-4 w-4 text-blue-500" />
+                    <span>{service.duration_minutes} min</span>
+                  </div>
+                </div>
+                
+                {/* Payment Methods */}
+                {(service.accepts_cash || service.accepts_transfer) && (
+                  <div className="flex flex-wrap gap-2">
                     {service.accepts_cash && (
-                      <Badge variant="outline" className="text-xs">Efectivo</Badge>
+                      <Badge variant="outline" className="text-xs font-medium border-gray-200 text-gray-600">
+                        Efectivo
+                      </Badge>
                     )}
                     {service.accepts_transfer && (
-                      <Badge variant="outline" className="text-xs">Transferencia</Badge>
+                      <Badge variant="outline" className="text-xs font-medium border-gray-200 text-gray-600">
+                        Transferencia
+                      </Badge>
                     )}
                   </div>
+                )}
 
-                  <div className="flex space-x-2 pt-2">
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
-                      onClick={() => handleEdit(service)}
-                      className="flex-1 border-gray-300 hover:border-blue-300 hover:text-blue-600"
-                    >
-                      <Edit className="h-3 w-3 mr-1" />
-                      Editar
-                    </Button>
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
-                      onClick={() => handleDelete(service.id)}
-                      className="border-red-300 text-red-600 hover:bg-red-50 hover:border-red-400"
-                    >
-                      <Trash2 className="h-3 w-3" />
-                    </Button>
-                  </div>
+                {/* Actions */}
+                <div className="flex gap-2 pt-2 border-t border-gray-100">
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={() => handleEdit(service)}
+                    className="flex-1 border-gray-200 hover:border-slate-300 hover:bg-slate-50 text-gray-700 hover:text-slate-900"
+                  >
+                    <Edit className="h-3 w-3 mr-2" />
+                    Editar
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={() => handleDelete(service.id)}
+                    className="border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 hover:text-red-700"
+                  >
+                    <Trash2 className="h-3 w-3" />
+                  </Button>
                 </div>
               </CardContent>
             </Card>
