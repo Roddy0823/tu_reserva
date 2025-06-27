@@ -63,7 +63,7 @@ export const useTimeBlocks = () => {
 
   // Crear un nuevo bloque de tiempo
   const createTimeBlockMutation = useMutation({
-    mutationFn: async (timeBlockData: Omit<TimeBlockInsert, 'id' | 'created_at'>) => {
+    mutationFn: async (timeBlockData: TimeBlockInsert) => {
       const { data, error } = await supabase
         .from('time_blocks')
         .insert(timeBlockData)

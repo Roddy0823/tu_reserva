@@ -11,15 +11,10 @@ export const useCreateAppointment = () => {
   const { business } = useBusiness();
 
   const createAppointmentMutation = useMutation({
-    mutationFn: async (appointmentData: Omit<AppointmentInsert, 'id' | 'created_at' | 'business_id'>) => {
-      if (!business?.id) throw new Error('Business ID is required');
-
+    mutationFn: async (appointmentData: AppointmentInsert) => {
       const { data, error } = await supabase
         .from('appointments')
-        .insert({
-          ...appointmentData,
-          business_id: business.id
-        })
+        .insert(appointmentData)
         .select(`
           *,
           staff_members (

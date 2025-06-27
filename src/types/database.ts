@@ -148,6 +148,20 @@ export interface Appointment {
   };
 }
 
+export interface AppointmentInsert {
+  business_id: string;
+  service_id: string;
+  staff_id: string;
+  start_time: string;
+  end_time: string;
+  client_name: string;
+  client_email: string;
+  client_phone?: string;
+  status?: AppointmentStatus;
+  payment_proof_url?: string;
+  payment_status?: PaymentValidationStatus;
+}
+
 export interface TimeBlock {
   id: string;
   staff_id: string;
@@ -155,4 +169,11 @@ export interface TimeBlock {
   end_time: string;
   reason?: string;
   created_at: string;
+}
+
+export interface TimeBlockInsert {
+  staff_id: string;
+  start_time: string;
+  end_time: string;
+  reason?: string;
 }
