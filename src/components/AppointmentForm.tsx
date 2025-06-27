@@ -17,6 +17,7 @@ import { useServices } from '@/hooks/useServices';
 import { useStaff } from '@/hooks/useStaff';
 import { useCreateAppointment } from '@/hooks/useCreateAppointment';
 import { useAvailableTimeSlots } from '@/hooks/useAvailableTimeSlots';
+import { useBusiness } from '@/hooks/useBusiness';
 import { useToast } from '@/hooks/use-toast';
 import { Appointment } from '@/types/database';
 
@@ -43,6 +44,7 @@ const AppointmentForm = ({ editingAppointment, onClose, defaultDate }: Appointme
   const { services } = useServices();
   const { staffMembers } = useStaff();
   const { createAppointment, isCreating } = useCreateAppointment();
+  const { business } = useBusiness();
   
   const [selectedDate, setSelectedDate] = useState<Date>(defaultDate || new Date());
   const [selectedServiceId, setSelectedServiceId] = useState<string>('');
@@ -102,6 +104,15 @@ const AppointmentForm = ({ editingAppointment, onClose, defaultDate }: Appointme
       return;
     }
 
+    if (!business?.id) {
+      toast({
+        title: "Error",
+        description: "No se pudo obtener la información del negocio",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
       const [hours, minutes] = data.time.split(':').map(Number);
       const startTime = new Date(data.date);
@@ -111,9 +122,10 @@ const AppointmentForm = ({ editingAppointment, onClose, defaultDate }: Appointme
       endTime.setMinutes(endTime.getMinutes() + selectedService.duration_minutes);
 
       const appointmentData = {
+        business_id: business.id,
         client_name: data.client_name,
         client_email: data.client_email,
-        client_phone: data.client_phone || null,
+        client_phone: data.client_phone || undefined,
         service_id: data.service_id,
         staff_id: data.staff_id,
         start_time: startTime.toISOString(),
@@ -125,7 +137,7 @@ const AppointmentForm = ({ editingAppointment, onClose, defaultDate }: Appointme
       
       toast({
         title: editingAppointment ? "Cita actualizada" : "Cita creada",
-        description: editingAppointment ? "La cita se ha actualizado correctamente" : "La cita se ha creado correctamente",
+        description: editingAppointment ? "La cita se ha actualizado correctamente" : "La cita se ha creada correctamente",
       });
       
       onClose();
