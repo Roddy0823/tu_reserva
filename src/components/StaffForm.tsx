@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -116,14 +117,12 @@ const StaffForm = ({ staffMember, services, onSubmit, onCancel, isLoading }: Sta
 
   const handlePhotoSelect = (file: File) => {
     setPhotoFile(file);
-    // Crear URL temporal para preview
     const tempUrl = URL.createObjectURL(file);
     setPhotoUrl(tempUrl);
   };
 
   const handlePhotoRemove = async () => {
     if (photoUrl && photoUrl.startsWith('http') && staffMember?.photo_url) {
-      // Si es una URL real (no temporal), eliminar del storage
       await deleteImage(photoUrl, 'staff');
     }
     setPhotoUrl(null);
@@ -133,29 +132,24 @@ const StaffForm = ({ staffMember, services, onSubmit, onCancel, isLoading }: Sta
   const handleSubmit = async (data: StaffFormData) => {
     let finalPhotoUrl = photoUrl;
 
-    // Si hay un archivo nuevo, subirlo
     if (photoFile) {
       const uploadedUrl = await uploadImage(photoFile, 'staff');
       if (uploadedUrl) {
         finalPhotoUrl = uploadedUrl;
-        // Si había una foto anterior, eliminarla
         if (staffMember?.photo_url) {
           await deleteImage(staffMember.photo_url, 'staff');
         }
       }
     }
 
-    // Crear el objeto de datos a enviar
     const submitData = {
       ...data,
       email: data.email || undefined,
       photo_url: finalPhotoUrl || undefined,
     };
 
-    // Enviar los datos
     await onSubmit(submitData);
 
-    // Si está editando y hay servicios seleccionados, actualizar las asociaciones
     if (staffMember && selectedServices.length >= 0) {
       updateStaffServices({
         staffId: staffMember.id,
@@ -173,68 +167,91 @@ const StaffForm = ({ staffMember, services, onSubmit, onCancel, isLoading }: Sta
   };
 
   return (
-    <Card className="w-full max-w-5xl mx-auto shadow-xl border-0 bg-gradient-to-br from-white to-gray-50">
-      <CardHeader className="bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-t-lg">
-        <div className="flex justify-between items-center">
+    <div className="min-h-screen bg-gray-50 py-8">
+      <div className="max-w-4xl mx-auto px-6">
+        {/* Apple-style Header */}
+        <div className="flex items-center justify-between mb-8">
           <div>
-            <CardTitle className="text-2xl font-bold">
+            <h1 className="text-3xl font-semibold text-gray-900 tracking-tight">
               {staffMember ? 'Editar Miembro del Personal' : 'Nuevo Miembro del Personal'}
-            </CardTitle>
-            <CardDescription className="text-blue-100">
-              {staffMember ? 'Modifica los datos del miembro del personal' : 'Agrega un nuevo miembro a tu equipo'}
-            </CardDescription>
+            </h1>
+            <p className="text-gray-500 mt-1 text-lg">
+              {staffMember ? 'Actualiza la información del miembro del equipo' : 'Agrega un nuevo miembro a tu equipo'}
+            </p>
           </div>
-          <Button variant="ghost" size="sm" onClick={onCancel} className="text-white hover:bg-white/20">
-            <X className="h-4 w-4" />
+          <Button 
+            variant="ghost" 
+            onClick={onCancel} 
+            className="h-10 w-10 p-0 rounded-full hover:bg-gray-200 text-gray-400 hover:text-gray-600"
+          >
+            <X className="h-5 w-5" />
           </Button>
         </div>
-      </CardHeader>
-      
-      <CardContent className="p-8">
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-8">
-            <div className="grid md:grid-cols-2 gap-8">
-              {/* Sección de foto */}
-              <StaffPhotoSection
-                photoUrl={photoUrl}
-                fullName={form.watch('full_name')}
-                onPhotoSelect={handlePhotoSelect}
-                onPhotoRemove={handlePhotoRemove}
-              />
 
-              {/* Sección de datos básicos */}
-              <StaffBasicInfo control={form.control} />
-            </div>
+        {/* Clean Card */}
+        <Card className="border-0 shadow-sm bg-white rounded-2xl overflow-hidden">
+          <CardContent className="p-8">
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-12">
+                {/* Photo Section */}
+                <div className="pb-8 border-b border-gray-100">
+                  <StaffPhotoSection
+                    photoUrl={photoUrl}
+                    fullName={form.watch('full_name')}
+                    onPhotoSelect={handlePhotoSelect}
+                    onPhotoRemove={handlePhotoRemove}
+                  />
+                </div>
 
-            {/* Sección de horarios y días de trabajo */}
-            <StaffWorkSchedule control={form.control} />
+                {/* Basic Info Section */}
+                <div className="pb-8 border-b border-gray-100">
+                  <h2 className="text-xl font-semibold text-gray-900 mb-6">Información Básica</h2>
+                  <StaffBasicInfo control={form.control} />
+                </div>
 
-            {/* Sección de servicios */}
-            <StaffServicesSelection
-              services={services}
-              selectedServices={selectedServices}
-              onServiceToggle={handleServiceToggle}
-            />
+                {/* Work Schedule Section */}
+                <div className="pb-8 border-b border-gray-100">
+                  <h2 className="text-xl font-semibold text-gray-900 mb-6">Horario de Trabajo</h2>
+                  <StaffWorkSchedule control={form.control} />
+                </div>
 
-            <div className="flex justify-end space-x-4 pt-6 border-t border-gray-200">
-              <Button type="button" variant="outline" onClick={onCancel} className="px-8">
-                Cancelar
-              </Button>
-              <Button 
-                type="submit" 
-                disabled={isLoading || isUpdatingServices || isUploading}
-                className="px-8 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800"
-              >
-                {isLoading || isUpdatingServices || isUploading 
-                  ? 'Guardando...' 
-                  : staffMember ? 'Actualizar' : 'Agregar'
-                }
-              </Button>
-            </div>
-          </form>
-        </Form>
-      </CardContent>
-    </Card>
+                {/* Services Section */}
+                <div className="pb-8">
+                  <h2 className="text-xl font-semibold text-gray-900 mb-6">Servicios</h2>
+                  <StaffServicesSelection
+                    services={services}
+                    selectedServices={selectedServices}
+                    onServiceToggle={handleServiceToggle}
+                  />
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex items-center justify-end space-x-4 pt-8 border-t border-gray-100">
+                  <Button 
+                    type="button" 
+                    variant="ghost" 
+                    onClick={onCancel} 
+                    className="px-8 h-11 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg"
+                  >
+                    Cancelar
+                  </Button>
+                  <Button 
+                    type="submit" 
+                    disabled={isLoading || isUpdatingServices || isUploading}
+                    className="px-8 h-11 bg-slate-900 hover:bg-slate-800 text-white rounded-lg shadow-sm font-medium"
+                  >
+                    {isLoading || isUpdatingServices || isUploading 
+                      ? 'Guardando...' 
+                      : staffMember ? 'Actualizar Miembro' : 'Agregar Miembro'
+                    }
+                  </Button>
+                </div>
+              </form>
+            </Form>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
   );
 };
 
