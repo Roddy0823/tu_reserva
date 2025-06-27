@@ -11,7 +11,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDes
 import { Checkbox } from '@/components/ui/checkbox';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { StaffMember, Service } from '@/types/database';
-import { X, User } from 'lucide-react';
+import { X, User, Clock } from 'lucide-react';
 import { useStaffServices } from '@/hooks/useStaffServices';
 import { useImageUpload } from '@/hooks/useImageUpload';
 import FileUpload from '@/components/ui/file-upload';
@@ -20,6 +20,13 @@ const staffSchema = z.object({
   full_name: z.string().min(1, 'El nombre completo es requerido'),
   email: z.string().email('Email inválido').optional().or(z.literal('')),
   is_active: z.boolean(),
+  work_start_time: z.string().min(1, 'La hora de inicio es requerida'),
+  work_end_time: z.string().min(1, 'La hora de fin es requerida'),
+}).refine((data) => {
+  return data.work_end_time > data.work_start_time;
+}, {
+  message: "La hora de fin debe ser posterior a la hora de inicio",
+  path: ["work_end_time"],
 });
 
 type StaffFormData = z.infer<typeof staffSchema>;
@@ -49,6 +56,8 @@ const StaffForm = ({ staffMember, services, onSubmit, onCancel, isLoading }: Sta
       full_name: staffMember?.full_name || '',
       email: staffMember?.email || '',
       is_active: staffMember?.is_active ?? true,
+      work_start_time: staffMember?.work_start_time || '08:00',
+      work_end_time: staffMember?.work_end_time || '18:00',
     },
   });
 
@@ -128,7 +137,7 @@ const StaffForm = ({ staffMember, services, onSubmit, onCancel, isLoading }: Sta
   };
 
   return (
-    <Card className="w-full max-w-4xl mx-auto shadow-xl border-0 bg-gradient-to-br from-white to-gray-50">
+    <Card className="w-full max-w-5xl mx-auto shadow-xl border-0 bg-gradient-to-br from-white to-gray-50">
       <CardHeader className="bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-t-lg">
         <div className="flex justify-between items-center">
           <div>
@@ -177,7 +186,7 @@ const StaffForm = ({ staffMember, services, onSubmit, onCancel, isLoading }: Sta
                 </div>
               </div>
 
-              {/* Sección de datos */}
+              {/* Sección de datos básicos */}
               <div className="space-y-6">
                 <FormField
                   control={form.control}
@@ -239,6 +248,58 @@ const StaffForm = ({ staffMember, services, onSubmit, onCancel, isLoading }: Sta
               </div>
             </div>
 
+            {/* Sección de horarios de trabajo */}
+            <div className="space-y-6">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                  <Clock className="h-5 w-5 text-blue-600" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900">Horario de Trabajo</h3>
+                  <p className="text-sm text-gray-600">Define el horario laboral disponible para reservas</p>
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-6 bg-blue-50 rounded-lg border border-blue-200">
+                <FormField
+                  control={form.control}
+                  name="work_start_time"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-base font-semibold text-blue-900">Hora de Inicio</FormLabel>
+                      <FormControl>
+                        <Input 
+                          type="time" 
+                          className="h-12 text-base border-blue-200 focus:border-blue-400"
+                          {...field} 
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="work_end_time"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-base font-semibold text-blue-900">Hora de Fin</FormLabel>
+                      <FormControl>
+                        <Input 
+                          type="time" 
+                          className="h-12 text-base border-blue-200 focus:border-blue-400"
+                          {...field} 
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </div>
+
+            {/* Sección de servicios */}
             {services.length > 0 && (
               <div className="space-y-4">
                 <h3 className="text-lg font-semibold text-gray-900">Servicios que puede realizar</h3>

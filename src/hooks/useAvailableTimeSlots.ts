@@ -14,6 +14,17 @@ export const useAvailableTimeSlots = (staffId?: string, date?: Date, serviceDura
       const dayStart = startOfDay(date);
       const dayEnd = endOfDay(date);
 
+      // Obtener información del personal incluyendo horarios de trabajo
+      const { data: staffMember, error: staffError } = await supabase
+        .from('staff_members')
+        .select('work_start_time, work_end_time')
+        .eq('id', staffId)
+        .single();
+
+      if (staffError) throw staffError;
+
+      console.log('Staff member work hours:', staffMember);
+
       // Obtener citas existentes para el día
       const { data: appointments, error: appointmentsError } = await supabase
         .from('appointments')
@@ -39,55 +50,70 @@ export const useAvailableTimeSlots = (staffId?: string, date?: Date, serviceDura
 
       console.log('Time blocks:', timeBlocks);
 
-      // Generar slots de tiempo disponibles (de 8:00 a 19:00 cada 30 minutos)
+      // Usar horarios de trabajo del personal o valores por defecto
+      const workStartTime = staffMember?.work_start_time || '08:00';
+      const workEndTime = staffMember?.work_end_time || '18:00';
+      
+      // Convertir horarios de trabajo a horas numéricas
+      const [startHour, startMinute] = workStartTime.split(':').map(Number);
+      const [endHour, endMinute] = workEndTime.split(':').map(Number);
+
+      console.log('Work hours:', { workStartTime, workEndTime, startHour, startMinute, endHour, endMinute });
+
+      // Generar slots de tiempo disponibles dentro del horario de trabajo
       const availableSlots: string[] = [];
-      const startHour = 8;
-      const endHour = 19;
       const slotDuration = 30; // minutos
 
-      for (let hour = startHour; hour < endHour; hour++) {
-        for (let minute = 0; minute < 60; minute += slotDuration) {
-          const slotStart = new Date(date);
-          slotStart.setHours(hour, minute, 0, 0);
-          
-          const slotEnd = addMinutes(slotStart, serviceDuration);
-          
-          // No permitir slots que terminen después del horario laboral
-          if (slotEnd.getHours() > endHour) {
-            continue;
-          }
+      // Crear fecha de inicio basada en el horario de trabajo
+      const workStart = new Date(date);
+      workStart.setHours(startHour, startMinute, 0, 0);
+      
+      const workEnd = new Date(date);
+      workEnd.setHours(endHour, endMinute, 0, 0);
 
-          // Verificar si el slot no se superpone con citas existentes
-          const hasAppointmentConflict = appointments?.some(appointment => {
-            const appointmentStart = parseISO(appointment.start_time);
-            const appointmentEnd = parseISO(appointment.end_time);
-            
-            return (
-              (isAfter(slotStart, appointmentStart) && isBefore(slotStart, appointmentEnd)) ||
-              (isAfter(slotEnd, appointmentStart) && isBefore(slotEnd, appointmentEnd)) ||
-              (isBefore(slotStart, appointmentStart) && isAfter(slotEnd, appointmentEnd)) ||
-              slotStart.getTime() === appointmentStart.getTime()
-            );
-          });
+      let currentSlot = new Date(workStart);
 
-          // Verificar si el slot no se superpone con bloqueos de tiempo
-          const hasTimeBlockConflict = timeBlocks?.some(block => {
-            const blockStart = parseISO(block.start_time);
-            const blockEnd = parseISO(block.end_time);
-            
-            return (
-              (isAfter(slotStart, blockStart) && isBefore(slotStart, blockEnd)) ||
-              (isAfter(slotEnd, blockStart) && isBefore(slotEnd, blockEnd)) ||
-              (isBefore(slotStart, blockStart) && isAfter(slotEnd, blockEnd)) ||
-              slotStart.getTime() === blockStart.getTime()
-            );
-          });
-
-          // Si no hay conflictos, agregar el slot
-          if (!hasAppointmentConflict && !hasTimeBlockConflict) {
-            availableSlots.push(format(slotStart, 'HH:mm'));
-          }
+      while (currentSlot < workEnd) {
+        const slotEnd = addMinutes(currentSlot, serviceDuration);
+        
+        // No permitir slots que terminen después del horario laboral
+        if (slotEnd > workEnd) {
+          break;
         }
+
+        // Verificar si el slot no se superpone con citas existentes
+        const hasAppointmentConflict = appointments?.some(appointment => {
+          const appointmentStart = parseISO(appointment.start_time);
+          const appointmentEnd = parseISO(appointment.end_time);
+          
+          return (
+            (isAfter(currentSlot, appointmentStart) && isBefore(currentSlot, appointmentEnd)) ||
+            (isAfter(slotEnd, appointmentStart) && isBefore(slotEnd, appointmentEnd)) ||
+            (isBefore(currentSlot, appointmentStart) && isAfter(slotEnd, appointmentEnd)) ||
+            currentSlot.getTime() === appointmentStart.getTime()
+          );
+        });
+
+        // Verificar si el slot no se superpone con bloqueos de tiempo
+        const hasTimeBlockConflict = timeBlocks?.some(block => {
+          const blockStart = parseISO(block.start_time);
+          const blockEnd = parseISO(block.end_time);
+          
+          return (
+            (isAfter(currentSlot, blockStart) && isBefore(currentSlot, blockEnd)) ||
+            (isAfter(slotEnd, blockStart) && isBefore(slotEnd, blockEnd)) ||
+            (isBefore(currentSlot, blockStart) && isAfter(slotEnd, blockEnd)) ||
+            currentSlot.getTime() === blockStart.getTime()
+          );
+        });
+
+        // Si no hay conflictos, agregar el slot
+        if (!hasAppointmentConflict && !hasTimeBlockConflict) {
+          availableSlots.push(format(currentSlot, 'HH:mm'));
+        }
+
+        // Avanzar al siguiente slot
+        currentSlot = addMinutes(currentSlot, slotDuration);
       }
 
       console.log('Available slots:', availableSlots);
