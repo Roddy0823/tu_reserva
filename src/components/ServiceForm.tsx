@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -9,7 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Badge } from '@/components/ui/badge';
+import { Badge } from '@/types/database';
 import { Service } from '@/types/database';
 import { X, Clock, DollarSign, Calendar, Users, Camera, MessageSquare, CreditCard } from 'lucide-react';
 import FileUpload from '@/components/ui/file-upload';
@@ -128,30 +127,31 @@ const ServiceForm = ({ service, onSubmit, onCancel, isLoading }: ServiceFormProp
   };
 
   const handleSubmit = (data: ServiceFormData) => {
-    // Filtrar campos de tiempo vacíos para evitar errores de base de datos
-    const cleanedData = { ...data };
+    // Create a clean copy of the data with proper typing
+    const cleanedData: Partial<ServiceFormData> = { ...data };
     
-    // Para cada día, si no está activo, limpiar los campos de tiempo
+    // For each day, if not active, clear the time fields
     days.forEach(day => {
       const isActiveKey = day.active as keyof ServiceFormData;
       const startKey = day.start as keyof ServiceFormData;
       const endKey = day.end as keyof ServiceFormData;
       
       if (!cleanedData[isActiveKey]) {
-        cleanedData[startKey] = null as any;
-        cleanedData[endKey] = null as any;
+        // Set to undefined instead of null for inactive days
+        delete cleanedData[startKey];
+        delete cleanedData[endKey];
       } else {
-        // Si está activo pero los campos están vacíos, usar valores por defecto
+        // If active but empty, use default values
         if (!cleanedData[startKey]) {
-          cleanedData[startKey] = '08:00' as any;
+          (cleanedData as any)[startKey] = '08:00';
         }
         if (!cleanedData[endKey]) {
-          cleanedData[endKey] = '20:00' as any;
+          (cleanedData as any)[endKey] = '20:00';
         }
       }
     });
     
-    onSubmit({ ...cleanedData, image_url: imageUrl });
+    onSubmit({ ...(cleanedData as ServiceFormData), image_url: imageUrl });
   };
 
   return (
