@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Check, X, Eye } from "lucide-react";
+import { Check, X, Eye, AlertTriangle } from "lucide-react";
 import { usePendingPayments } from "@/hooks/usePendingPayments";
 import { usePaymentValidation } from "@/hooks/usePaymentValidation";
 import { format } from "date-fns";
@@ -39,6 +39,10 @@ const PendingPaymentsList = () => {
     validatePayment({ appointmentId, action: 'rechazado' });
   };
 
+  const hasValidPaymentProof = (payment: any) => {
+    return payment.payment_proof_url && payment.payment_proof_url.trim() !== '';
+  };
+
   return (
     <>
       <Card>
@@ -60,6 +64,7 @@ const PendingPaymentsList = () => {
                   <TableHead>Fecha</TableHead>
                   <TableHead>Monto</TableHead>
                   <TableHead>Estado</TableHead>
+                  <TableHead>Comprobante</TableHead>
                   <TableHead>Acciones</TableHead>
                 </TableRow>
               </TableHeader>
@@ -82,6 +87,18 @@ const PendingPaymentsList = () => {
                       <Badge variant="secondary">Pendiente</Badge>
                     </TableCell>
                     <TableCell>
+                      {hasValidPaymentProof(payment) ? (
+                        <Badge variant="default" className="bg-green-100 text-green-800">
+                          Disponible
+                        </Badge>
+                      ) : (
+                        <Badge variant="destructive" className="bg-red-100 text-red-800">
+                          <AlertTriangle className="h-3 w-3 mr-1" />
+                          No disponible
+                        </Badge>
+                      )}
+                    </TableCell>
+                    <TableCell>
                       <div className="flex space-x-2">
                         <Button
                           size="sm"
@@ -94,7 +111,8 @@ const PendingPaymentsList = () => {
                           size="sm"
                           variant="default"
                           onClick={() => handleApprove(payment.id)}
-                          disabled={isValidating}
+                          disabled={isValidating || !hasValidPaymentProof(payment)}
+                          title={!hasValidPaymentProof(payment) ? "No se puede aprobar sin comprobante válido" : "Aprobar pago"}
                         >
                           <Check className="h-4 w-4" />
                         </Button>

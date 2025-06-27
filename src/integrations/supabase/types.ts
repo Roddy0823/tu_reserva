@@ -629,6 +629,10 @@ export type Database = {
         Args: { business_uuid: string }
         Returns: boolean
       }
+      cleanup_broken_payment_proof_urls: {
+        Args: Record<PropertyKey, never>
+        Returns: number
+      }
       create_appointment_safely: {
         Args: {
           p_client_name: string
