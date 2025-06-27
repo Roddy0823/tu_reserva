@@ -4,17 +4,16 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Switch } from '@/components/ui/switch';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from '@/components/ui/form';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Form } from '@/components/ui/form';
 import { StaffMember, Service } from '@/types/database';
-import { X, User, Clock, Calendar } from 'lucide-react';
+import { X } from 'lucide-react';
 import { useStaffServices } from '@/hooks/useStaffServices';
 import { useImageUpload } from '@/hooks/useImageUpload';
-import FileUpload from '@/components/ui/file-upload';
+import StaffPhotoSection from '@/components/staff/StaffPhotoSection';
+import StaffBasicInfo from '@/components/staff/StaffBasicInfo';
+import StaffWorkSchedule from '@/components/staff/StaffWorkSchedule';
+import StaffServicesSelection from '@/components/staff/StaffServicesSelection';
 
 const staffSchema = z.object({
   full_name: z.string().min(1, 'El nombre completo es requerido'),
@@ -146,26 +145,6 @@ const StaffForm = ({ staffMember, services, onSubmit, onCancel, isLoading }: Sta
     }
   };
 
-  // Función para obtener las iniciales del nombre
-  const getInitials = (name: string) => {
-    return name
-      .split(' ')
-      .map(word => word.charAt(0))
-      .join('')
-      .toUpperCase()
-      .slice(0, 2);
-  };
-
-  const weekDays = [
-    { key: 'works_monday', label: 'Lunes' },
-    { key: 'works_tuesday', label: 'Martes' },
-    { key: 'works_wednesday', label: 'Miércoles' },
-    { key: 'works_thursday', label: 'Jueves' },
-    { key: 'works_friday', label: 'Viernes' },
-    { key: 'works_saturday', label: 'Sábado' },
-    { key: 'works_sunday', label: 'Domingo' },
-  ];
-
   return (
     <Card className="w-full max-w-5xl mx-auto shadow-xl border-0 bg-gradient-to-br from-white to-gray-50">
       <CardHeader className="bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-t-lg">
@@ -189,211 +168,26 @@ const StaffForm = ({ staffMember, services, onSubmit, onCancel, isLoading }: Sta
           <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-8">
             <div className="grid md:grid-cols-2 gap-8">
               {/* Sección de foto */}
-              <div className="space-y-6">
-                <div className="text-center">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Foto de Perfil</h3>
-                  <div className="flex flex-col items-center space-y-4">
-                    <Avatar className="h-32 w-32 border-4 border-gray-200 shadow-lg">
-                      <AvatarImage 
-                        src={photoUrl || undefined} 
-                        alt="Foto de perfil"
-                        className="object-cover"
-                      />
-                      <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-600 text-white text-2xl font-semibold">
-                        {form.watch('full_name') ? getInitials(form.watch('full_name')) : <User className="h-12 w-12" />}
-                      </AvatarFallback>
-                    </Avatar>
-                    
-                    <FileUpload
-                      onFileSelect={handlePhotoSelect}
-                      onFileRemove={handlePhotoRemove}
-                      currentImage={photoUrl || undefined}
-                      accept="image/*"
-                      maxSize={5}
-                      className="w-full"
-                    />
-                  </div>
-                </div>
-              </div>
+              <StaffPhotoSection
+                photoUrl={photoUrl}
+                fullName={form.watch('full_name')}
+                onPhotoSelect={handlePhotoSelect}
+                onPhotoRemove={handlePhotoRemove}
+              />
 
               {/* Sección de datos básicos */}
-              <div className="space-y-6">
-                <FormField
-                  control={form.control}
-                  name="full_name"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-base font-semibold">Nombre Completo</FormLabel>
-                      <FormControl>
-                        <Input 
-                          placeholder="Ej: Juan Pérez" 
-                          className="h-12 text-base"
-                          {...field} 
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="email"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-base font-semibold">Email (Opcional)</FormLabel>
-                      <FormControl>
-                        <Input 
-                          type="email"
-                          placeholder="juan@ejemplo.com"
-                          className="h-12 text-base"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="is_active"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-6 bg-gray-50">
-                      <div className="space-y-0.5">
-                        <FormLabel className="text-base font-semibold">Estado Activo</FormLabel>
-                        <FormDescription className="text-gray-600">
-                          Los miembros activos pueden recibir citas
-                        </FormDescription>
-                      </div>
-                      <FormControl>
-                        <Switch
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                        />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-              </div>
+              <StaffBasicInfo control={form.control} />
             </div>
 
-            {/* Sección de horarios de trabajo */}
-            <div className="space-y-6">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                  <Clock className="h-5 w-5 text-blue-600" />
-                </div>
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-900">Horario de Trabajo</h3>
-                  <p className="text-sm text-gray-600">Define el horario laboral disponible para reservas</p>
-                </div>
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-6 bg-blue-50 rounded-lg border border-blue-200">
-                <FormField
-                  control={form.control}
-                  name="work_start_time"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-base font-semibold text-blue-900">Hora de Inicio</FormLabel>
-                      <FormControl>
-                        <Input 
-                          type="time" 
-                          className="h-12 text-base border-blue-200 focus:border-blue-400"
-                          {...field} 
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="work_end_time"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-base font-semibold text-blue-900">Hora de Fin</FormLabel>
-                      <FormControl>
-                        <Input 
-                          type="time" 
-                          className="h-12 text-base border-blue-200 focus:border-blue-400"
-                          {...field} 
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-            </div>
-
-            {/* Sección de días de trabajo */}
-            <div className="space-y-6">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
-                  <Calendar className="h-5 w-5 text-green-600" />
-                </div>
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-900">Días de Trabajo</h3>
-                  <p className="text-sm text-gray-600">Selecciona los días que trabaja este miembro del personal</p>
-                </div>
-              </div>
-              
-              <div className="p-6 bg-green-50 rounded-lg border border-green-200">
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  {weekDays.map((day) => (
-                    <FormField
-                      key={day.key}
-                      control={form.control}
-                      name={day.key as keyof StaffFormData}
-                      render={({ field }) => (
-                        <FormItem className="flex flex-row items-center space-x-3 space-y-0">
-                          <FormControl>
-                            <Checkbox
-                              checked={field.value as boolean}
-                              onCheckedChange={field.onChange}
-                            />
-                          </FormControl>
-                          <FormLabel className="text-sm font-medium text-green-900">
-                            {day.label}
-                          </FormLabel>
-                        </FormItem>
-                      )}
-                    />
-                  ))}
-                </div>
-                <FormMessage className="mt-2" />
-              </div>
-            </div>
+            {/* Sección de horarios y días de trabajo */}
+            <StaffWorkSchedule control={form.control} />
 
             {/* Sección de servicios */}
-            {services.length > 0 && (
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold text-gray-900">Servicios que puede realizar</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-64 overflow-y-auto p-4 bg-gray-50 rounded-lg">
-                  {services.map((service) => (
-                    <div key={service.id} className="flex items-center space-x-3 p-3 bg-white rounded-lg shadow-sm">
-                      <Checkbox
-                        id={service.id}
-                        checked={selectedServices.includes(service.id)}
-                        onCheckedChange={(checked) => 
-                          handleServiceToggle(service.id, checked as boolean)
-                        }
-                      />
-                      <label
-                        htmlFor={service.id}
-                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 flex-1 cursor-pointer"
-                      >
-                        <div className="font-semibold">{service.name}</div>
-                        <div className="text-xs text-gray-500">{service.duration_minutes} min - ${service.price}</div>
-                      </label>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
+            <StaffServicesSelection
+              services={services}
+              selectedServices={selectedServices}
+              onServiceToggle={handleServiceToggle}
+            />
 
             <div className="flex justify-end space-x-4 pt-6 border-t border-gray-200">
               <Button type="button" variant="outline" onClick={onCancel} className="px-8">
