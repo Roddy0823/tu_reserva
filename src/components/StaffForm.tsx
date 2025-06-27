@@ -11,7 +11,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDes
 import { Checkbox } from '@/components/ui/checkbox';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { StaffMember, Service } from '@/types/database';
-import { X, Upload, Camera, User } from 'lucide-react';
+import { X, User } from 'lucide-react';
 import { useStaffServices } from '@/hooks/useStaffServices';
 import { useImageUpload } from '@/hooks/useImageUpload';
 import FileUpload from '@/components/ui/file-upload';
@@ -90,12 +90,15 @@ const StaffForm = ({ staffMember, services, onSubmit, onCancel, isLoading }: Sta
       }
     }
 
-    // Primero crear/actualizar el miembro del personal
-    await onSubmit({
+    // Crear el objeto de datos a enviar
+    const submitData = {
       ...data,
-      email: data.email || null,
-      photo_url: finalPhotoUrl || null,
-    });
+      email: data.email || undefined,
+      photo_url: finalPhotoUrl || undefined,
+    };
+
+    // Enviar los datos
+    await onSubmit(submitData);
 
     // Si está editando y hay servicios seleccionados, actualizar las asociaciones
     if (staffMember && selectedServices.length >= 0) {

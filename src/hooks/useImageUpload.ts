@@ -12,7 +12,7 @@ export const useImageUpload = () => {
     
     try {
       const fileExt = file.name.split('.').pop();
-      const fileName = `${folder}/${Date.now()}.${fileExt}`;
+      const fileName = `${Date.now()}.${fileExt}`;
       
       // Determinar el bucket basado en la carpeta
       const bucketName = folder === 'staff' ? 'staff-photos' : 'service-images';
@@ -34,6 +34,7 @@ export const useImageUpload = () => {
 
       return publicUrl;
     } catch (error: any) {
+      console.error('Error uploading image:', error);
       toast({
         title: "Error al subir imagen",
         description: error.message,
@@ -47,9 +48,19 @@ export const useImageUpload = () => {
 
   const deleteImage = async (url: string, folder: string = 'services'): Promise<boolean> => {
     try {
-      // Extract path from URL
+      // Extract path from URL - handle both old and new URL formats
       const urlParts = url.split('/');
-      const path = urlParts.slice(-2).join('/'); // Get last two parts (folder/filename)
+      let path = '';
+      
+      // Find the part after 'object/public' or 'object/sign'
+      const objectIndex = urlParts.findIndex(part => part === 'object');
+      if (objectIndex !== -1 && objectIndex + 2 < urlParts.length) {
+        // Get everything after 'object/public/' or 'object/sign/'
+        path = urlParts.slice(objectIndex + 2).join('/');
+      } else {
+        // Fallback: get the filename only
+        path = urlParts[urlParts.length - 1];
+      }
       
       // Determinar el bucket basado en la carpeta
       const bucketName = folder === 'staff' ? 'staff-photos' : 'service-images';
@@ -59,11 +70,14 @@ export const useImageUpload = () => {
         .remove([path]);
 
       if (error) {
-        throw error;
+        console.error('Error deleting image:', error);
+        // Don't throw error for delete operations, just log it
+        return false;
       }
 
       return true;
     } catch (error: any) {
+      console.error('Error deleting image:', error);
       toast({
         title: "Error al eliminar imagen",
         description: error.message,
