@@ -59,23 +59,24 @@ const StaffDateTimeSelection = ({ service, staffMember, onDateTimeSelect, onBack
   };
 
   return (
-    <div>
-      <div className="flex items-center gap-2 mb-6">
-        <Button variant="ghost" size="sm" onClick={onBack}>
-          <ArrowLeft className="h-4 w-4" />
-        </Button>
-        <div>
-          <h2 className="text-xl font-semibold text-gray-900">Selecciona Fecha y Hora</h2>
-          <p className="text-gray-600">
-            {service.name} con {staffMember.full_name}
-          </p>
+    <Card>
+      <CardHeader>
+        <div className="flex items-center gap-2">
+          <Button variant="ghost" size="sm" onClick={onBack}>
+            <ArrowLeft className="h-4 w-4" />
+          </Button>
+          <div>
+            <CardTitle>Selecciona Fecha y Hora</CardTitle>
+            <p className="text-gray-600">
+              {service.name} con {staffMember.full_name}
+            </p>
+          </div>
         </div>
-      </div>
-      
-      <div className="space-y-8">
+      </CardHeader>
+      <CardContent className="space-y-6">
         {/* Date Selection */}
         <div>
-          <h3 className="font-medium mb-4 flex items-center gap-2">
+          <h3 className="font-semibold mb-3 flex items-center gap-2">
             <CalendarIcon className="h-4 w-4" />
             Selecciona una fecha
           </h3>
@@ -85,7 +86,7 @@ const StaffDateTimeSelection = ({ service, staffMember, onDateTimeSelect, onBack
               selected={selectedDate}
               onSelect={handleDateSelect}
               disabled={disabledDays}
-              className="rounded-lg border border-gray-200"
+              className="rounded-md border"
               locale={es}
             />
           </div>
@@ -94,31 +95,31 @@ const StaffDateTimeSelection = ({ service, staffMember, onDateTimeSelect, onBack
         {/* Time Selection */}
         {selectedDate && (
           <div>
-            <h3 className="font-medium mb-4 flex items-center gap-2">
+            <h3 className="font-semibold mb-3 flex items-center gap-2">
               <Clock className="h-4 w-4" />
               Horarios disponibles para {formatDateHeader(selectedDate)}
             </h3>
             
             {isLoading ? (
               <div className="flex items-center justify-center py-8">
-                <div className="w-6 h-6 border-2 border-gray-900 border-t-transparent rounded-full animate-spin"></div>
+                <div className="w-6 h-6 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
               </div>
             ) : availableSlots.length === 0 ? (
-              <div className="text-center py-8 bg-gray-50 rounded-lg border border-gray-200">
+              <div className="text-center py-8">
                 <p className="text-gray-600">No hay horarios disponibles para esta fecha.</p>
                 <p className="text-sm text-gray-500 mt-1">
                   Selecciona otra fecha o intenta más tarde.
                 </p>
               </div>
             ) : (
-              <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
+              <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
                 {availableSlots.map((time) => (
                   <Button
                     key={time}
                     variant={selectedTime === time ? "default" : "outline"}
                     size="sm"
                     onClick={() => handleTimeSelect(time)}
-                    className={selectedTime === time ? "bg-gray-900 hover:bg-gray-800" : "border-gray-200 hover:border-gray-900"}
+                    className="text-sm"
                   >
                     {time}
                   </Button>
@@ -130,25 +131,25 @@ const StaffDateTimeSelection = ({ service, staffMember, onDateTimeSelect, onBack
 
         {/* Summary and Continue */}
         {selectedDate && selectedTime && (
-          <div className="pt-6 border-t border-gray-200">
-            <div className="bg-gray-50 rounded-lg p-4 mb-4 border border-gray-200">
-              <h4 className="font-medium text-gray-900 mb-3">Resumen:</h4>
-              <div className="space-y-2 text-sm text-gray-700">
-                <p><span className="font-medium">Servicio:</span> {service.name}</p>
-                <p><span className="font-medium">Personal:</span> {staffMember.full_name}</p>
-                <p><span className="font-medium">Fecha:</span> {format(selectedDate, "EEEE, dd 'de' MMMM 'de' yyyy", { locale: es })}</p>
-                <p><span className="font-medium">Hora:</span> {selectedTime}</p>
-                <p><span className="font-medium">Duración:</span> {service.duration_minutes} minutos</p>
+          <div className="pt-4 border-t">
+            <div className="bg-blue-50 rounded-lg p-4 mb-4">
+              <h4 className="font-semibold text-blue-900 mb-2">Resumen:</h4>
+              <div className="space-y-1 text-sm text-blue-800">
+                <p><strong>Servicio:</strong> {service.name}</p>
+                <p><strong>Personal:</strong> {staffMember.full_name}</p>
+                <p><strong>Fecha:</strong> {format(selectedDate, "EEEE, dd 'de' MMMM 'de' yyyy", { locale: es })}</p>
+                <p><strong>Hora:</strong> {selectedTime}</p>
+                <p><strong>Duración:</strong> {service.duration_minutes} minutos</p>
               </div>
             </div>
             
-            <Button onClick={handleContinue} className="w-full bg-gray-900 hover:bg-gray-800">
+            <Button onClick={handleContinue} className="w-full">
               Continuar
             </Button>
           </div>
         )}
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 };
 

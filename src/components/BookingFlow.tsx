@@ -129,13 +129,6 @@ const BookingFlow = ({ businessSlug }: BookingFlowProps) => {
     });
   };
 
-  // New navigation function that allows jumping to any previous step
-  const handleNavigateToStep = (stepNumber: number) => {
-    if (stepNumber < currentStep && stepNumber >= 1) {
-      setCurrentStep(stepNumber);
-    }
-  };
-
   const handleBack = () => {
     if (currentStep > 1) {
       setCurrentStep(currentStep - 1);
@@ -148,10 +141,10 @@ const BookingFlow = ({ businessSlug }: BookingFlowProps) => {
 
   if (businessLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100">
         <div className="text-center space-y-4">
-          <div className="w-8 h-8 border-2 border-gray-900 border-t-transparent rounded-full animate-spin mx-auto"></div>
-          <p className="text-gray-600 font-medium">Cargando información...</p>
+          <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto"></div>
+          <p className="text-slate-600 font-medium">Cargando información...</p>
         </div>
       </div>
     );
@@ -159,13 +152,13 @@ const BookingFlow = ({ businessSlug }: BookingFlowProps) => {
 
   if (businessError || !business) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100">
         <div className="text-center space-y-4">
-          <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto">
-            <span className="text-gray-600 text-2xl">!</span>
+          <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto">
+            <span className="text-red-600 text-2xl">!</span>
           </div>
-          <h1 className="text-2xl font-bold text-gray-900">Negocio no encontrado</h1>
-          <p className="text-gray-600">La URL de reserva no es válida o el negocio no existe.</p>
+          <h1 className="text-2xl font-bold text-slate-900">Negocio no encontrado</h1>
+          <p className="text-slate-600">La URL de reserva no es válida o el negocio no existe.</p>
         </div>
       </div>
     );
@@ -174,7 +167,7 @@ const BookingFlow = ({ businessSlug }: BookingFlowProps) => {
   // Success page
   if (currentStep === 7 && createdAppointment) {
     return (
-      <div className="min-h-screen bg-gray-50 py-8">
+      <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-50 py-8">
         <div className="container mx-auto px-4">
           <BookingSuccess
             business={business}
@@ -190,7 +183,7 @@ const BookingFlow = ({ businessSlug }: BookingFlowProps) => {
   // Payment step for transfer services
   if (currentStep === 6 && createdAppointment && bookingData.service?.accepts_transfer) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
         <div className="container mx-auto px-4 py-8">
           <BookingHeader business={business} />
           <div className="max-w-2xl mx-auto mt-8">
@@ -208,17 +201,13 @@ const BookingFlow = ({ businessSlug }: BookingFlowProps) => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
       <div className="container mx-auto px-4 py-8">
         <BookingHeader business={business} />
-        <BookingSteps 
-          currentStep={currentStep} 
-          steps={steps}
-          onStepClick={handleNavigateToStep}
-        />
+        <BookingSteps currentStep={currentStep} steps={steps} />
 
         <div className="max-w-3xl mx-auto mt-12">
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+          <div className="bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden">
             {currentStep === 1 && (
               <div className="p-8">
                 <ServiceSelection

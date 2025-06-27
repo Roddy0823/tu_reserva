@@ -63,95 +63,98 @@ const ClientDetails = ({ onSubmit, onBack }: ClientDetailsProps) => {
   };
 
   return (
-    <div>
-      <div className="flex items-center gap-2 mb-6">
-        <Button variant="ghost" size="sm" onClick={onBack}>
-          <ArrowLeft className="h-4 w-4" />
-        </Button>
-        <div>
-          <h2 className="text-xl font-semibold text-gray-900">Tus Datos de Contacto</h2>
-          <p className="text-gray-600">Necesitamos estos datos para confirmar tu reserva</p>
+    <Card>
+      <CardHeader>
+        <div className="flex items-center gap-2">
+          <Button variant="ghost" size="sm" onClick={onBack}>
+            <ArrowLeft className="h-4 w-4" />
+          </Button>
+          <div>
+            <CardTitle>Tus Datos de Contacto</CardTitle>
+            <p className="text-gray-600">Necesitamos estos datos para confirmar tu reserva</p>
+          </div>
         </div>
-      </div>
-      
-      <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Name Field */}
-        <div>
-          <Label htmlFor="name" className="flex items-center gap-2 text-gray-700 font-medium mb-2">
-            <User className="h-4 w-4" />
-            Nombre Completo *
-          </Label>
-          <Input
-            id="name"
-            type="text"
-            value={formData.name}
-            onChange={(e) => handleInputChange('name', e.target.value)}
-            placeholder="Ej: Juan Pérez"
-            className={`border-gray-200 focus:border-gray-900 focus:ring-gray-900 ${errors.name ? 'border-red-500' : ''}`}
-          />
-          {errors.name && (
-            <p className="text-red-500 text-sm mt-1">{errors.name}</p>
-          )}
-        </div>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Name Field */}
+          <div>
+            <Label htmlFor="name" className="flex items-center gap-2">
+              <User className="h-4 w-4" />
+              Nombre Completo *
+            </Label>
+            <Input
+              id="name"
+              type="text"
+              value={formData.name}
+              onChange={(e) => handleInputChange('name', e.target.value)}
+              placeholder="Ej: Juan Pérez"
+              className={errors.name ? 'border-red-500' : ''}
+            />
+            {errors.name && (
+              <p className="text-red-500 text-sm mt-1">{errors.name}</p>
+            )}
+          </div>
 
-        {/* Email Field */}
-        <div>
-          <Label htmlFor="email" className="flex items-center gap-2 text-gray-700 font-medium mb-2">
-            <Mail className="h-4 w-4" />
-            Correo Electrónico *
-          </Label>
-          <Input
-            id="email"
-            type="email"
-            value={formData.email}
-            onChange={(e) => handleInputChange('email', e.target.value)}
-            placeholder="Ej: juan@email.com"
-            className={`border-gray-200 focus:border-gray-900 focus:ring-gray-900 ${errors.email ? 'border-red-500' : ''}`}
-          />
-          {errors.email && (
-            <p className="text-red-500 text-sm mt-1">{errors.email}</p>
-          )}
-          <p className="text-xs text-gray-500 mt-2">
-            Te enviaremos la confirmación de tu cita a este correo
-          </p>
-        </div>
+          {/* Email Field */}
+          <div>
+            <Label htmlFor="email" className="flex items-center gap-2">
+              <Mail className="h-4 w-4" />
+              Correo Electrónico *
+            </Label>
+            <Input
+              id="email"
+              type="email"
+              value={formData.email}
+              onChange={(e) => handleInputChange('email', e.target.value)}
+              placeholder="Ej: juan@email.com"
+              className={errors.email ? 'border-red-500' : ''}
+            />
+            {errors.email && (
+              <p className="text-red-500 text-sm mt-1">{errors.email}</p>
+            )}
+            <p className="text-xs text-gray-500 mt-1">
+              Te enviaremos la confirmación de tu cita a este correo
+            </p>
+          </div>
 
-        {/* Phone Field */}
-        <div>
-          <Label htmlFor="phone" className="flex items-center gap-2 text-gray-700 font-medium mb-2">
-            <Phone className="h-4 w-4" />
-            Número de Teléfono *
-          </Label>
-          <Input
-            id="phone"
-            type="tel"
-            value={formData.phone}
-            onChange={(e) => handleInputChange('phone', e.target.value)}
-            placeholder="Ej: +57 300 123 4567"
-            className={`border-gray-200 focus:border-gray-900 focus:ring-gray-900 ${errors.phone ? 'border-red-500' : ''}`}
-          />
-          {errors.phone && (
-            <p className="text-red-500 text-sm mt-1">{errors.phone}</p>
-          )}
-          <p className="text-xs text-gray-500 mt-2">
-            Te contactaremos en caso de necesitar confirmar algún detalle
-          </p>
-        </div>
+          {/* Phone Field */}
+          <div>
+            <Label htmlFor="phone" className="flex items-center gap-2">
+              <Phone className="h-4 w-4" />
+              Número de Teléfono *
+            </Label>
+            <Input
+              id="phone"
+              type="tel"
+              value={formData.phone}
+              onChange={(e) => handleInputChange('phone', e.target.value)}
+              placeholder="Ej: +57 300 123 4567"
+              className={errors.phone ? 'border-red-500' : ''}
+            />
+            {errors.phone && (
+              <p className="text-red-500 text-sm mt-1">{errors.phone}</p>
+            )}
+            <p className="text-xs text-gray-500 mt-1">
+              Te contactaremos en caso de necesitar confirmar algún detalle
+            </p>
+          </div>
 
-        {/* Privacy Notice */}
-        <div className="bg-gray-50 rounded-lg p-4 text-xs text-gray-600 border border-gray-200">
-          <p>
-            Al continuar, aceptas que podemos usar esta información para contactarte 
-            sobre tu reserva y enviarte recordatorios relacionados con tu cita.
-          </p>
-        </div>
+          {/* Privacy Notice */}
+          <div className="bg-gray-50 rounded-lg p-3 text-xs text-gray-600">
+            <p>
+              Al continuar, aceptas que podemos usar esta información para contactarte 
+              sobre tu reserva y enviarte recordatorios relacionados con tu cita.
+            </p>
+          </div>
 
-        {/* Submit Button */}
-        <Button type="submit" className="w-full bg-gray-900 hover:bg-gray-800">
-          Continuar
-        </Button>
-      </form>
-    </div>
+          {/* Submit Button */}
+          <Button type="submit" className="w-full">
+            Continuar
+          </Button>
+        </form>
+      </CardContent>
+    </Card>
   );
 };
 
