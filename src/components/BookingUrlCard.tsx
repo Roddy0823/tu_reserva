@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Copy, ExternalLink, Check } from "lucide-react";
+import { Copy, ExternalLink, Check, Smartphone } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface BookingUrlCardProps {
@@ -81,7 +81,11 @@ const BookingUrlCard = ({ businessSlug }: BookingUrlCardProps) => {
         </div>
         
         <div className="flex flex-wrap gap-2 text-xs text-gray-500">
-          <span>💡 Tip: Puedes compartir este enlace en redes sociales, WhatsApp o tu sitio web</span>
+          <div className="flex items-center gap-1">
+            <Smartphone className="h-3 w-3" />
+            <span>Optimizado para móviles</span>
+          </div>
+          <span>💡 Tip: Comparte en redes sociales, WhatsApp o tu sitio web</span>
         </div>
       </CardContent>
     </Card>

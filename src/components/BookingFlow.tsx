@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { useBusinessBySlug } from '@/hooks/useBusinessBySlug';
 import { useServices } from '@/hooks/useServices';
 import { useStaff } from '@/hooks/useStaff';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { Appointment } from '@/types/database';
 import BookingHeader from './booking/BookingHeader';
 import BookingSuccess from './booking/BookingSuccess';
@@ -21,6 +22,7 @@ interface BookingFlowProps {
 
 const BookingFlow = ({ businessSlug }: BookingFlowProps) => {
   const [createdAppointment, setCreatedAppointment] = useState<Appointment | null>(null);
+  const isMobile = useIsMobile();
 
   const { business, isLoading: businessLoading, error: businessError } = useBusinessBySlug(businessSlug);
   const { services, isLoading: servicesLoading } = useServices();
@@ -52,6 +54,13 @@ const BookingFlow = ({ businessSlug }: BookingFlowProps) => {
     }
   }, [business]);
 
+  // Optimización para móviles - scroll to top en cambio de paso
+  useEffect(() => {
+    if (isMobile) {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }, [currentStep, isMobile]);
+
   const handlePaymentComplete = () => {
     goToStep(7); // Ir al paso de éxito
   };
@@ -67,7 +76,7 @@ const BookingFlow = ({ businessSlug }: BookingFlowProps) => {
   // Success page
   if (currentStep === 7 && createdAppointment) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-50 py-8">
+      <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-50 py-4 sm:py-8">
         <div className="container mx-auto px-4">
           <BookingSuccess
             business={business}
@@ -84,9 +93,9 @@ const BookingFlow = ({ businessSlug }: BookingFlowProps) => {
   if (currentStep === 6 && createdAppointment && bookingData.service?.accepts_transfer) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
-        <div className="container mx-auto px-4 py-8">
+        <div className="container mx-auto px-4 py-4 sm:py-8">
           <BookingHeader business={business} />
-          <div className="max-w-2xl mx-auto mt-8">
+          <div className="max-w-2xl mx-auto mt-6 sm:mt-8">
             <PaymentStep
               appointment={createdAppointment}
               service={bookingData.service}

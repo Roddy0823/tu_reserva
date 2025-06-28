@@ -1,6 +1,7 @@
 
 import { Service, StaffMember } from '@/types/database';
 import { BookingData } from './hooks/useBookingData';
+import { useIsMobile } from '@/hooks/use-mobile';
 import ServiceSelection from './ServiceSelection';
 import StaffSelection from './StaffSelection';
 import StaffDateTimeSelection from './StaffDateTimeSelection';
@@ -38,56 +39,79 @@ const BookingStepRenderer = ({
   onBookingConfirm,
   onBack
 }: BookingStepRendererProps) => {
+  const isMobile = useIsMobile();
+
+  // Wrapper para optimización móvil
+  const MobileOptimizedWrapper = ({ children }: { children: React.ReactNode }) => {
+    if (!isMobile) return <>{children}</>;
+    
+    return (
+      <div className="space-y-4">
+        {children}
+      </div>
+    );
+  };
+
   switch (currentStep) {
     case 1:
       return (
-        <ServiceSelection
-          services={services}
-          isLoading={servicesLoading}
-          onServiceSelect={onServiceSelect}
-        />
+        <MobileOptimizedWrapper>
+          <ServiceSelection
+            services={services}
+            isLoading={servicesLoading}
+            onServiceSelect={onServiceSelect}
+          />
+        </MobileOptimizedWrapper>
       );
 
     case 2:
       if (!bookingData.service) return null;
       return (
-        <StaffSelection
-          service={bookingData.service}
-          staffMembers={staffMembers}
-          isLoading={staffLoading}
-          onStaffSelect={onStaffSelect}
-          onBack={onBack}
-        />
+        <MobileOptimizedWrapper>
+          <StaffSelection
+            service={bookingData.service}
+            staffMembers={staffMembers}
+            isLoading={staffLoading}
+            onStaffSelect={onStaffSelect}
+            onBack={onBack}
+          />
+        </MobileOptimizedWrapper>
       );
 
     case 3:
       if (!bookingData.service || !bookingData.staffMember) return null;
       return (
-        <StaffDateTimeSelection
-          service={bookingData.service}
-          staffMember={bookingData.staffMember}
-          onDateTimeSelect={onDateTimeSelect}
-          onBack={onBack}
-        />
+        <MobileOptimizedWrapper>
+          <StaffDateTimeSelection
+            service={bookingData.service}
+            staffMember={bookingData.staffMember}
+            onDateTimeSelect={onDateTimeSelect}
+            onBack={onBack}
+          />
+        </MobileOptimizedWrapper>
       );
 
     case 4:
       return (
-        <ClientDetails
-          onSubmit={onClientDetailsSubmit}
-          onBack={onBack}
-        />
+        <MobileOptimizedWrapper>
+          <ClientDetails
+            onSubmit={onClientDetailsSubmit}
+            onBack={onBack}
+          />
+        </MobileOptimizedWrapper>
       );
 
     case 5:
       if (!bookingData.service || !bookingData.staffMember || !bookingData.date || !bookingData.time) return null;
       return (
-        <BookingSummary
-          bookingData={bookingData}
-          onConfirm={onBookingConfirm}
-          onBack={onBack}
-          isLoading={isCreating}
-        />
+        <MobileOptimizedWrapper>
+          <BookingSummary
+            bookingData={bookingData}
+            onConfirm={onBookingConfirm}
+            onBack={onBack}
+            isLoading={isCreating}
+          />
+        </MobileOptimizedWrapper>
       );
 
     default:
