@@ -1,9 +1,9 @@
-
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { CalendarDays, Package, TrendingUp, Settings, CheckCircle, ArrowRight, Sparkles } from "lucide-react";
 import { useBusiness } from "@/hooks/useBusiness";
 import { useDashboardStats } from "@/hooks/useDashboardStats";
+import { useRealtimeSubscriptions } from "@/hooks/useRealtimeSubscriptions";
 import { Link } from "react-router-dom";
 import RecentActivity from "./RecentActivity";
 import PendingPaymentsList from "./PendingPaymentsList";
@@ -14,6 +14,9 @@ import BusinessSetup from "./BusinessSetup";
 const Dashboard = () => {
   const { business, isLoading: businessLoading } = useBusiness();
   const { stats, recentActivity, isLoading: statsLoading } = useDashboardStats();
+  
+  // Habilitar suscripciones en tiempo real
+  useRealtimeSubscriptions();
 
   // Si está cargando la información del negocio, mostrar spinner
   if (businessLoading) {

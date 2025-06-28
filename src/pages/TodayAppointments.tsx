@@ -1,8 +1,8 @@
-
 import { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useBusiness } from '@/hooks/useBusiness';
 import { useTodayAppointments } from '@/hooks/useTodayAppointments';
+import { useRealtimeSubscriptions } from '@/hooks/useRealtimeSubscriptions';
 import { Button } from '@/components/ui/button';
 import { Plus, Calendar } from 'lucide-react';
 import BusinessSetup from '@/components/BusinessSetup';
@@ -16,6 +16,9 @@ const TodayAppointments = () => {
   const { appointments, stats, isLoading, refetch } = useTodayAppointments();
   const [showForm, setShowForm] = useState(false);
   const [editingAppointment, setEditingAppointment] = useState(null);
+
+  // Habilitar suscripciones en tiempo real
+  useRealtimeSubscriptions();
 
   if (businessLoading) {
     return (

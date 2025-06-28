@@ -1,7 +1,7 @@
-
 import { useState } from 'react';
 import { useTimeBlocks } from '@/hooks/useTimeBlocks';
 import { useStaff } from '@/hooks/useStaff';
+import { useRealtimeTimeBlocks } from '@/hooks/useRealtimeTimeBlocks';
 import TimeBlockForm from './TimeBlockForm';
 import StaffAvailabilityCard from './StaffAvailabilityCard';
 import { TimeBlock } from '@/types/database';
@@ -14,6 +14,9 @@ const AvailabilityManagement = () => {
   const { getAllTimeBlocks, createTimeBlock, updateTimeBlock, deleteTimeBlock, isCreating, isUpdating, isDeleting } = useTimeBlocks();
   const { staffMembers } = useStaff();
   const { data: timeBlocks = [], isLoading } = getAllTimeBlocks();
+
+  // Habilitar suscripciones en tiempo real para time_blocks
+  useRealtimeTimeBlocks();
 
   const handleCreateTimeBlock = (data: any) => {
     createTimeBlock(data, {

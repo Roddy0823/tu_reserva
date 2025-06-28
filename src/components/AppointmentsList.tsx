@@ -1,9 +1,9 @@
-
 import { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { Search, Filter, RefreshCw } from 'lucide-react';
+import { useRealtimeSubscriptions } from '@/hooks/useRealtimeSubscriptions';
 import AppointmentCard from './AppointmentCard';
 import { Appointment } from '@/types/database';
 
@@ -21,6 +21,9 @@ const AppointmentsList = ({ appointments, onEdit, onRefresh, isLoading }: Appoin
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [staffFilter, setStaffFilter] = useState('all');
+
+  // Habilitar suscripciones en tiempo real
+  useRealtimeSubscriptions();
 
   // Get unique staff members for filter - with safety check
   const staffMembers = Array.from(

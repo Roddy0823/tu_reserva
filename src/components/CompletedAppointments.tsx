@@ -1,8 +1,8 @@
-
 import { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useBusiness } from '@/hooks/useBusiness';
 import { useCompletedAppointments } from '@/hooks/useCompletedAppointments';
+import { useRealtimeSubscriptions } from '@/hooks/useRealtimeSubscriptions';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -20,6 +20,9 @@ const CompletedAppointments = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [timeFilter, setTimeFilter] = useState('all');
   const [staffFilter, setStaffFilter] = useState('all');
+
+  // Habilitar suscripciones en tiempo real
+  useRealtimeSubscriptions();
 
   if (businessLoading) {
     return (
