@@ -16,9 +16,16 @@ export const useBusiness = () => {
   } = useQuery({
     queryKey: ['business'],
     queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        throw new Error('Usuario no autenticado');
+      }
+
       const { data, error } = await supabase
         .from('businesses')
         .select('*')
+        .eq('owner_user_id', user.id)
         .single();
       
       if (error) {
