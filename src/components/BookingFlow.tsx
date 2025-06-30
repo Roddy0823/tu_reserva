@@ -25,8 +25,10 @@ const BookingFlow = ({ businessSlug }: BookingFlowProps) => {
   const isMobile = useIsMobile();
 
   const { business, isLoading: businessLoading, error: businessError } = useBusinessBySlug(businessSlug);
-  const { services, isLoading: servicesLoading } = useServices();
-  const { staffMembers, isLoading: staffLoading } = useStaff();
+  
+  // Pasar businessId a los hooks para filtrar por negocio específico
+  const { services, isLoading: servicesLoading } = useServices(business?.id);
+  const { staffMembers, isLoading: staffLoading } = useStaff(business?.id);
   
   const { bookingData, updateBookingData } = useBookingData();
   const { currentStep, steps, goToStep, goBack } = useBookingSteps();
@@ -46,13 +48,6 @@ const BookingFlow = ({ businessSlug }: BookingFlowProps) => {
     businessId: business?.id,
     setCreatedAppointment
   });
-
-  // Reset services and staff when business changes
-  useEffect(() => {
-    if (business) {
-      // Services and staff will be fetched automatically through hooks
-    }
-  }, [business]);
 
   // Optimización para móviles - scroll to top en cambio de paso
   useEffect(() => {

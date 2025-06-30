@@ -1,52 +1,33 @@
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { AppointmentInsert, AppointmentStatus } from "@/types/database";
 import { useToast } from "@/hooks/use-toast";
-import { useBusiness } from "./useBusiness";
+import { Appointment } from "@/types/database";
 
-// Interfaz para el valor de retorno de la función RPC
-interface CreateAppointmentResponse {
-  success: boolean;
-  error?: string;
-  appointment?: {
-    id: string;
-    business_id: string;
-    service_id: string;
-    staff_id: string;
-    start_time: string;
-    end_time: string;
-    client_name: string;
-    client_email: string;
-    client_phone?: string;
-    status: AppointmentStatus;
-    created_at: string;
-    staff_members: {
-      full_name: string;
-    };
-    services: {
-      name: string;
-      duration_minutes: number;
-      price: number;
-    };
-  };
+interface CreateAppointmentData {
+  business_id: string;
+  service_id: string;
+  staff_id: string;
+  start_time: string;
+  end_time: string;
+  client_name: string;
+  client_email: string;
+  client_phone: string;
 }
 
 export const useCreateAppointment = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const { business } = useBusiness();
 
-  const createAppointmentMutation = useMutation({
-    mutationFn: async (appointmentData: AppointmentInsert) => {
-      console.log('=== CREATING APPOINTMENT WITH ATOMIC FUNCTION ===');
-      console.log('Appointment data:', appointmentData);
-
-      // Llamar a la función RPC de Supabase para crear la cita de forma atómica
+  return useMutation({
+    mutationFn: async (appointmentData: CreateAppointmentData) => {
+      console.log('Creating appointment with data:', appointmentData);
+      
+      // Usar la función create_appointment_safely para validaciones completas
       const { data, error } = await supabase.rpc('create_appointment_safely', {
         p_client_name: appointmentData.client_name,
         p_client_email: appointmentData.client_email,
-        p_client_phone: appointmentData.client_phone || null,
+        p_client_phone: appointmentData.client_phone || '',
         p_service_id: appointmentData.service_id,
         p_staff_id: appointmentData.staff_id,
         p_start_time: appointmentData.start_time,
@@ -55,46 +36,44 @@ export const useCreateAppointment = () => {
       });
 
       if (error) {
-        console.error('❌ RPC call failed:', error);
-        throw new Error('Error al conectar con el servidor: ' + error.message);
+        console.error('Error calling create_appointment_safely:', error);
+        throw error;
       }
 
-      console.log('📝 RPC response:', data);
+      console.log('Function result:', data);
 
-      // Hacer casting del tipo Json al tipo específico que esperamos
-      const result = data as unknown as CreateAppointmentResponse;
-
-      // Verificar si la función devolvió un error
-      if (!result.success) {
-        console.error('❌ Appointment creation failed:', result.error);
-        throw new Error(result.error || 'Error desconocido al crear la cita');
+      // La función devuelve un JSON con success y appointment/error
+      if (!data.success) {
+        throw new Error(data.error || 'Error desconocido al crear la cita');
       }
 
-      console.log('✅ Appointment created successfully:', result.appointment);
-      return result.appointment;
+      return data.appointment as Appointment;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['appointments'] });
-      queryClient.invalidateQueries({ queryKey: ['available-time-slots'] });
-      queryClient.invalidateQueries({ queryKey: ['today-appointments'] });
+    onSuccess: (data) => {
+      console.log('Appointment created successfully:', data);
       toast({
-        title: "Cita creada exitosamente",
-        description: "Tu cita se ha agendado correctamente con el especialista",
+        title: "¡Cita creada exitosamente!",
+        description: "Tu reserva ha sido confirmada. Recibirás más detalles por email.",
       });
+      
+      // Invalidar queries relacionadas
+      queryClient.invalidateQueries({ queryKey: ['appointments'] });
+      queryClient.invalidateQueries({ queryKey: ['dashboard-stats'] });
     },
-    onError: (error: Error) => {
-      console.error('❌ Appointment creation error:', error);
+    onError: (error: any) => {
+      console.error('Error creating appointment:', error);
+      
+      let errorMessage = "Ocurrió un error al crear la cita. Intenta nuevamente.";
+      
+      if (error.message) {
+        errorMessage = error.message;
+      }
+      
       toast({
         title: "Error al crear la cita",
-        description: error.message,
+        description: errorMessage,
         variant: "destructive",
       });
-    },
+    }
   });
-
-  return {
-    createAppointment: createAppointmentMutation.mutate,
-    isCreating: createAppointmentMutation.isPending,
-    error: createAppointmentMutation.error,
-  };
 };
