@@ -15,11 +15,17 @@ interface CreateAppointmentData {
   client_phone: string;
 }
 
+interface CreateAppointmentResponse {
+  success: boolean;
+  error?: string;
+  appointment?: Appointment;
+}
+
 export const useCreateAppointment = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  return useMutation({
+  const mutation = useMutation({
     mutationFn: async (appointmentData: CreateAppointmentData) => {
       console.log('Creating appointment with data:', appointmentData);
       
@@ -42,12 +48,14 @@ export const useCreateAppointment = () => {
 
       console.log('Function result:', data);
 
-      // La función devuelve un JSON con success y appointment/error
-      if (!data.success) {
-        throw new Error(data.error || 'Error desconocido al crear la cita');
+      // Type cast the response
+      const response = data as CreateAppointmentResponse;
+
+      if (!response.success) {
+        throw new Error(response.error || 'Error desconocido al crear la cita');
       }
 
-      return data.appointment as Appointment;
+      return response.appointment as Appointment;
     },
     onSuccess: (data) => {
       console.log('Appointment created successfully:', data);
@@ -76,4 +84,10 @@ export const useCreateAppointment = () => {
       });
     }
   });
+
+  return {
+    createAppointment: mutation.mutate,
+    isCreating: mutation.isPending,
+    ...mutation
+  };
 };

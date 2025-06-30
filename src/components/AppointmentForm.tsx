@@ -125,7 +125,7 @@ const AppointmentForm = ({ editingAppointment, onClose, defaultDate }: Appointme
         business_id: business.id,
         client_name: data.client_name,
         client_email: data.client_email,
-        client_phone: data.client_phone || undefined,
+        client_phone: data.client_phone || '',
         service_id: data.service_id,
         staff_id: data.staff_id,
         start_time: startTime.toISOString(),
@@ -133,14 +133,15 @@ const AppointmentForm = ({ editingAppointment, onClose, defaultDate }: Appointme
         status: 'pendiente' as const,
       };
 
-      await createAppointment(appointmentData);
-      
-      toast({
-        title: editingAppointment ? "Cita actualizada" : "Cita creada",
-        description: editingAppointment ? "La cita se ha actualizado correctamente" : "La cita se ha creada correctamente",
+      createAppointment(appointmentData, {
+        onSuccess: () => {
+          toast({
+            title: editingAppointment ? "Cita actualizada" : "Cita creada",
+            description: editingAppointment ? "La cita se ha actualizado correctamente" : "La cita se ha creada correctamente",
+          });
+          onClose();
+        }
       });
-      
-      onClose();
     } catch (error: any) {
       toast({
         title: "Error",
