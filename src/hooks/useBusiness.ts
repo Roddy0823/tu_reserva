@@ -72,22 +72,23 @@ export const useBusiness = () => {
       console.error('Error creating business:', error);
       
       if (error.code === '23505' && error.message.includes('businesses_booking_url_slug_key')) {
-        // No mostrar toast para error de URL duplicada, será manejado por el componente
-        throw new Error('URL de reservas ya en uso');
+        toast({
+          title: "URL de reservas ya existe",
+          description: "Esta URL ya está en uso. Por favor, elige una URL diferente para tu negocio.",
+          variant: "destructive",
+        });
       } else if (error.message.includes('duplicate key')) {
         toast({
           title: "Información duplicada",
           description: "Ya existe un negocio con estos datos. Verifica la información e intenta nuevamente.",
           variant: "destructive",
         });
-        throw error;
       } else {
         toast({
           title: "Error al crear negocio",
           description: error.message || "Ocurrió un error inesperado. Intenta nuevamente.",
           variant: "destructive",
         });
-        throw error;
       }
     },
   });
@@ -139,7 +140,7 @@ export const useBusiness = () => {
     business,
     isLoading,
     error,
-    createBusiness: createBusinessMutation.mutateAsync, // Usar mutateAsync para manejar errores
+    createBusiness: createBusinessMutation.mutate,
     updateBusiness: updateBusinessMutation.mutate,
     isCreating: createBusinessMutation.isPending,
     isUpdating: updateBusinessMutation.isPending,
