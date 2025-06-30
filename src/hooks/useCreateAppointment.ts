@@ -48,8 +48,8 @@ export const useCreateAppointment = () => {
 
       console.log('Function result:', data);
 
-      // Type cast the response
-      const response = data as CreateAppointmentResponse;
+      // Type cast the response with proper type checking
+      const response = data as unknown as CreateAppointmentResponse;
 
       if (!response.success) {
         throw new Error(response.error || 'Error desconocido al crear la cita');
