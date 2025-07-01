@@ -51,7 +51,7 @@ const PricingSection = () => {
             </div>
             <div className="text-center mb-8">
               <h3 className="text-2xl font-bold mb-2">Plan Pro</h3>
-              <div className="text-4xl font-bold mb-2">$29.900</div>
+              <div className="text-4xl font-bold mb-2">$60.000</div>
               <div className="text-blue-100 mb-4">/mes</div>
               <p className="text-blue-100">Para negocios en crecimiento</p>
             </div>
