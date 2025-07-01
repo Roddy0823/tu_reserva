@@ -16,13 +16,13 @@ export const useStaff = (businessId?: string) => {
       let query = supabase
         .from('staff_members')
         .select('*')
-        .eq('is_active', true)
         .order('full_name');
 
-      // Si se proporciona businessId (para reservas públicas), filtrar por ese negocio
+      // Si se proporciona businessId (para reservas públicas), filtrar por ese negocio Y solo activos
       if (businessId) {
-        query = query.eq('business_id', businessId);
+        query = query.eq('business_id', businessId).eq('is_active', true);
       }
+      // Si no hay businessId (panel de administración), mostrar todos (activos e inactivos)
 
       const { data, error } = await query;
       
