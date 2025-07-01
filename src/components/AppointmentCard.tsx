@@ -14,7 +14,7 @@ import { useToast } from '@/hooks/use-toast';
 interface AppointmentCardProps {
   appointment: Appointment & { 
     staff_members: { full_name: string }, 
-    services: { name: string, duration_minutes: number, price: number } 
+    services: { name: string, duration_minutes: number, price: number, accepts_transfer?: boolean, accepts_cash?: boolean } 
   };
   onEdit?: (appointment: any) => void;
 }
@@ -82,6 +82,10 @@ const AppointmentCard = ({ appointment, onEdit }: AppointmentCardProps) => {
   const endTime = new Date(appointment.end_time);
   const isUpcoming = startTime > new Date();
   const isOngoing = startTime <= new Date() && endTime >= new Date();
+  
+  // Determinar si la cita requiere comprobante de pago
+  const requiresPaymentProof = appointment.services?.accepts_transfer || false;
+  const acceptsCash = appointment.services?.accepts_cash !== false; // Default true si no está definido
 
   return (
     <Card className={`transition-all duration-200 hover:shadow-lg ${isOngoing ? 'ring-2 ring-blue-500' : ''}`}>
@@ -135,30 +139,65 @@ const AppointmentCard = ({ appointment, onEdit }: AppointmentCardProps) => {
         </div>
 
         <div className="flex flex-wrap gap-2 pt-2 border-t">
-          {appointment.status === 'pendiente' && (
-            <Button
-              size="sm"
-              onClick={() => handleStatusUpdate('confirmado')}
-              disabled={isUpdating}
-              className="gap-1"
-            >
-              <CheckCircle className="h-3 w-3" />
-              Confirmar
-            </Button>
-          )}
-          
-          {appointment.status === 'confirmado' && isUpcoming && (
-            <Button
-              size="sm"
-              onClick={() => handleStatusUpdate('completado')}
-              disabled={isUpdating}
-              className="gap-1"
-            >
-              <CheckCircle className="h-3 w-3" />
-              Completar
-            </Button>
+          {/* Botones para citas que NO requieren comprobante (solo efectivo) */}
+          {!requiresPaymentProof && acceptsCash && (
+            <>
+              {appointment.status === 'pendiente' && (
+                <Button
+                  size="sm"
+                  onClick={() => handleStatusUpdate('confirmado')}
+                  disabled={isUpdating}
+                  className="gap-1"
+                >
+                  <CheckCircle className="h-3 w-3" />
+                  Confirmar
+                </Button>
+              )}
+              
+              {appointment.status === 'confirmado' && isUpcoming && (
+                <Button
+                  size="sm"
+                  onClick={() => handleStatusUpdate('completado')}
+                  disabled={isUpdating}
+                  className="gap-1"
+                >
+                  <CheckCircle className="h-3 w-3" />
+                  Completar
+                </Button>
+              )}
+            </>
           )}
 
+          {/* Botones para citas que requieren comprobante de pago */}
+          {requiresPaymentProof && (
+            <>
+              {appointment.status === 'pendiente' && appointment.payment_status === 'aprobado' && (
+                <Button
+                  size="sm"
+                  onClick={() => handleStatusUpdate('confirmado')}
+                  disabled={isUpdating}
+                  className="gap-1"
+                >
+                  <CheckCircle className="h-3 w-3" />
+                  Confirmar
+                </Button>
+              )}
+              
+              {appointment.status === 'confirmado' && isUpcoming && (
+                <Button
+                  size="sm"
+                  onClick={() => handleStatusUpdate('completado')}
+                  disabled={isUpdating}
+                  className="gap-1"
+                >
+                  <CheckCircle className="h-3 w-3" />
+                  Completar
+                </Button>
+              )}
+            </>
+          )}
+
+          {/* Botón cancelar disponible para todas las citas pendientes o confirmadas */}
           {['pendiente', 'confirmado'].includes(appointment.status) && (
             <Button
               size="sm"
@@ -172,6 +211,7 @@ const AppointmentCard = ({ appointment, onEdit }: AppointmentCardProps) => {
             </Button>
           )}
 
+          {/* Botón editar disponible para todas las citas */}
           {onEdit && (
             <Button
               size="sm"
