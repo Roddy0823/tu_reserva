@@ -1,11 +1,12 @@
 
 import { useBusiness } from '@/hooks/useBusiness';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Settings as SettingsIcon, Bell, CreditCard, Building } from 'lucide-react';
+import { Settings as SettingsIcon, Bell, CreditCard, Building, Calendar } from 'lucide-react';
 import BusinessInfoSettings from '@/components/settings/BusinessInfoSettings';
 import BookingRulesSettings from '@/components/settings/BookingRulesSettings';
 import NotificationSettings from '@/components/settings/NotificationSettings';
 import BillingSettings from '@/components/settings/BillingSettings';
+import GoogleCalendarSettings from '@/components/settings/GoogleCalendarSettings';
 
 const SettingsPage = () => {
   const { business, isLoading } = useBusiness();
@@ -38,7 +39,7 @@ const SettingsPage = () => {
       </div>
 
       <Tabs defaultValue="business-info" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="business-info" className="flex items-center gap-2">
             <Building className="h-4 w-4" />
             Información
@@ -46,6 +47,10 @@ const SettingsPage = () => {
           <TabsTrigger value="booking-rules" className="flex items-center gap-2">
             <SettingsIcon className="h-4 w-4" />
             Reglas de Reserva
+          </TabsTrigger>
+          <TabsTrigger value="google-calendar" className="flex items-center gap-2">
+            <Calendar className="h-4 w-4" />
+            Google Calendar
           </TabsTrigger>
           <TabsTrigger value="notifications" className="flex items-center gap-2">
             <Bell className="h-4 w-4" />
@@ -63,6 +68,10 @@ const SettingsPage = () => {
 
         <TabsContent value="booking-rules">
           <BookingRulesSettings business={business} />
+        </TabsContent>
+
+        <TabsContent value="google-calendar">
+          <GoogleCalendarSettings />
         </TabsContent>
 
         <TabsContent value="notifications">
