@@ -131,7 +131,27 @@ export const useAvailableTimeSlots = (staffId?: string, date?: Date, serviceDura
 
       console.log('Time blocks:', timeBlocks?.length || 0);
 
-      // 5. Generar slots disponibles con lógica mejorada
+      // 5. Obtener eventos de Google Calendar
+      let googleEvents: any[] = [];
+      try {
+        const { data: googleCalendarData, error: googleError } = await supabase.functions.invoke('google-calendar-events', {
+          body: {
+            startDate: dayStart.toISOString(),
+            endDate: dayEnd.toISOString(),
+            staffId
+          }
+        });
+
+        if (!googleError && googleCalendarData?.events) {
+          googleEvents = googleCalendarData.events;
+          console.log('Google Calendar events:', googleEvents.length);
+        }
+      } catch (googleError) {
+        console.warn('Error fetching Google Calendar events:', googleError);
+        // Continuar sin eventos de Google Calendar
+      }
+
+      // 6. Generar slots disponibles con lógica mejorada
       const [startHour, startMinute] = workStartTime.split(':').map(Number);
       const [endHour, endMinute] = workEndTime.split(':').map(Number);
 
@@ -197,8 +217,26 @@ export const useAvailableTimeSlots = (staffId?: string, date?: Date, serviceDura
           return hasOverlap;
         });
 
+        // Verificar conflictos con eventos de Google Calendar
+        const hasGoogleEventConflict = googleEvents?.some(event => {
+          const eventStart = parseISO(event.start);
+          const eventEnd = parseISO(event.end);
+          
+          const hasOverlap = (
+            currentSlot < eventEnd && slotEnd > eventStart
+          );
+
+          if (hasOverlap) {
+            console.log('❌ Conflict with Google Calendar event:', 
+              format(eventStart, 'HH:mm'), '-', format(eventEnd, 'HH:mm'),
+              'vs proposed slot:', format(currentSlot, 'HH:mm'), '-', format(slotEnd, 'HH:mm'));
+          }
+
+          return hasOverlap;
+        });
+
         // Si no hay conflictos, agregar el slot solo si coincide con intervalos de 30 minutos para mostrar
-        if (!hasAppointmentConflict && !hasTimeBlockConflict) {
+        if (!hasAppointmentConflict && !hasTimeBlockConflict && !hasGoogleEventConflict) {
           const minutes = currentSlot.getMinutes();
           // Solo mostrar slots que empiecen en :00 o :30 para mantener la UI limpia
           if (minutes % 30 === 0) {
