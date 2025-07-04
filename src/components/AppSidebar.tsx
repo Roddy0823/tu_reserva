@@ -3,7 +3,8 @@ import {
   Home, 
   Package, 
   CalendarDays, 
-  Calendar, 
+  Calendar,
+  CalendarCheck,
   CheckCircle,
   CreditCard, 
   Crown, 
@@ -43,6 +44,11 @@ const menuItems = [
     title: "Gestión de Disponibilidad",
     url: "/availability",
     icon: CalendarDays,
+  },
+  {
+    title: "Gestión de Citas",
+    url: "/appointments",
+    icon: CalendarCheck,
   },
   {
     title: "Citas de Hoy",

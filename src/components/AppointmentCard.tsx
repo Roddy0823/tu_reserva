@@ -2,14 +2,11 @@
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Appointment, AppointmentStatus } from '@/types/database';
-import { Clock, User, Phone, Mail, DollarSign, Edit, CheckCircle, XCircle } from 'lucide-react';
+import { Appointment } from '@/types/database';
+import { User, Phone, Mail, DollarSign, Edit, CheckCircle, XCircle } from 'lucide-react';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { useState } from 'react';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
+import { useAppointmentStateManager } from '@/hooks/useAppointmentStateManager';
 
 interface AppointmentCardProps {
   appointment: Appointment & { 
@@ -20,72 +17,22 @@ interface AppointmentCardProps {
 }
 
 const AppointmentCard = ({ appointment, onEdit }: AppointmentCardProps) => {
-  const { toast } = useToast();
-  const queryClient = useQueryClient();
-  const [isUpdating, setIsUpdating] = useState(false);
+  const { updateStatus, isUpdating, getAvailableActions, getStatusInfo } = useAppointmentStateManager();
 
-  const updateStatusMutation = useMutation({
-    mutationFn: async (newStatus: AppointmentStatus) => {
-      const { error } = await supabase
-        .from('appointments')
-        .update({ status: newStatus })
-        .eq('id', appointment.id);
-      
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['appointments'] });
-      toast({
-        title: "Estado actualizado",
-        description: "El estado de la cita se ha actualizado correctamente",
-      });
-    },
-    onError: (error) => {
-      toast({
-        title: "Error al actualizar estado",
-        description: error.message,
-        variant: "destructive",
-      });
-    },
-  });
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'confirmado': return 'bg-green-100 text-green-800 border-green-200';
-      case 'pendiente': return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-      case 'cancelado': return 'bg-red-100 text-red-800 border-red-200';
-      case 'completado': return 'bg-blue-100 text-blue-800 border-blue-200';
-      default: return 'bg-gray-100 text-gray-800 border-gray-200';
-    }
-  };
-
-  const getStatusText = (status: string) => {
-    switch (status) {
-      case 'confirmado': return 'Confirmada';
-      case 'pendiente': return 'Pendiente';
-      case 'cancelado': return 'Cancelada';
-      case 'completado': return 'Completada';
-      default: return status;
-    }
-  };
-
-  const handleStatusUpdate = async (newStatus: AppointmentStatus) => {
-    setIsUpdating(true);
-    try {
-      await updateStatusMutation.mutateAsync(newStatus);
-    } finally {
-      setIsUpdating(false);
-    }
+  const handleStatusUpdate = (newStatus: any) => {
+    updateStatus({
+      appointmentId: appointment.id,
+      newStatus,
+      currentAppointment: appointment
+    });
   };
 
   const startTime = new Date(appointment.start_time);
   const endTime = new Date(appointment.end_time);
-  const isUpcoming = startTime > new Date();
   const isOngoing = startTime <= new Date() && endTime >= new Date();
   
-  // Determinar si la cita requiere comprobante de pago
-  const requiresPaymentProof = appointment.services?.accepts_transfer || false;
-  const acceptsCash = appointment.services?.accepts_cash !== false; // Default true si no está definido
+  const statusInfo = getStatusInfo(appointment.status, appointment.payment_status);
+  const availableActions = getAvailableActions(appointment);
 
   return (
     <Card className={`transition-all duration-200 hover:shadow-lg ${isOngoing ? 'ring-2 ring-blue-500' : ''}`}>
@@ -94,8 +41,8 @@ const AppointmentCard = ({ appointment, onEdit }: AppointmentCardProps) => {
           <div className="space-y-1">
             <div className="flex items-center gap-2">
               <h3 className="font-semibold text-lg">{appointment.client_name}</h3>
-              <Badge className={getStatusColor(appointment.status)}>
-                {getStatusText(appointment.status)}
+              <Badge className={statusInfo.color}>
+                {statusInfo.text}
               </Badge>
               {isOngoing && (
                 <Badge variant="secondary" className="bg-blue-100 text-blue-800">
@@ -139,79 +86,24 @@ const AppointmentCard = ({ appointment, onEdit }: AppointmentCardProps) => {
         </div>
 
         <div className="flex flex-wrap gap-2 pt-2 border-t">
-          {/* Botones para citas que NO requieren comprobante (solo efectivo) */}
-          {!requiresPaymentProof && acceptsCash && (
-            <>
-              {appointment.status === 'pendiente' && (
-                <Button
-                  size="sm"
-                  onClick={() => handleStatusUpdate('confirmado')}
-                  disabled={isUpdating}
-                  className="gap-1"
-                >
-                  <CheckCircle className="h-3 w-3" />
-                  Confirmar
-                </Button>
-              )}
-              
-              {appointment.status === 'confirmado' && isUpcoming && (
-                <Button
-                  size="sm"
-                  onClick={() => handleStatusUpdate('completado')}
-                  disabled={isUpdating}
-                  className="gap-1"
-                >
-                  <CheckCircle className="h-3 w-3" />
-                  Completar
-                </Button>
-              )}
-            </>
-          )}
-
-          {/* Botones para citas que requieren comprobante de pago */}
-          {requiresPaymentProof && (
-            <>
-              {appointment.status === 'pendiente' && appointment.payment_status === 'aprobado' && (
-                <Button
-                  size="sm"
-                  onClick={() => handleStatusUpdate('confirmado')}
-                  disabled={isUpdating}
-                  className="gap-1"
-                >
-                  <CheckCircle className="h-3 w-3" />
-                  Confirmar
-                </Button>
-              )}
-              
-              {appointment.status === 'confirmado' && isUpcoming && (
-                <Button
-                  size="sm"
-                  onClick={() => handleStatusUpdate('completado')}
-                  disabled={isUpdating}
-                  className="gap-1"
-                >
-                  <CheckCircle className="h-3 w-3" />
-                  Completar
-                </Button>
-              )}
-            </>
-          )}
-
-          {/* Botón cancelar disponible para todas las citas pendientes o confirmadas */}
-          {['pendiente', 'confirmado'].includes(appointment.status) && (
+          {/* Renderizar botones según acciones disponibles */}
+          {availableActions.map((action) => (
             <Button
+              key={action.action}
               size="sm"
-              variant="outline"
-              onClick={() => handleStatusUpdate('cancelado')}
+              variant={action.variant as any || "default"}
+              onClick={() => handleStatusUpdate(action.action)}
               disabled={isUpdating}
-              className="gap-1 text-red-600 hover:text-red-700"
+              className={`gap-1 ${action.variant === 'outline' && action.action === 'cancelado' ? 'text-red-600 hover:text-red-700' : ''}`}
             >
-              <XCircle className="h-3 w-3" />
-              Cancelar
+              {action.action === 'confirmado' && <CheckCircle className="h-3 w-3" />}
+              {action.action === 'completado' && <CheckCircle className="h-3 w-3" />}
+              {action.action === 'cancelado' && <XCircle className="h-3 w-3" />}
+              {action.label}
             </Button>
-          )}
+          ))}
 
-          {/* Botón editar disponible para todas las citas */}
+          {/* Botón editar siempre disponible */}
           {onEdit && (
             <Button
               size="sm"
@@ -222,6 +114,13 @@ const AppointmentCard = ({ appointment, onEdit }: AppointmentCardProps) => {
               <Edit className="h-3 w-3" />
               Editar
             </Button>
+          )}
+
+          {/* Información adicional para citas pendientes */}
+          {appointment.status === 'pendiente' && appointment.services.accepts_transfer && appointment.payment_status === 'pendiente' && (
+            <div className="w-full mt-2 p-2 bg-amber-50 border border-amber-200 rounded text-sm text-amber-800">
+              ⏳ Esperando aprobación de comprobante de pago
+            </div>
           )}
         </div>
       </CardContent>

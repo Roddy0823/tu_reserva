@@ -15,6 +15,7 @@ import NotFound from "./pages/NotFound";
 import Availability from "@/pages/Availability";
 import BookingPublic from "@/pages/BookingPublic";
 import TodayAppointments from "@/pages/TodayAppointments";
+import AllAppointments from "@/pages/AllAppointments";
 import CompletedAppointments from "@/pages/CompletedAppointments";
 import Transfers from "@/pages/Transfers";
 import Subscription from "@/pages/Subscription";
@@ -68,6 +69,13 @@ function AppContent() {
         user ? (
           <AdminLayout>
             <Availability />
+          </AdminLayout>
+        ) : <Navigate to="/auth" replace />
+      } />
+      <Route path="/appointments" element={
+        user ? (
+          <AdminLayout>
+            <AllAppointments />
           </AdminLayout>
         ) : <Navigate to="/auth" replace />
       } />
