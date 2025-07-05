@@ -19,7 +19,7 @@ const FileUpload = ({
   currentImage, 
   accept = "image/*", 
   className,
-  maxSize = 5 
+  maxSize = 10 
 }: FileUploadProps) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [dragActive, setDragActive] = useState(false);
