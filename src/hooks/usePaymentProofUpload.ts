@@ -30,9 +30,18 @@ export const usePaymentProofUpload = () => {
         .update({ payment_proof_url: publicUrl })
         .eq('id', appointmentId)
         .select()
-        .single();
+        .maybeSingle();
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error updating appointment with payment proof:', error);
+        throw error;
+      }
+      
+      if (!data) {
+        console.error('No appointment found with ID:', appointmentId);
+        throw new Error('No se encontró la cita para actualizar el comprobante');
+      }
+      
       return data;
     },
     onSuccess: () => {
