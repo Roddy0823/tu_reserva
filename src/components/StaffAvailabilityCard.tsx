@@ -2,6 +2,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { TimeBlock, StaffMember } from '@/types/database';
 import { Edit, Trash2, Calendar, Clock, User, Plus, Briefcase } from 'lucide-react';
 import { format } from 'date-fns';
@@ -78,25 +79,31 @@ const StaffAvailabilityCard = ({
   };
 
   return (
-    <Card className="shadow-sm border-gray-200">
-      <CardHeader className="pb-4">
+    <Card className="card-elevated bg-card border-border/50 overflow-hidden">
+      <CardHeader className="pb-6 bg-gradient-to-r from-background-subtle to-background">
         <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
-              {staff.photo_url ? (
-                <img src={staff.photo_url} alt={staff.full_name} className="w-12 h-12 rounded-full object-cover" />
-              ) : (
-                <User className="h-6 w-6 text-white" />
-              )}
+          <div className="flex items-center space-x-4">
+            <div className="relative">
+              <div className="w-16 h-16 bg-gradient-to-br from-primary to-primary-hover rounded-full flex items-center justify-center shadow-lg">
+                {staff.photo_url ? (
+                  <img src={staff.photo_url} alt={staff.full_name} className="w-16 h-16 rounded-full object-cover border-2 border-white shadow-sm" />
+                ) : (
+                  <User className="h-8 w-8 text-white" />
+                )}
+              </div>
+              <div className={`absolute -bottom-1 -right-1 w-6 h-6 rounded-full border-2 border-white shadow-sm ${staff.is_active ? 'bg-green-500' : 'bg-gray-400'}`} />
             </div>
-            <div>
-              <CardTitle className="text-lg font-medium text-gray-900">{staff.full_name}</CardTitle>
-              <div className="flex items-center gap-2">
-                <Badge variant={staff.is_active ? "default" : "secondary"} className="text-xs">
+            <div className="space-y-1">
+              <CardTitle className="text-xl font-semibold text-foreground">{staff.full_name}</CardTitle>
+              <div className="flex items-center gap-3">
+                <Badge 
+                  variant={staff.is_active ? "default" : "secondary"} 
+                  className={`status-indicator ${staff.is_active ? 'bg-green-100 text-green-800 border-green-200' : 'bg-gray-100 text-gray-600 border-gray-200'}`}
+                >
                   {staff.is_active ? 'Activo' : 'Inactivo'}
                 </Badge>
                 {staff.email && (
-                  <span className="text-xs text-gray-500">{staff.email}</span>
+                  <span className="text-sm text-muted-foreground font-medium">{staff.email}</span>
                 )}
               </div>
             </div>
@@ -104,7 +111,7 @@ const StaffAvailabilityCard = ({
           <Button 
             onClick={onAddException}
             size="sm"
-            className="bg-gray-900 hover:bg-gray-800 text-white"
+            className="btn-interactive hover-glow bg-primary hover:bg-primary-hover text-primary-foreground shadow-sm"
           >
             <Plus className="h-4 w-4 mr-2" />
             Agregar Excepción
@@ -112,63 +119,83 @@ const StaffAvailabilityCard = ({
         </div>
       </CardHeader>
 
-      <CardContent className="space-y-6">
-        {/* Horario Regular */}
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-          <div className="flex items-center gap-2 mb-3">
-            <Briefcase className="h-4 w-4 text-blue-600" />
-            <h4 className="text-sm font-medium text-blue-900">Horarios de Trabajo por Día</h4>
-          </div>
-          <div className="space-y-2">
-            {getDaySchedules().map((schedule, index) => (
-              <div key={index} className="flex items-center justify-between p-2 bg-blue-25 rounded">
-                <span className="text-sm font-medium text-blue-800">{schedule.day}</span>
-                <div className="flex items-center gap-2 text-blue-700">
-                  <Clock className="h-3 w-3" />
-                  <span className="text-sm">
-                    {schedule.start || staff.work_start_time || '08:00'} - {schedule.end || staff.work_end_time || '18:00'}
-                  </span>
+      <CardContent className="space-y-8 p-6">
+        {/* Horario Regular con Accordion */}
+        <Accordion type="single" defaultValue="schedule" collapsible>
+          <AccordionItem value="schedule" className="border-border/30">
+            <AccordionTrigger className="hover:no-underline py-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-primary-subtle rounded-full flex items-center justify-center">
+                  <Briefcase className="h-5 w-5 text-primary" />
+                </div>
+                <div className="text-left">
+                  <h4 className="font-semibold text-foreground">Horarios de Trabajo</h4>
+                  <p className="text-sm text-muted-foreground">
+                    {getDaySchedules().length} días configurados
+                  </p>
                 </div>
               </div>
-            ))}
-            {getDaySchedules().length === 0 && (
-              <p className="text-sm text-blue-700">No hay días de trabajo configurados</p>
-            )}
-          </div>
-          <p className="text-xs text-blue-700 mt-2">
-            Horarios específicos configurados para cada día de trabajo
-          </p>
-        </div>
+            </AccordionTrigger>
+            <AccordionContent className="pb-4">
+              <div className="grid gap-3 mt-4">
+                {getDaySchedules().map((schedule, index) => (
+                  <div key={index} className="flex items-center justify-between p-4 bg-background-subtle rounded-lg border border-border/30 hover:border-border transition-colors">
+                    <span className="font-medium text-foreground">{schedule.day}</span>
+                    <div className="flex items-center gap-2 text-muted-foreground">
+                      <Clock className="h-4 w-4" />
+                      <span className="font-mono">
+                        {schedule.start || staff.work_start_time || '08:00'} - {schedule.end || staff.work_end_time || '18:00'}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+                {getDaySchedules().length === 0 && (
+                  <div className="text-center py-8 text-muted-foreground">
+                    <Briefcase className="h-8 w-8 mx-auto mb-2 text-muted-foreground/50" />
+                    <p className="font-medium">Sin horarios configurados</p>
+                  </div>
+                )}
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
 
         {/* Excepciones activas */}
         {activeTimeBlocks.length > 0 && (
-          <div>
-            <h4 className="text-sm font-medium text-gray-900 mb-3 flex items-center gap-2">
-              <Calendar className="h-4 w-4 text-red-500" />
-              Excepciones de Disponibilidad
-            </h4>
-            <div className="space-y-3">
+          <div className="space-y-4">
+            <div className="flex items-center gap-3 pb-2 border-b border-border/30">
+              <div className="w-10 h-10 bg-destructive-subtle rounded-full flex items-center justify-center">
+                <Calendar className="h-5 w-5 text-destructive" />
+              </div>
+              <div>
+                <h4 className="font-semibold text-foreground">Excepciones Activas</h4>
+                <p className="text-sm text-muted-foreground">{activeTimeBlocks.length} excepciones programadas</p>
+              </div>
+            </div>
+            <div className="grid gap-4">
               {activeTimeBlocks.map((timeBlock) => (
-                <div key={timeBlock.id} className="bg-red-50 border border-red-200 rounded-lg p-4">
-                  <div className="flex justify-between items-start mb-2">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-2">
-                        <Calendar className="h-4 w-4 text-red-500" />
-                        <span className="text-sm font-medium text-red-900">
+                <div key={timeBlock.id} className="card-interactive bg-destructive-subtle border border-destructive/20 rounded-lg p-5 hover:border-destructive/40 transition-all">
+                  <div className="flex justify-between items-start">
+                    <div className="flex-1 space-y-3">
+                      <div className="flex items-center gap-3">
+                        <Calendar className="h-5 w-5 text-destructive" />
+                        <span className="font-medium text-destructive">
                           {format(new Date(timeBlock.start_time), "dd 'de' MMMM 'de' yyyy", { locale: es })}
                         </span>
                         {getStatusBadge(getBlockStatus(timeBlock))}
                       </div>
-                      <div className="flex items-center gap-2 mb-2">
-                        <Clock className="h-4 w-4 text-red-500" />
-                        <span className="text-sm text-red-700">
+                      <div className="flex items-center gap-3">
+                        <Clock className="h-4 w-4 text-destructive/70" />
+                        <span className="font-mono text-destructive/90">
                           {format(new Date(timeBlock.start_time), "HH:mm")} - {format(new Date(timeBlock.end_time), "HH:mm")}
                         </span>
                       </div>
                       {timeBlock.reason && (
-                        <p className="text-sm text-red-700 mt-2">
-                          <strong>Motivo:</strong> {timeBlock.reason}
-                        </p>
+                        <div className="bg-white/60 rounded-lg p-3 border border-destructive/10">
+                          <p className="text-sm text-destructive/80">
+                            <span className="font-medium">Motivo:</span> {timeBlock.reason}
+                          </p>
+                        </div>
                       )}
                     </div>
                     <div className="flex gap-2 ml-4">
@@ -176,18 +203,18 @@ const StaffAvailabilityCard = ({
                         variant="outline"
                         size="sm"
                         onClick={() => onEditTimeBlock(timeBlock)}
-                        className="h-8 w-8 p-0 border-red-200 hover:bg-red-50"
+                        className="btn-interactive h-9 w-9 p-0 border-destructive/30 hover:bg-destructive/10 hover:border-destructive/50"
                       >
-                        <Edit className="h-3 w-3 text-red-600" />
+                        <Edit className="h-4 w-4 text-destructive" />
                       </Button>
                       <Button
                         variant="outline"
                         size="sm"
                         onClick={() => onDeleteTimeBlock(timeBlock.id)}
                         disabled={isDeleting}
-                        className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200"
+                        className="btn-interactive h-9 w-9 p-0 border-destructive/30 hover:bg-destructive hover:text-white"
                       >
-                        <Trash2 className="h-3 w-3" />
+                        <Trash2 className="h-4 w-4" />
                       </Button>
                     </div>
                   </div>
@@ -229,11 +256,13 @@ const StaffAvailabilityCard = ({
 
         {/* Estado sin excepciones */}
         {timeBlocks.length === 0 && (
-          <div className="text-center py-6 text-gray-500 bg-gray-25 rounded-lg">
-            <Calendar className="h-6 w-6 mx-auto mb-2 text-gray-300" />
-            <p className="text-sm font-medium">Sin excepciones de disponibilidad</p>
-            <p className="text-xs text-gray-400 mt-1">
-              Disponible según horarios configurados por día ({getWorkingDays() || 'L-V'})
+          <div className="text-center py-12 bg-background-subtle rounded-xl border border-dashed border-border">
+            <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
+              <Calendar className="h-8 w-8 text-muted-foreground/50" />
+            </div>
+            <h4 className="font-semibold text-foreground mb-2">Sin excepciones programadas</h4>
+            <p className="text-sm text-muted-foreground max-w-sm mx-auto">
+              Personal disponible según horarios configurados ({getWorkingDays() || 'Sin horarios'})
             </p>
           </div>
         )}

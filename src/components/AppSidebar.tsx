@@ -23,6 +23,7 @@ import {
   SidebarMenuItem,
   SidebarHeader,
   SidebarFooter,
+  useSidebar,
 } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
 import { useBusiness } from "@/hooks/useBusiness";
@@ -82,6 +83,9 @@ export function AppSidebar() {
   const { business, isLoading } = useBusiness();
   const { signOut } = useAuth();
   const { toast } = useToast();
+  const { state } = useSidebar();
+  
+  const collapsed = state === "collapsed";
 
   const handleSignOut = async () => {
     const { error } = await signOut();
@@ -103,17 +107,19 @@ export function AppSidebar() {
 
   return (
     <Sidebar>
-      <SidebarHeader className="p-4">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-            <span className="text-white font-bold text-sm">R</span>
+      <SidebarHeader className="p-4 border-b border-border/50">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center shadow-sm">
+            <span className="text-primary-foreground font-bold text-lg">R</span>
           </div>
-          <div>
-            <h2 className="font-semibold text-lg">ReservaFácil</h2>
-            {business?.name && (
-              <p className="text-xs text-muted-foreground">{business.name}</p>
-            )}
-          </div>
+          {!collapsed && (
+            <div className="page-transition">
+              <h2 className="font-semibold text-lg text-foreground">ReservaFácil</h2>
+              {business?.name && (
+                <p className="text-xs text-muted-foreground truncate">{business.name}</p>
+              )}
+            </div>
+          )}
         </div>
       </SidebarHeader>
       
@@ -139,7 +145,7 @@ export function AppSidebar() {
                     >
                       <Link to={item.url}>
                         <item.icon className="h-4 w-4" />
-                        <span>{item.title}</span>
+                        {!collapsed && <span className="page-transition">{item.title}</span>}
                       </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
@@ -150,18 +156,20 @@ export function AppSidebar() {
         </SidebarGroup>
       </SidebarContent>
       
-      <SidebarFooter className="p-4 space-y-4">
+      <SidebarFooter className="p-4 space-y-4 border-t border-border/50">
         <Button 
           variant="outline" 
           onClick={handleSignOut}
-          className="w-full justify-start"
+          className="btn-interactive w-full justify-start hover-glow bg-background hover:bg-muted"
         >
           <LogOut className="h-4 w-4 mr-2" />
-          Cerrar Sesión
+          {!collapsed && <span className="page-transition">Cerrar Sesión</span>}
         </Button>
-        <div className="text-xs text-muted-foreground">
-          © 2024 ReservaFácil
-        </div>
+        {!collapsed && (
+          <div className="text-xs text-muted-foreground page-transition">
+            © 2024 ReservaFácil
+          </div>
+        )}
       </SidebarFooter>
     </Sidebar>
   );

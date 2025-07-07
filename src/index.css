@@ -6,33 +6,54 @@
 
 @layer base {
   :root {
+    /* Enhanced Background System */
     --background: 0 0% 100%;
+    --background-subtle: 210 40% 98%;
+    --background-elevated: 0 0% 100%;
     --foreground: 222.2 84% 4.9%;
 
+    /* Enhanced Card System */
     --card: 0 0% 100%;
     --card-foreground: 222.2 84% 4.9%;
+    --card-elevated: 0 0% 100%;
+    --card-subtle: 210 40% 98%;
 
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    /* Enhanced Primary System */
+    --primary: 213 94% 68%;
+    --primary-foreground: 0 0% 100%;
+    --primary-hover: 213 94% 60%;
+    --primary-subtle: 213 100% 96%;
 
+    /* Enhanced Secondary System */
     --secondary: 210 40% 96.1%;
     --secondary-foreground: 222.2 47.4% 11.2%;
+    --secondary-hover: 210 40% 92%;
 
+    /* Enhanced Muted System */
     --muted: 210 40% 96.1%;
     --muted-foreground: 215.4 16.3% 46.9%;
+    --muted-hover: 210 40% 92%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    /* Enhanced Accent System */
+    --accent: 213 100% 96%;
+    --accent-foreground: 213 94% 30%;
+    --accent-hover: 213 100% 92%;
 
+    /* Enhanced Destructive System */
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
+    --destructive-hover: 0 84.2% 55%;
+    --destructive-subtle: 0 100% 97%;
 
+    /* Enhanced Border and Input System */
     --border: 214.3 31.8% 91.4%;
+    --border-input: 214.3 31.8% 87%;
     --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    --input-focus: 213 94% 68%;
+    --ring: 213 94% 68%;
 
     --radius: 0.5rem;
 
@@ -99,5 +120,89 @@
 
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+/* Enhanced Animation and Interaction System */
+@layer components {
+  /* Card elevation system */
+  .card-elevated {
+    @apply shadow-lg hover:shadow-xl transition-all duration-300;
+  }
+  
+  .card-interactive {
+    @apply hover:-translate-y-1 transition-all duration-300 cursor-pointer;
+  }
+
+  /* Button micro-interactions */
+  .btn-interactive {
+    @apply transition-all duration-200 active:scale-95;
+  }
+
+  /* Input focus enhancements */
+  .input-enhanced {
+    @apply transition-all duration-200 focus:ring-2 focus:ring-primary/20 focus:border-primary;
+  }
+
+  /* Loading animations */
+  .loading-shimmer {
+    @apply animate-pulse bg-gradient-to-r from-muted via-muted-hover to-muted bg-[length:200%_100%];
+    animation: shimmer 2s infinite;
+  }
+
+  /* Smooth page transitions */
+  .page-transition {
+    @apply opacity-0 translate-y-4;
+    animation: fadeInUp 0.6s ease-out forwards;
+  }
+
+  /* Status indicators */
+  .status-indicator {
+    @apply inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium;
+  }
+
+  /* Hover effects */
+  .hover-lift {
+    @apply transition-transform duration-300 hover:-translate-y-1;
+  }
+
+  .hover-glow {
+    @apply transition-all duration-300 hover:shadow-lg hover:shadow-primary/25;
+  }
+}
+
+@layer utilities {
+  /* Custom animations */
+  @keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+  }
+
+  @keyframes fadeInUp {
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes slideInRight {
+    from {
+      opacity: 0;
+      transform: translateX(100%);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  /* Focus ring improvements */
+  .focus-ring {
+    @apply focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2;
+  }
+
+  /* Smooth scrolling */
+  .smooth-scroll {
+    scroll-behavior: smooth;
   }
 }

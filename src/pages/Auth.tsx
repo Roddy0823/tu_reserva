@@ -132,16 +132,16 @@ const Auth = () => {
               <p className="text-gray-600">Gestiona tu negocio de manera inteligente</p>
             </div>
 
-            <Card className="shadow-2xl border-0">
-              <CardHeader className="text-center pb-6">
-                <CardTitle className="text-2xl font-bold text-gray-900">
+            <Card className="card-elevated shadow-2xl border-0 bg-card/90 backdrop-blur-sm">
+              <CardHeader className="text-center pb-6 bg-gradient-to-b from-background-subtle to-background rounded-t-lg">
+                <CardTitle className="text-2xl font-bold text-foreground">
                   Bienvenido de vuelta
                 </CardTitle>
-                <CardDescription className="text-gray-600">
+                <CardDescription className="text-muted-foreground">
                   Inicia sesión para acceder a tu panel de control
                 </CardDescription>
               </CardHeader>
-              <CardContent>
+              <CardContent className="p-6">
                 <Tabs defaultValue="signin" className="w-full">
                   <TabsList className="grid w-full grid-cols-2 mb-6">
                     <TabsTrigger 
@@ -170,11 +170,11 @@ const Auth = () => {
                           type="email"
                           placeholder="tu@email.com"
                           required
-                          className="h-12 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                          className="input-enhanced h-12 transition-all duration-200 focus:ring-2 focus:ring-primary/20 focus:border-primary"
                         />
                       </div>
                       <div className="space-y-2">
-                        <Label htmlFor="signin-password" className="text-gray-700 font-medium">
+                        <Label htmlFor="signin-password" className="text-foreground font-medium">
                           Contraseña
                         </Label>
                         <Input
@@ -183,12 +183,12 @@ const Auth = () => {
                           type="password"
                           placeholder="••••••••"
                           required
-                          className="h-12 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                          className="input-enhanced h-12 transition-all duration-200 focus:ring-2 focus:ring-primary/20 focus:border-primary"
                         />
                       </div>
                       <Button 
                         type="submit" 
-                        className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white font-medium text-base"
+                        className="btn-interactive w-full h-12 bg-primary hover:bg-primary-hover text-primary-foreground font-medium text-base shadow-lg hover:shadow-xl transition-all duration-200"
                         disabled={isLoading}
                       >
                         {isLoading ? (
@@ -215,11 +215,11 @@ const Auth = () => {
                           type="email"
                           placeholder="tu@email.com"
                           required
-                          className="h-12 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                          className="input-enhanced h-12 transition-all duration-200 focus:ring-2 focus:ring-primary/20 focus:border-primary"
                         />
                       </div>
                       <div className="space-y-2">
-                        <Label htmlFor="signup-password" className="text-gray-700 font-medium">
+                        <Label htmlFor="signup-password" className="text-foreground font-medium">
                           Contraseña
                         </Label>
                         <Input
@@ -229,15 +229,15 @@ const Auth = () => {
                           placeholder="••••••••"
                           required
                           minLength={6}
-                          className="h-12 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                          className="input-enhanced h-12 transition-all duration-200 focus:ring-2 focus:ring-primary/20 focus:border-primary"
                         />
                       </div>
-                      <p className="text-sm text-gray-600 text-center">
+                      <p className="text-sm text-muted-foreground text-center bg-muted/30 rounded-lg p-3">
                         Al crear una cuenta, aceptas nuestros términos de servicio y política de privacidad.
                       </p>
                       <Button 
                         type="submit" 
-                        className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white font-medium text-base"
+                        className="btn-interactive w-full h-12 bg-primary hover:bg-primary-hover text-primary-foreground font-medium text-base shadow-lg hover:shadow-xl transition-all duration-200"
                         disabled={isLoading}
                       >
                         {isLoading ? (
