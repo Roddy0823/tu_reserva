@@ -173,27 +173,33 @@ const StaffForm = ({ staffMember, services, onSubmit, onCancel, isLoading }: Sta
   };
 
   return (
-    <Card className="w-full max-w-5xl mx-auto shadow-xl border-0 bg-gradient-to-br from-white to-gray-50">
-      <CardHeader className="bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-t-lg">
-        <div className="flex justify-between items-center">
-          <div>
-            <CardTitle className="text-2xl font-bold">
-              {staffMember ? 'Editar Miembro del Personal' : 'Nuevo Miembro del Personal'}
-            </CardTitle>
-            <CardDescription className="text-blue-100">
-              {staffMember ? 'Modifica los datos del miembro del personal' : 'Agrega un nuevo miembro a tu equipo'}
-            </CardDescription>
+    <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-8 max-w-6xl">
+      <Card className="w-full shadow-xl border-0 bg-gradient-to-br from-card to-card-subtle">
+        <CardHeader className="bg-gradient-to-r from-primary to-primary-hover text-primary-foreground rounded-t-lg p-4 sm:p-6">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+            <div className="min-w-0 flex-1">
+              <CardTitle className="text-xl sm:text-2xl font-bold">
+                {staffMember ? 'Editar Personal' : 'Nuevo Personal'}
+              </CardTitle>
+              <CardDescription className="text-primary-foreground/80 text-sm sm:text-base">
+                {staffMember ? 'Modifica los datos del miembro del personal' : 'Agrega un nuevo miembro a tu equipo'}
+              </CardDescription>
+            </div>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={onCancel} 
+              className="text-primary-foreground hover:bg-white/20 self-start sm:self-center"
+            >
+              <X className="h-4 w-4" />
+            </Button>
           </div>
-          <Button variant="ghost" size="sm" onClick={onCancel} className="text-white hover:bg-white/20">
-            <X className="h-4 w-4" />
-          </Button>
-        </div>
-      </CardHeader>
-      
-      <CardContent className="p-8">
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-8">
-            <div className="grid md:grid-cols-2 gap-8">
+        </CardHeader>
+        
+        <CardContent className="p-4 sm:p-6 lg:p-8">
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6 sm:space-y-8">
+              <div className="grid lg:grid-cols-2 gap-6 sm:gap-8">
               {/* Sección de foto */}
               <StaffPhotoSection
                 photoUrl={photoUrl}
@@ -216,25 +222,31 @@ const StaffForm = ({ staffMember, services, onSubmit, onCancel, isLoading }: Sta
               onServiceToggle={handleServiceToggle}
             />
 
-            <div className="flex justify-end space-x-4 pt-6 border-t border-gray-200">
-              <Button type="button" variant="outline" onClick={onCancel} className="px-8">
-                Cancelar
-              </Button>
-              <Button 
-                type="submit" 
-                disabled={isLoading || isUpdatingServices || isUploading}
-                className="px-8 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800"
-              >
-                {isLoading || isUpdatingServices || isUploading 
-                  ? 'Guardando...' 
-                  : staffMember ? 'Actualizar' : 'Agregar'
-                }
-              </Button>
-            </div>
-          </form>
-        </Form>
-      </CardContent>
-    </Card>
+              <div className="flex flex-col sm:flex-row justify-end gap-3 sm:space-x-4 pt-6 border-t border-border">
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  onClick={onCancel} 
+                  className="w-full sm:w-auto px-6 sm:px-8"
+                >
+                  Cancelar
+                </Button>
+                <Button 
+                  type="submit" 
+                  disabled={isLoading || isUpdatingServices || isUploading}
+                  className="w-full sm:w-auto px-6 sm:px-8 bg-gradient-to-r from-primary to-primary-hover hover:from-primary-hover hover:to-primary"
+                >
+                  {isLoading || isUpdatingServices || isUploading 
+                    ? 'Guardando...' 
+                    : staffMember ? 'Actualizar' : 'Agregar'
+                  }
+                </Button>
+              </div>
+            </form>
+          </Form>
+        </CardContent>
+      </Card>
+    </div>
   );
 };
 

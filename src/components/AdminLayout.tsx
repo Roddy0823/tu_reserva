@@ -46,32 +46,39 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
     <SidebarProvider>
       <div className="min-h-screen flex w-full">
         <AppSidebar />
-        <SidebarInset>
-          {/* Solo mostrar header si hay negocio o estamos en dashboard */}
+        <SidebarInset className="flex flex-col">
+          {/* Header responsivo */}
           {(business || location.pathname === '/dashboard') && (
-            <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
-              <div className="flex items-center gap-2 px-4">
-                <SidebarTrigger className="-ml-1" />
-                <Separator orientation="vertical" className="mr-2 h-4" />
-                <Breadcrumb>
-                  <BreadcrumbList>
-                    <BreadcrumbItem className="hidden md:block">
-                      <BreadcrumbLink href="/dashboard">
-                        Panel de Administración
+            <header className="flex h-14 sm:h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12 border-b border-border/50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+              <div className="flex items-center gap-2 px-3 sm:px-4 w-full">
+                <SidebarTrigger className="-ml-1 h-8 w-8 sm:h-9 sm:w-9" />
+                <Separator orientation="vertical" className="mr-2 h-4 hidden sm:block" />
+                <Breadcrumb className="flex-1 min-w-0">
+                  <BreadcrumbList className="flex items-center gap-1 sm:gap-2">
+                    <BreadcrumbItem className="hidden lg:block">
+                      <BreadcrumbLink 
+                        href="/dashboard"
+                        className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                      >
+                        Panel
                       </BreadcrumbLink>
                     </BreadcrumbItem>
-                    <BreadcrumbSeparator className="hidden md:block" />
-                    <BreadcrumbItem>
-                      <BreadcrumbPage>{getBreadcrumbs()}</BreadcrumbPage>
+                    <BreadcrumbSeparator className="hidden lg:block" />
+                    <BreadcrumbItem className="min-w-0 flex-1">
+                      <BreadcrumbPage className="text-sm font-medium text-foreground truncate">
+                        {getBreadcrumbs()}
+                      </BreadcrumbPage>
                     </BreadcrumbItem>
                   </BreadcrumbList>
                 </Breadcrumb>
               </div>
             </header>
           )}
-          <div className="flex-1 overflow-auto">
-            {children}
-          </div>
+          <main className="flex-1 overflow-auto">
+            <div className="h-full">
+              {children}
+            </div>
+          </main>
         </SidebarInset>
       </div>
     </SidebarProvider>

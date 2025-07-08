@@ -156,30 +156,35 @@ const ServiceForm = ({ service, onSubmit, onCancel, isLoading }: ServiceFormProp
   };
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-4xl">
-      <Card className="shadow-xl border-0 bg-gradient-to-br from-white to-gray-50">
-        <CardHeader className="bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-t-lg">
-          <div className="flex justify-between items-center">
-            <div>
-              <CardTitle className="text-2xl font-bold">
+    <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-8 max-w-6xl">
+      <Card className="shadow-xl border-0 bg-gradient-to-br from-card to-card-subtle">
+        <CardHeader className="bg-gradient-to-r from-primary to-primary-hover text-primary-foreground rounded-t-lg p-4 sm:p-6">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+            <div className="min-w-0 flex-1">
+              <CardTitle className="text-xl sm:text-2xl font-bold">
                 {service ? 'Editar Servicio' : 'Nuevo Servicio'}
               </CardTitle>
-              <CardDescription className="text-blue-100 mt-2">
+              <CardDescription className="text-primary-foreground/80 mt-2 text-sm sm:text-base">
                 {service ? 'Modifica los datos del servicio' : 'Crea un nuevo servicio para tu negocio'}
               </CardDescription>
             </div>
-            <Button variant="ghost" size="sm" onClick={onCancel} className="text-white hover:bg-blue-800">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={onCancel} 
+              className="text-primary-foreground hover:bg-white/20 self-start sm:self-center"
+            >
               <X className="h-5 w-5" />
             </Button>
           </div>
         </CardHeader>
         
-        <CardContent className="p-8">
+        <CardContent className="p-4 sm:p-6 lg:p-8">
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-8">
+            <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6 sm:space-y-8">
               
               {/* Información Básica */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
                 <div className="space-y-6">
                   <div>
                     <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">

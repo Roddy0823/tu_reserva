@@ -35,57 +35,61 @@ const AppointmentCard = ({ appointment, onEdit }: AppointmentCardProps) => {
   const availableActions = getAvailableActions(appointment);
 
   return (
-    <Card className={`transition-all duration-200 hover:shadow-lg ${isOngoing ? 'ring-2 ring-blue-500' : ''}`}>
-      <CardHeader className="pb-3">
-        <div className="flex justify-between items-start">
-          <div className="space-y-1">
-            <div className="flex items-center gap-2">
-              <h3 className="font-semibold text-lg">{appointment.client_name}</h3>
-              <Badge className={statusInfo.color}>
-                {statusInfo.text}
-              </Badge>
-              {isOngoing && (
-                <Badge variant="secondary" className="bg-blue-100 text-blue-800">
-                  En curso
+    <Card className={`transition-all duration-200 hover:shadow-lg ${isOngoing ? 'ring-2 ring-primary' : ''} card-interactive`}>
+      <CardHeader className="pb-3 p-4 sm:p-6">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3">
+          <div className="space-y-2 min-w-0 flex-1">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+              <h3 className="font-semibold text-base sm:text-lg text-foreground truncate">
+                {appointment.client_name}
+              </h3>
+              <div className="flex flex-wrap gap-2">
+                <Badge className={statusInfo.color}>
+                  {statusInfo.text}
                 </Badge>
-              )}
+                {isOngoing && (
+                  <Badge variant="secondary" className="bg-primary/10 text-primary text-xs">
+                    En curso
+                  </Badge>
+                )}
+              </div>
             </div>
-            <p className="text-sm text-gray-600">{appointment.services.name}</p>
+            <p className="text-sm text-muted-foreground">{appointment.services.name}</p>
           </div>
-          <div className="text-right">
-            <p className="text-sm font-medium">
+          <div className="text-left sm:text-right flex-shrink-0">
+            <p className="text-sm font-medium text-foreground">
               {format(startTime, "HH:mm")} - {format(endTime, "HH:mm")}
             </p>
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-muted-foreground">
               {appointment.services.duration_minutes} min
             </p>
           </div>
         </div>
       </CardHeader>
       
-      <CardContent className="space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+      <CardContent className="space-y-4 p-4 sm:p-6 pt-0">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
           <div className="flex items-center gap-2">
-            <User className="h-4 w-4 text-gray-400" />
-            <span>{appointment.staff_members.full_name}</span>
+            <User className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+            <span className="truncate">{appointment.staff_members.full_name}</span>
           </div>
           <div className="flex items-center gap-2">
-            <DollarSign className="h-4 w-4 text-gray-400" />
+            <DollarSign className="h-4 w-4 text-muted-foreground flex-shrink-0" />
             <span>${appointment.services.price.toLocaleString()}</span>
           </div>
           {appointment.client_phone && (
             <div className="flex items-center gap-2">
-              <Phone className="h-4 w-4 text-gray-400" />
-              <span>{appointment.client_phone}</span>
+              <Phone className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+              <span className="truncate">{appointment.client_phone}</span>
             </div>
           )}
           <div className="flex items-center gap-2">
-            <Mail className="h-4 w-4 text-gray-400" />
+            <Mail className="h-4 w-4 text-muted-foreground flex-shrink-0" />
             <span className="truncate">{appointment.client_email}</span>
           </div>
         </div>
 
-        <div className="flex flex-wrap gap-2 pt-2 border-t">
+        <div className="flex flex-wrap gap-2 pt-3 border-t border-border">
           {/* Renderizar botones según acciones disponibles */}
           {availableActions.map((action) => (
             <Button
@@ -94,12 +98,17 @@ const AppointmentCard = ({ appointment, onEdit }: AppointmentCardProps) => {
               variant={action.variant as any || "default"}
               onClick={() => handleStatusUpdate(action.action)}
               disabled={isUpdating}
-              className={`gap-1 ${action.variant === 'outline' && action.action === 'cancelado' ? 'text-red-600 hover:text-red-700' : ''}`}
+              className={`gap-1 text-xs sm:text-sm ${action.variant === 'outline' && action.action === 'cancelado' ? 'text-destructive hover:text-destructive' : ''}`}
             >
               {action.action === 'confirmado' && <CheckCircle className="h-3 w-3" />}
               {action.action === 'completado' && <CheckCircle className="h-3 w-3" />}
               {action.action === 'cancelado' && <XCircle className="h-3 w-3" />}
-              {action.label}
+              <span className="hidden sm:inline">{action.label}</span>
+              <span className="sm:hidden">
+                {action.action === 'confirmado' && 'Conf.'}
+                {action.action === 'completado' && 'Comp.'}
+                {action.action === 'cancelado' && 'Canc.'}
+              </span>
             </Button>
           ))}
 
@@ -109,20 +118,20 @@ const AppointmentCard = ({ appointment, onEdit }: AppointmentCardProps) => {
               size="sm"
               variant="outline"
               onClick={() => onEdit(appointment)}
-              className="gap-1"
+              className="gap-1 text-xs sm:text-sm"
             >
               <Edit className="h-3 w-3" />
-              Editar
+              <span className="hidden sm:inline">Editar</span>
             </Button>
           )}
-
-          {/* Información adicional para citas pendientes */}
-          {appointment.status === 'pendiente' && appointment.services.accepts_transfer && appointment.payment_status === 'pendiente' && (
-            <div className="w-full mt-2 p-2 bg-amber-50 border border-amber-200 rounded text-sm text-amber-800">
-              ⏳ Esperando aprobación de comprobante de pago
-            </div>
-          )}
         </div>
+
+        {/* Información adicional para citas pendientes */}
+        {appointment.status === 'pendiente' && appointment.services.accepts_transfer && appointment.payment_status === 'pendiente' && (
+          <div className="w-full mt-3 p-3 bg-amber-50 border border-amber-200 rounded text-xs sm:text-sm text-amber-800">
+            ⏳ Esperando aprobación de comprobante de pago
+          </div>
+        )}
       </CardContent>
     </Card>
   );

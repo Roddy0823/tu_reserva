@@ -47,29 +47,29 @@ const AppointmentsList = ({ appointments, onEdit, onRefresh, isLoading }: Appoin
   });
 
   return (
-    <div className="space-y-6">
-      {/* Filters */}
-      <div className="bg-white p-4 rounded-lg border shadow-sm">
-        <div className="flex flex-col lg:flex-row gap-4">
-          <div className="flex-1">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-              <Input
-                placeholder="Buscar por cliente, email o servicio..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-9"
-              />
-            </div>
+    <div className="space-y-4 sm:space-y-6 p-4 sm:p-6">
+      {/* Filtros responsivos */}
+      <div className="bg-card p-4 sm:p-6 rounded-lg border shadow-sm">
+        <div className="space-y-4">
+          {/* Barra de búsqueda */}
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+            <Input
+              placeholder="Buscar por cliente, email o servicio..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-9 h-10 sm:h-11"
+            />
           </div>
           
-          <div className="flex gap-2">
+          {/* Filtros en grid responsivo */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-3">
             <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-40">
+              <SelectTrigger className="h-10 sm:h-11 text-sm">
                 <SelectValue placeholder="Estado" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Todos los estados</SelectItem>
+                <SelectItem value="all">Todos</SelectItem>
                 <SelectItem value="pendiente">Pendiente</SelectItem>
                 <SelectItem value="confirmado">Confirmada</SelectItem>
                 <SelectItem value="completado">Completada</SelectItem>
@@ -78,7 +78,7 @@ const AppointmentsList = ({ appointments, onEdit, onRefresh, isLoading }: Appoin
             </Select>
 
             <Select value={staffFilter} onValueChange={setStaffFilter}>
-              <SelectTrigger className="w-40">
+              <SelectTrigger className="h-10 sm:h-11 text-sm">
                 <SelectValue placeholder="Personal" />
               </SelectTrigger>
               <SelectContent>
@@ -92,22 +92,24 @@ const AppointmentsList = ({ appointments, onEdit, onRefresh, isLoading }: Appoin
             {onRefresh && (
               <Button
                 variant="outline"
-                size="icon"
+                size="sm"
                 onClick={onRefresh}
                 disabled={isLoading}
-                className="shrink-0"
+                className="h-10 sm:h-11 col-span-2 sm:col-span-1"
               >
-                <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
+                <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''} sm:mr-2`} />
+                <span className="hidden sm:inline">Actualizar</span>
               </Button>
             )}
           </div>
-        </div>
 
-        <div className="flex items-center gap-2 mt-3 text-sm text-gray-600">
-          <Filter className="h-4 w-4" />
-          <span>
-            Mostrando {filteredAppointments.length} de {appointments.length} citas
-          </span>
+          {/* Contador de resultados */}
+          <div className="flex items-center gap-2 text-xs sm:text-sm text-muted-foreground">
+            <Filter className="h-4 w-4" />
+            <span>
+              Mostrando {filteredAppointments.length} de {appointments.length} citas
+            </span>
+          </div>
         </div>
       </div>
 
