@@ -7,7 +7,10 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
-import Dashboard from "./components/Dashboard";
+import EnhancedDashboard from "./components/dashboard/EnhancedDashboard";
+import AppointmentCenter from "./pages/AppointmentCenter";
+import CatalogManagement from "./pages/CatalogManagement";
+import ClientCRM from "./pages/ClientCRM";
 import Services from "./pages/Services";
 import Staff from "./pages/Staff";
 import SettingsPage from "./pages/Settings";
@@ -47,7 +50,7 @@ function AppContent() {
       <Route path="/dashboard" element={
         user ? (
           <AdminLayout>
-            <Dashboard />
+            <EnhancedDashboard />
           </AdminLayout>
         ) : <Navigate to="/auth" replace />
       } />
@@ -75,7 +78,21 @@ function AppContent() {
       <Route path="/appointments" element={
         user ? (
           <AdminLayout>
-            <AllAppointments />
+            <AppointmentCenter />
+          </AdminLayout>
+        ) : <Navigate to="/auth" replace />
+      } />
+      <Route path="/catalog" element={
+        user ? (
+          <AdminLayout>
+            <CatalogManagement />
+          </AdminLayout>
+        ) : <Navigate to="/auth" replace />
+      } />
+      <Route path="/clients" element={
+        user ? (
+          <AdminLayout>
+            <ClientCRM />
           </AdminLayout>
         ) : <Navigate to="/auth" replace />
       } />

@@ -2,12 +2,9 @@
 import { 
   Home, 
   Package, 
-  CalendarDays, 
-  Calendar,
   CalendarCheck,
-  CheckCircle,
-  CreditCard, 
-  Crown, 
+  Users,
+  BarChart3,
   Settings,
   LogOut
 } from "lucide-react";
@@ -32,47 +29,32 @@ import { useToast } from "@/hooks/use-toast";
 
 const menuItems = [
   {
-    title: "Inicio",
+    title: "Dashboard",
     url: "/dashboard",
     icon: Home,
   },
   {
-    title: "Servicios",
-    url: "/services",
-    icon: Package,
-  },
-  {
-    title: "Gestión de Disponibilidad",
-    url: "/availability",
-    icon: CalendarDays,
-  },
-  {
-    title: "Gestión de Citas",
+    title: "Centro de Citas",
     url: "/appointments",
     icon: CalendarCheck,
   },
   {
-    title: "Citas de Hoy",
-    url: "/appointments/today",
-    icon: Calendar,
+    title: "Gestión de Catálogo",
+    url: "/catalog",
+    icon: Package,
   },
   {
-    title: "Citas Completadas",
-    url: "/appointments/completed",
-    icon: CheckCircle,
+    title: "CRM Clientes",
+    url: "/clients",
+    icon: Users,
   },
   {
-    title: "Transferencias",
-    url: "/transfers",
-    icon: CreditCard,
+    title: "Estadísticas",
+    url: "/reports",
+    icon: BarChart3,
   },
   {
-    title: "Mi Suscripción",
-    url: "/subscription",
-    icon: Crown,
-  },
-  {
-    title: "Ajustes",
+    title: "Configuración",
     url: "/settings",
     icon: Settings,
   },
