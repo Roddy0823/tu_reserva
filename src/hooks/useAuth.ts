@@ -64,9 +64,16 @@ export const useAuth = () => {
     });
 
     if (error) {
+      let errorMessage = error.message;
+      
+      // Provide more user-friendly error messages
+      if (error.message === "Invalid login credentials") {
+        errorMessage = "The email or password you entered is incorrect. Please check your credentials, ensure your email is confirmed, or try resetting your password.";
+      }
+      
       toast({
         title: "Error al iniciar sesión",
-        description: error.message,
+        description: errorMessage,
         variant: "destructive",
       });
     }
