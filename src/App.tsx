@@ -22,6 +22,7 @@ import AllAppointments from "@/pages/AllAppointments";
 import CompletedAppointments from "@/pages/CompletedAppointments";
 import Transfers from "@/pages/Transfers";
 import Subscription from "@/pages/Subscription";
+import Reports from "@/pages/Reports";
 import AdminLayout from "@/components/AdminLayout";
 
 const queryClient = new QueryClient();
@@ -121,6 +122,13 @@ function AppContent() {
         user ? (
           <AdminLayout>
             <Subscription />
+          </AdminLayout>
+        ) : <Navigate to="/auth" replace />
+      } />
+      <Route path="/reports" element={
+        user ? (
+          <AdminLayout>
+            <Reports />
           </AdminLayout>
         ) : <Navigate to="/auth" replace />
       } />

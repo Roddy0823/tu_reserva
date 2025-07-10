@@ -1,12 +1,11 @@
 
 import { useBusiness } from '@/hooks/useBusiness';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Settings as SettingsIcon, Bell, CreditCard, Building, Calendar } from 'lucide-react';
-import BusinessInfoSettings from '@/components/settings/BusinessInfoSettings';
-import BookingRulesSettings from '@/components/settings/BookingRulesSettings';
-import NotificationSettings from '@/components/settings/NotificationSettings';
-import BillingSettings from '@/components/settings/BillingSettings';
-import GoogleCalendarSettings from '@/components/settings/GoogleCalendarSettings';
+import { Building, Globe, Link, User } from 'lucide-react';
+import BusinessProfileSettings from '@/components/settings/BusinessProfileSettings';
+import PublicPageSettings from '@/components/settings/PublicPageSettings';
+import IntegrationsSettings from '@/components/settings/IntegrationsSettings';
+import AccountSettings from '@/components/settings/AccountSettings';
 
 const SettingsPage = () => {
   const { business, isLoading } = useBusiness();
@@ -32,54 +31,46 @@ const SettingsPage = () => {
   return (
     <div className="container py-8">
       <div className="mb-6">
-        <h1 className="text-3xl font-bold">Configuración del Negocio</h1>
-        <p className="text-gray-600 mt-2">
-          Gestiona la configuración y ajustes de tu negocio
+        <h1 className="text-3xl font-bold">Configuración</h1>
+        <p className="text-muted-foreground mt-2">
+          Gestiona toda la configuración de tu negocio y cuenta
         </p>
       </div>
 
-      <Tabs defaultValue="business-info" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-5">
-          <TabsTrigger value="business-info" className="flex items-center gap-2">
+      <Tabs defaultValue="business-profile" className="space-y-6">
+        <TabsList className="grid w-full grid-cols-4">
+          <TabsTrigger value="business-profile" className="flex items-center gap-2">
             <Building className="h-4 w-4" />
-            Información
+            Perfil del Negocio
           </TabsTrigger>
-          <TabsTrigger value="booking-rules" className="flex items-center gap-2">
-            <SettingsIcon className="h-4 w-4" />
-            Reglas de Reserva
+          <TabsTrigger value="public-page" className="flex items-center gap-2">
+            <Globe className="h-4 w-4" />
+            Página Pública
           </TabsTrigger>
-          <TabsTrigger value="google-calendar" className="flex items-center gap-2">
-            <Calendar className="h-4 w-4" />
-            Google Calendar
+          <TabsTrigger value="integrations" className="flex items-center gap-2">
+            <Link className="h-4 w-4" />
+            Integraciones
           </TabsTrigger>
-          <TabsTrigger value="notifications" className="flex items-center gap-2">
-            <Bell className="h-4 w-4" />
-            Notificaciones
-          </TabsTrigger>
-          <TabsTrigger value="billing" className="flex items-center gap-2">
-            <CreditCard className="h-4 w-4" />
-            Facturación
+          <TabsTrigger value="account" className="flex items-center gap-2">
+            <User className="h-4 w-4" />
+            Cuenta
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="business-info">
-          <BusinessInfoSettings business={business} />
+        <TabsContent value="business-profile">
+          <BusinessProfileSettings business={business} />
         </TabsContent>
 
-        <TabsContent value="booking-rules">
-          <BookingRulesSettings business={business} />
+        <TabsContent value="public-page">
+          <PublicPageSettings business={business} />
         </TabsContent>
 
-        <TabsContent value="google-calendar">
-          <GoogleCalendarSettings />
+        <TabsContent value="integrations">
+          <IntegrationsSettings />
         </TabsContent>
 
-        <TabsContent value="notifications">
-          <NotificationSettings business={business} />
-        </TabsContent>
-
-        <TabsContent value="billing">
-          <BillingSettings business={business} />
+        <TabsContent value="account">
+          <AccountSettings business={business} />
         </TabsContent>
       </Tabs>
     </div>
