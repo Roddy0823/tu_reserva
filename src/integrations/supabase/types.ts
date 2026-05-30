@@ -634,6 +634,20 @@ export type Database = {
     }
     Functions: {
       can_accept_booking: { Args: { business_uuid: string }; Returns: boolean }
+      cleanup_broken_payment_proof_urls: { Args: never; Returns: number }
+      create_appointment_safely: {
+        Args: {
+          p_business_id: string
+          p_client_email: string
+          p_client_name: string
+          p_client_phone: string
+          p_end_time: string
+          p_service_id: string
+          p_staff_id: string
+          p_start_time: string
+        }
+        Returns: Json
+      }
     }
     Enums: {
       appointment_status:
