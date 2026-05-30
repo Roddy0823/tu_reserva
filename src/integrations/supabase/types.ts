@@ -14,16 +14,649 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      appointments: {
+        Row: {
+          business_id: string
+          client_email: string
+          client_name: string
+          client_phone: string | null
+          created_at: string
+          end_time: string
+          id: string
+          payment_proof_url: string | null
+          payment_status:
+            | Database["public"]["Enums"]["payment_validation_status"]
+            | null
+          service_id: string
+          staff_id: string
+          start_time: string
+          status: Database["public"]["Enums"]["appointment_status"]
+        }
+        Insert: {
+          business_id: string
+          client_email: string
+          client_name: string
+          client_phone?: string | null
+          created_at?: string
+          end_time: string
+          id?: string
+          payment_proof_url?: string | null
+          payment_status?:
+            | Database["public"]["Enums"]["payment_validation_status"]
+            | null
+          service_id: string
+          staff_id: string
+          start_time: string
+          status?: Database["public"]["Enums"]["appointment_status"]
+        }
+        Update: {
+          business_id?: string
+          client_email?: string
+          client_name?: string
+          client_phone?: string | null
+          created_at?: string
+          end_time?: string
+          id?: string
+          payment_proof_url?: string | null
+          payment_status?:
+            | Database["public"]["Enums"]["payment_validation_status"]
+            | null
+          service_id?: string
+          staff_id?: string
+          start_time?: string
+          status?: Database["public"]["Enums"]["appointment_status"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "appointments_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "appointments_service_id_fkey"
+            columns: ["service_id"]
+            isOneToOne: false
+            referencedRelation: "services"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "appointments_staff_id_fkey"
+            columns: ["staff_id"]
+            isOneToOne: false
+            referencedRelation: "staff_members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      business_settings: {
+        Row: {
+          allow_same_day_booking: boolean
+          auto_confirm_bookings: boolean
+          browser_notifications: boolean
+          business_id: string
+          cancellation_hours: number
+          cancellation_policy: string
+          cancellation_policy_text: string
+          created_at: string
+          email_booking_cancelled: boolean
+          email_booking_confirmed: boolean
+          email_daily_summary: boolean
+          email_new_booking: boolean
+          email_payment_received: boolean
+          email_weekly_report: boolean
+          id: string
+          max_advance_days: number
+          min_advance_hours: number
+          require_confirmation: boolean
+          sms_booking_reminder: boolean
+          sms_new_booking: boolean
+          sound_notifications: boolean
+          updated_at: string
+        }
+        Insert: {
+          allow_same_day_booking?: boolean
+          auto_confirm_bookings?: boolean
+          browser_notifications?: boolean
+          business_id: string
+          cancellation_hours?: number
+          cancellation_policy?: string
+          cancellation_policy_text?: string
+          created_at?: string
+          email_booking_cancelled?: boolean
+          email_booking_confirmed?: boolean
+          email_daily_summary?: boolean
+          email_new_booking?: boolean
+          email_payment_received?: boolean
+          email_weekly_report?: boolean
+          id?: string
+          max_advance_days?: number
+          min_advance_hours?: number
+          require_confirmation?: boolean
+          sms_booking_reminder?: boolean
+          sms_new_booking?: boolean
+          sound_notifications?: boolean
+          updated_at?: string
+        }
+        Update: {
+          allow_same_day_booking?: boolean
+          auto_confirm_bookings?: boolean
+          browser_notifications?: boolean
+          business_id?: string
+          cancellation_hours?: number
+          cancellation_policy?: string
+          cancellation_policy_text?: string
+          created_at?: string
+          email_booking_cancelled?: boolean
+          email_booking_confirmed?: boolean
+          email_daily_summary?: boolean
+          email_new_booking?: boolean
+          email_payment_received?: boolean
+          email_weekly_report?: boolean
+          id?: string
+          max_advance_days?: number
+          min_advance_hours?: number
+          require_confirmation?: boolean
+          sms_booking_reminder?: boolean
+          sms_new_booking?: boolean
+          sound_notifications?: boolean
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "business_settings_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: true
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      business_subscriptions: {
+        Row: {
+          business_id: string
+          created_at: string
+          current_period_end: string
+          current_period_start: string
+          id: string
+          plan_id: string
+          status: Database["public"]["Enums"]["subscription_status"]
+          stripe_subscription_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          business_id: string
+          created_at?: string
+          current_period_end?: string
+          current_period_start?: string
+          id?: string
+          plan_id: string
+          status?: Database["public"]["Enums"]["subscription_status"]
+          stripe_subscription_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          business_id?: string
+          created_at?: string
+          current_period_end?: string
+          current_period_start?: string
+          id?: string
+          plan_id?: string
+          status?: Database["public"]["Enums"]["subscription_status"]
+          stripe_subscription_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "business_subscriptions_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: true
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "business_subscriptions_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "subscription_plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      businesses: {
+        Row: {
+          address: string | null
+          bank_account_details: string | null
+          booking_url_slug: string
+          contact_email: string | null
+          contact_phone: string | null
+          created_at: string
+          description: string | null
+          id: string
+          logo_url: string | null
+          name: string
+          owner_user_id: string
+          updated_at: string
+        }
+        Insert: {
+          address?: string | null
+          bank_account_details?: string | null
+          booking_url_slug: string
+          contact_email?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          logo_url?: string | null
+          name: string
+          owner_user_id: string
+          updated_at?: string
+        }
+        Update: {
+          address?: string | null
+          bank_account_details?: string | null
+          booking_url_slug?: string
+          contact_email?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          logo_url?: string | null
+          name?: string
+          owner_user_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      monthly_usage: {
+        Row: {
+          business_id: string
+          completed_bookings: number
+          created_at: string
+          id: string
+          month: number
+          year: number
+        }
+        Insert: {
+          business_id: string
+          completed_bookings?: number
+          created_at?: string
+          id?: string
+          month: number
+          year: number
+        }
+        Update: {
+          business_id?: string
+          completed_bookings?: number
+          created_at?: string
+          id?: string
+          month?: number
+          year?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "monthly_usage_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      services: {
+        Row: {
+          accepts_cash: boolean | null
+          accepts_transfer: boolean | null
+          business_id: string
+          confirmation_message: string | null
+          created_at: string
+          description: string | null
+          duration_minutes: number
+          friday_end: string | null
+          friday_start: string | null
+          id: string
+          image_url: string | null
+          is_friday_active: boolean | null
+          is_monday_active: boolean | null
+          is_saturday_active: boolean | null
+          is_sunday_active: boolean | null
+          is_thursday_active: boolean | null
+          is_tuesday_active: boolean | null
+          is_wednesday_active: boolean | null
+          min_advance_days: number | null
+          monday_end: string | null
+          monday_start: string | null
+          name: string
+          price: number
+          saturday_end: string | null
+          saturday_start: string | null
+          sunday_end: string | null
+          sunday_start: string | null
+          thursday_end: string | null
+          thursday_start: string | null
+          tuesday_end: string | null
+          tuesday_start: string | null
+          wednesday_end: string | null
+          wednesday_start: string | null
+        }
+        Insert: {
+          accepts_cash?: boolean | null
+          accepts_transfer?: boolean | null
+          business_id: string
+          confirmation_message?: string | null
+          created_at?: string
+          description?: string | null
+          duration_minutes?: number
+          friday_end?: string | null
+          friday_start?: string | null
+          id?: string
+          image_url?: string | null
+          is_friday_active?: boolean | null
+          is_monday_active?: boolean | null
+          is_saturday_active?: boolean | null
+          is_sunday_active?: boolean | null
+          is_thursday_active?: boolean | null
+          is_tuesday_active?: boolean | null
+          is_wednesday_active?: boolean | null
+          min_advance_days?: number | null
+          monday_end?: string | null
+          monday_start?: string | null
+          name: string
+          price?: number
+          saturday_end?: string | null
+          saturday_start?: string | null
+          sunday_end?: string | null
+          sunday_start?: string | null
+          thursday_end?: string | null
+          thursday_start?: string | null
+          tuesday_end?: string | null
+          tuesday_start?: string | null
+          wednesday_end?: string | null
+          wednesday_start?: string | null
+        }
+        Update: {
+          accepts_cash?: boolean | null
+          accepts_transfer?: boolean | null
+          business_id?: string
+          confirmation_message?: string | null
+          created_at?: string
+          description?: string | null
+          duration_minutes?: number
+          friday_end?: string | null
+          friday_start?: string | null
+          id?: string
+          image_url?: string | null
+          is_friday_active?: boolean | null
+          is_monday_active?: boolean | null
+          is_saturday_active?: boolean | null
+          is_sunday_active?: boolean | null
+          is_thursday_active?: boolean | null
+          is_tuesday_active?: boolean | null
+          is_wednesday_active?: boolean | null
+          min_advance_days?: number | null
+          monday_end?: string | null
+          monday_start?: string | null
+          name?: string
+          price?: number
+          saturday_end?: string | null
+          saturday_start?: string | null
+          sunday_end?: string | null
+          sunday_start?: string | null
+          thursday_end?: string | null
+          thursday_start?: string | null
+          tuesday_end?: string | null
+          tuesday_start?: string | null
+          wednesday_end?: string | null
+          wednesday_start?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "services_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      staff_members: {
+        Row: {
+          business_id: string
+          created_at: string
+          email: string | null
+          friday_end_time: string | null
+          friday_start_time: string | null
+          full_name: string
+          id: string
+          is_active: boolean
+          monday_end_time: string | null
+          monday_start_time: string | null
+          photo_url: string | null
+          saturday_end_time: string | null
+          saturday_start_time: string | null
+          sunday_end_time: string | null
+          sunday_start_time: string | null
+          thursday_end_time: string | null
+          thursday_start_time: string | null
+          tuesday_end_time: string | null
+          tuesday_start_time: string | null
+          wednesday_end_time: string | null
+          wednesday_start_time: string | null
+          work_end_time: string | null
+          work_start_time: string | null
+          works_friday: boolean | null
+          works_monday: boolean | null
+          works_saturday: boolean | null
+          works_sunday: boolean | null
+          works_thursday: boolean | null
+          works_tuesday: boolean | null
+          works_wednesday: boolean | null
+        }
+        Insert: {
+          business_id: string
+          created_at?: string
+          email?: string | null
+          friday_end_time?: string | null
+          friday_start_time?: string | null
+          full_name: string
+          id?: string
+          is_active?: boolean
+          monday_end_time?: string | null
+          monday_start_time?: string | null
+          photo_url?: string | null
+          saturday_end_time?: string | null
+          saturday_start_time?: string | null
+          sunday_end_time?: string | null
+          sunday_start_time?: string | null
+          thursday_end_time?: string | null
+          thursday_start_time?: string | null
+          tuesday_end_time?: string | null
+          tuesday_start_time?: string | null
+          wednesday_end_time?: string | null
+          wednesday_start_time?: string | null
+          work_end_time?: string | null
+          work_start_time?: string | null
+          works_friday?: boolean | null
+          works_monday?: boolean | null
+          works_saturday?: boolean | null
+          works_sunday?: boolean | null
+          works_thursday?: boolean | null
+          works_tuesday?: boolean | null
+          works_wednesday?: boolean | null
+        }
+        Update: {
+          business_id?: string
+          created_at?: string
+          email?: string | null
+          friday_end_time?: string | null
+          friday_start_time?: string | null
+          full_name?: string
+          id?: string
+          is_active?: boolean
+          monday_end_time?: string | null
+          monday_start_time?: string | null
+          photo_url?: string | null
+          saturday_end_time?: string | null
+          saturday_start_time?: string | null
+          sunday_end_time?: string | null
+          sunday_start_time?: string | null
+          thursday_end_time?: string | null
+          thursday_start_time?: string | null
+          tuesday_end_time?: string | null
+          tuesday_start_time?: string | null
+          wednesday_end_time?: string | null
+          wednesday_start_time?: string | null
+          work_end_time?: string | null
+          work_start_time?: string | null
+          works_friday?: boolean | null
+          works_monday?: boolean | null
+          works_saturday?: boolean | null
+          works_sunday?: boolean | null
+          works_thursday?: boolean | null
+          works_tuesday?: boolean | null
+          works_wednesday?: boolean | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "staff_members_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      staff_services: {
+        Row: {
+          created_at: string
+          id: string
+          service_id: string
+          staff_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          service_id: string
+          staff_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          service_id?: string
+          staff_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "staff_services_service_id_fkey"
+            columns: ["service_id"]
+            isOneToOne: false
+            referencedRelation: "services"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "staff_services_staff_id_fkey"
+            columns: ["staff_id"]
+            isOneToOne: false
+            referencedRelation: "staff_members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      subscription_plans: {
+        Row: {
+          created_at: string
+          description: string
+          id: string
+          is_active: boolean
+          max_bookings_per_month: number | null
+          name: string
+          price_cop: number
+        }
+        Insert: {
+          created_at?: string
+          description?: string
+          id?: string
+          is_active?: boolean
+          max_bookings_per_month?: number | null
+          name: string
+          price_cop?: number
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          id?: string
+          is_active?: boolean
+          max_bookings_per_month?: number | null
+          name?: string
+          price_cop?: number
+        }
+        Relationships: []
+      }
+      time_blocks: {
+        Row: {
+          created_at: string
+          end_time: string
+          id: string
+          reason: string | null
+          staff_id: string
+          start_time: string
+        }
+        Insert: {
+          created_at?: string
+          end_time: string
+          id?: string
+          reason?: string | null
+          staff_id: string
+          start_time: string
+        }
+        Update: {
+          created_at?: string
+          end_time?: string
+          id?: string
+          reason?: string | null
+          staff_id?: string
+          start_time?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "time_blocks_staff_id_fkey"
+            columns: ["staff_id"]
+            isOneToOne: false
+            referencedRelation: "staff_members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      can_accept_booking: { Args: { business_uuid: string }; Returns: boolean }
+      cleanup_broken_payment_proof_urls: { Args: never; Returns: number }
+      create_appointment_safely: {
+        Args: {
+          p_business_id: string
+          p_client_email: string
+          p_client_name: string
+          p_client_phone: string
+          p_end_time: string
+          p_service_id: string
+          p_staff_id: string
+          p_start_time: string
+        }
+        Returns: Json
+      }
     }
     Enums: {
-      [_ in never]: never
+      appointment_status:
+        | "pendiente"
+        | "confirmado"
+        | "cancelado"
+        | "completado"
+      payment_validation_status: "pendiente" | "aprobado" | "rechazado"
+      subscription_status: "active" | "cancelled" | "past_due"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +783,15 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      appointment_status: [
+        "pendiente",
+        "confirmado",
+        "cancelado",
+        "completado",
+      ],
+      payment_validation_status: ["pendiente", "aprobado", "rechazado"],
+      subscription_status: ["active", "cancelled", "past_due"],
+    },
   },
 } as const
